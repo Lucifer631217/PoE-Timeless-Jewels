@@ -1,13 +1,12 @@
 ﻿<script lang="ts">
   import type { SavedJewelEntry } from '../favorite_jewels';
   import { createTradeSeedResult } from '../favorite_jewels';
-  import { formatBilingualStatHtml, openTrade } from '../skill_tree';
+  import { formatBilingualStatHtml, openTrade, type TradeCondition } from '../skill_tree';
 
   export let entry: SavedJewelEntry;
   export let league = 'Standard';
   export let twLeague = 'Standard';
-  export let buyout = true;
-  export let faceToFace = true;
+  export let tradeCondition: TradeCondition = 'instant_buyout';
   export let onEdit: (entry: SavedJewelEntry) => void;
   export let onDelete: (entry: SavedJewelEntry) => void;
 </script>
@@ -64,14 +63,14 @@
       type="button"
       class="intl-trade"
       on:click={() =>
-        openTrade(entry.jewel, entry.conqueror, [createTradeSeedResult(entry.seed)], 'PC', league, 'international', buyout, faceToFace)}>
+        openTrade(entry.jewel, entry.conqueror, [createTradeSeedResult(entry.seed)], 'PC', league, 'international', tradeCondition)}>
       國際服交易
     </button>
     <button
       type="button"
       class="tw-trade"
       on:click={() =>
-        openTrade(entry.jewel, entry.conqueror, [createTradeSeedResult(entry.seed)], 'PC', twLeague, 'tw', buyout, faceToFace)}>
+        openTrade(entry.jewel, entry.conqueror, [createTradeSeedResult(entry.seed)], 'PC', twLeague, 'tw', tradeCondition)}>
       台服交易
     </button>
   </div>

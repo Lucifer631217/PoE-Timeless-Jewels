@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import type { SearchResults, SearchWithSeed } from '../skill_tree';
+  import type { SearchResults, SearchWithSeed, TradeCondition } from '../skill_tree';
   import SearchResult from './SearchResult.svelte';
   import VirtualList from 'svelte-tiny-virtual-list';
 
@@ -12,8 +12,7 @@
   export let platform: string;
   export let league: string;
   export let twLeague: string;
-  export let buyout = true;
-  export let faceToFace = true;
+  export let tradeCondition: TradeCondition = 'instant_buyout';
 
   const computeSize = (r: SearchWithSeed) =>
     8 + 56 + r.skills.reduce((total, skill) => total + 36 + Object.keys(skill.stats).length * 24, 0);
@@ -54,8 +53,7 @@
                 {platform}
                 {league}
                 {twLeague}
-                {buyout}
-                {faceToFace} />
+                {tradeCondition} />
             </div>
           </VirtualList>
         </div>
@@ -79,8 +77,7 @@
           {platform}
           {league}
           {twLeague}
-          {buyout}
-          {faceToFace} />
+          {tradeCondition} />
       </div>
     </VirtualList>
   </div>

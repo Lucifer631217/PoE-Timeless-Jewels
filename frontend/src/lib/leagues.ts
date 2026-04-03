@@ -25,7 +25,7 @@ const isHardcoreLeague = (league: LeagueLike): boolean => {
   return /hardcore/i.test(name) || hasRule(league, /hardcore/i);
 };
 
-const isSoloSelfFoundLeague = (league: LeagueLike): boolean => {
+export const isSoloSelfFoundLeague = (league: LeagueLike): boolean => {
   const name = getLeagueName(league);
   return /solo self-found|\bssf\b/i.test(name) || hasRule(league, /solo self-found|noparties|\bssf\b/i);
 };

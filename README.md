@@ -60,3 +60,46 @@ pnpm check
 - 重構交易詞綴查詢：移除 disabled filter 方案，改為穩定的 count + min:1 分組查詢，避免詞綴條件被市集忽略。
 - 台服詞綴查詢改為雙軌：優先將軍 pseudo stat，並保留台服 stat id fallback，提升詞綴代入成功率。
 - 聯盟值改為優先使用 id（非顯示名稱），並在交易 URL path segment 做 encodeURIComponent，降低聯盟路由錯誤。
+## 2026-04-04 交易修正補充
+- 交易條件改為單一模式：即刻購買 / 面對面交易 / 不限，避免舊版雙開關互相覆蓋。
+- 國際服 sale_type 對應：即刻購買 -> priced、面對面交易 -> unpriced。
+- 台服 sale_type 對應：即刻購買 -> buyout、面對面交易 -> facetoface。
+- 聯盟下拉排除 Solo Self-Found (SSF) 自力聯盟，避免選到不可交易聯盟。
+- 反查結果卡與收藏珠寶卡共用同一組交易設定（模式與當前選擇聯盟）。
+- 修正聯盟翻譯大小寫比對：MIRAGE / HARDCORE MIRAGE / RUTHLESS MIRAGE / HC RUTHLESS MIRAGE 等全大寫名稱也會正確顯示中文。
+
+## 2026-04-04 交易條件語意修正（本次）
+- 將前端命名從 `TradeSaleMode` 統一調整為 `TradeCondition`，避免誤解成「販售型式」。
+- 交易條件選項改為對齊官網語意：`即刻購買`、`面對面（聯盟上線）`、`面對面（上線）`、`不限`。
+- 國際服查詢新增狀態映射：`面對面（聯盟上線）` 會套用 `status=onlineleague`，其餘條件維持 `status=online`。
+- 台服維持相容：兩種面對面條件皆映射為 `sale_type=facetoface`。
+- 2026-04-04：修正國際服 `sale_type` 映射為 `buyout/facetoface`，避免 `即刻購買` 被錯誤解讀為面對面交易。
+- 2026-04-04：調整狀態映射：`即刻購買` 與 `不限` 改用 `status=any`，僅面對面條件使用 `online/onlineleague`。
+- 2026-04-04：台服相容修正：`即刻購買` 改為 `status=online`，避免台服將查詢誤判為非即刻購買條件。
+- 2026-04-04：新增 Firebase Hosting GitHub Actions 自動部署（PR Preview + main Live）。
+
+## Firebase Hosting 自動部署
+
+已新增 GitHub Actions workflow：
+- `.github/workflows/firebase-hosting.yml`
+
+觸發規則：
+- `pull_request`：自動部署到 Firebase Hosting Preview Channel（會回寫 PR 留言）
+- `push` 到 `main`：自動部署到 Firebase Hosting `live`
+
+需要在 GitHub Repository Secrets 新增：
+- `FIREBASE_SERVICE_ACCOUNT_POE_TIMELESS_JEWELS`
+
+建立方式（擇一）：
+1. 在 Firebase Console 建立可部署 Hosting 的 Service Account JSON，完整內容貼到上述 Secret。
+2. 於本機執行 `firebase init hosting:github` 讓 Firebase 自動幫你建立 workflow 與 secrets（如需覆蓋目前設定）。
+
+## 2026-04-04 部署策略調整
+- 停用 Firebase Hosting GitHub Actions 自動部署，改為手動部署。
+- 手動部署指令：`firebase deploy --only hosting --project poe-timeless-jewels`
+
+## 2026-04-04 致謝與來源補充
+- 本專案目前維護版 GitHub：`https://github.com/Lucifer631217/PoE-Timeless-Jewels.git`
+- 本專案基於原作者專案修改：`https://github.com/Vilsol/timeless-jewels.git`
+- 感謝原作者 **Vilsol** 開源此專案，提供重要的基礎與資料流程。
+- README 資料來源補充：`https://github.com/Vilsol/timeless-jewels.git`

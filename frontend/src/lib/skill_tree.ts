@@ -521,6 +521,7 @@ const twTradeStatNames: { [key: number]: string } = {
 };
 
 type TradeServer = 'international' | 'tw';
+export type TradeCondition = 'any' | 'instant_buyout' | 'in_person_online_in_league' | 'in_person_online';
 
 type TradeStatFilter = {
   id: string;
@@ -582,28 +583,39 @@ const buildSeedFilters = (results: SearchWithSeed[], statIds: string[]): TradeSt
   return filters;
 };
 
-const resolveSaleTypeOption = (server: TradeServer, buyout: boolean, faceToFace: boolean): string | undefined => {
-  if (server === 'international') {
-    return buyout && !faceToFace ? 'priced' : undefined;
-  }
-
-  if (buyout === faceToFace) {
+const resolveSaleTypeOption = (_server: TradeServer, condition: TradeCondition): string | undefined => {
+  if (condition === 'any') {
     return undefined;
   }
 
-  return buyout ? 'buyout' : 'facetoface';
+  return condition === 'instant_buyout' ? 'buyout' : 'facetoface';
 };
+
+const resolveTradeStatusOption = (server: TradeServer, condition: TradeCondition): 'any' | 'online' | 'onlineleague' => {
+  if (condition === 'in_person_online_in_league') {
+    return 'onlineleague';
+  }
+
+  if (condition === 'in_person_online') {
+    return 'online';
+  }
+
+  if (condition === 'instant_buyout' && server === 'tw') {
+    return 'online';
+  }
+
+  return 'any';
+};
+
 export const constructQuery = (
   jewel: number,
   conqueror: string,
   results: SearchWithSeed[],
-  buyout?: boolean,
-  faceToFace?: boolean,
+  condition: TradeCondition = 'instant_buyout',
   server: TradeServer = 'international'
 ) => {
-  const effectiveBuyout = buyout ?? true;
-  const effectiveFaceToFace = faceToFace ?? true;
-  const saleTypeOption = resolveSaleTypeOption(server, effectiveBuyout, effectiveFaceToFace);
+  const saleTypeOption = resolveSaleTypeOption(server, condition);
+  const statusOption = resolveTradeStatusOption(server, condition);
   const statIds = resolveTradeStatIds(jewel, conqueror, server);
   const statFilters = buildSeedFilters(results, statIds);
   const stats: TradeStatCategory[] = chunkFilters(statFilters).map((filters) => ({
@@ -614,7 +626,7 @@ export const constructQuery = (
 
   const query: Record<string, unknown> = {
     status: {
-      option: 'online'
+      option: statusOption
     },
     stats
   };
@@ -646,8 +658,7 @@ export const openTrade = (
   platform: string,
   league: string,
   server: TradeServer = 'international',
-  buyout = true,
-  faceToFace = true
+  condition: TradeCondition = 'instant_buyout'
 ) => {
   const normalizedPlatform = !platform || typeof platform !== 'string' ? 'PC' : platform;
   const normalizedLeague = !league || typeof league !== 'string' ? 'Standard' : league;
@@ -662,7 +673,7 @@ export const openTrade = (
     url = new URL(`https://www.pathofexile.com/trade/search${platformSegment}/${leagueSegment}`);
   }
 
-  url.searchParams.set('q', JSON.stringify(constructQuery(jewel, conqueror, results, buyout, faceToFace, server)));
+  url.searchParams.set('q', JSON.stringify(constructQuery(jewel, conqueror, results, condition, server)));
 
   console.log('opening trade', url);
 

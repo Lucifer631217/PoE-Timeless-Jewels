@@ -211,12 +211,11 @@
 
     <!-- Footer -->
     <div class="page-footer">
-      <a href="https://discord.gg/mfacademy" target="_blank" rel="noopener" class="footer-link mf-link">
-        <img src="{assets}/mf-academy-logo.png" width="18px" alt="MF Academy" />
-        <span>MF Academy</span>
+      <a href="https://github.com/Lucifer631217/PoE-Timeless-Jewels" target="_blank" rel="noopener" class="footer-link">
+        此專案 GitHub
       </a>
       <a href="https://github.com/Vilsol/timeless-jewels" target="_blank" rel="noopener" class="footer-link">
-        原始碼 (Github)
+        感謝原作者 Vilsol
       </a>
     </div>
   </div>

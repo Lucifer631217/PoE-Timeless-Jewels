@@ -72,6 +72,10 @@ const leaguePhraseNames: Array<[string, string]> = [
   ['HC', '專家']
 ];
 
+const exactLeagueNamesLower = Object.fromEntries(
+  Object.entries(exactLeagueNames).map(([key, value]) => [key.toLowerCase(), value])
+) as Record<string, string>;
+
 /** 屬性描述 (Stats) 對應表：ID → 官方繁體中文模板 */
 export const statDescriptions: Record<number, string> = {
   25: '增加 #% 法術傷害',
@@ -774,13 +778,20 @@ export const translateLeagueName = (englishName: string): string => {
     return englishName;
   }
 
-  if (exactLeagueNames[englishName]) {
-    return exactLeagueNames[englishName];
+  const normalized = englishName.trim();
+
+  if (exactLeagueNames[normalized]) {
+    return exactLeagueNames[normalized];
   }
 
-  let translated = englishName;
+  const directLowerMatch = exactLeagueNamesLower[normalized.toLowerCase()];
+  if (directLowerMatch) {
+    return directLowerMatch;
+  }
+
+  let translated = normalized;
   for (const [source, target] of leaguePhraseNames) {
-    translated = translated.replaceAll(source, target);
+    translated = translated.replace(new RegExp(source, 'gi'), target);
   }
 
   return translated.replace(/\s+/g, '');

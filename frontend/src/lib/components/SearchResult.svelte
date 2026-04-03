@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import type { SearchWithSeed } from '../skill_tree';
+  import type { SearchWithSeed, TradeCondition } from '../skill_tree';
   import { formatBilingualStatHtml, skillTree, translateStatBilingual, openTrade } from '../skill_tree';
 
   export let highlight: (newSeed: number, passives: number[]) => void;
@@ -10,8 +10,7 @@
   export let platform: string;
   export let league: string;
   export let twLeague: string;
-  export let buyout: boolean;
-  export let faceToFace: boolean;
+  export let tradeCondition: TradeCondition = 'instant_buyout';
 </script>
 
 <div
@@ -40,13 +39,13 @@
       <button
         class="trade-btn intl-trade"
         on:click|stopPropagation={() =>
-          openTrade(jewel, conqueror, [set], platform, league, 'international', buyout, faceToFace)}>
+          openTrade(jewel, conqueror, [set], platform, league, 'international', tradeCondition)}>
         國際服交易
       </button>
       <button
         class="trade-btn tw-trade"
         on:click|stopPropagation={() =>
-          openTrade(jewel, conqueror, [set], platform, twLeague, 'tw', buyout, faceToFace)}>
+          openTrade(jewel, conqueror, [set], platform, twLeague, 'tw', tradeCondition)}>
         台服交易
       </button>
     </div>

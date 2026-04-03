@@ -21,7 +21,7 @@
     type SavedJewelDraft,
     type SavedJewelEntry
   } from '../../lib/favorite_jewels';
-  import { pickCurrentLeagueValue, type LeagueLike } from '../../lib/leagues';
+  import { isSoloSelfFoundLeague, pickCurrentLeagueValue, type LeagueLike } from '../../lib/leagues';
   import {
     formatBilingualStatHtml,
     getAffectedNodes,
@@ -32,7 +32,8 @@
     type ReverseSearchConfig,
     type SearchResults as SearchResultsType,
     type SearchWithSeed,
-    type StatConfig
+    type StatConfig,
+    type TradeCondition
   } from '../../lib/skill_tree';
   import type { Node } from '../../lib/skill_tree_types';
   import { data, calculator } from '../../lib/types';
@@ -557,6 +558,7 @@
 
   const toLeagueOptions = (rawLeagues: LeagueLike[]): LeagueOption[] => {
     const mapped = rawLeagues
+      .filter((leagueItem) => !isSoloSelfFoundLeague(leagueItem))
       .map((leagueItem) => (leagueItem.id || leagueItem.name || '').trim())
       .filter(Boolean)
       .map((value) => ({
@@ -617,8 +619,7 @@
     }
   };
 
-  let buyout = true;
-  let faceToFace = true;
+  let tradeCondition: TradeCondition = 'instant_buyout';
   const extractTranslatedStats = (result: data.AlternatePassiveSkillInformation): string[] => {
     const translatedStats: string[] = [];
 
@@ -856,11 +857,17 @@
             <div class="trade-panel">
               <div class="trade-row compact-row">
                 <span class="trade-label">交易條件</span>
-                <button class="trade-toggle" class:trade-toggle-active={buyout} on:click={() => (buyout = !buyout)}>
+                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'instant_buyout'} on:click={() => (tradeCondition = 'instant_buyout')}>
                   即刻購買
                 </button>
-                <button class="trade-toggle" class:trade-toggle-active={faceToFace} on:click={() => (faceToFace = !faceToFace)}>
-                  面對面交易
+                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'} on:click={() => (tradeCondition = 'in_person_online_in_league')}>
+                  面對面（聯盟上線）
+                </button>
+                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'in_person_online'} on:click={() => (tradeCondition = 'in_person_online')}>
+                  面對面（上線）
+                </button>
+                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'any'} on:click={() => (tradeCondition = 'any')}>
+                  不限
                 </button>
               </div>
 
@@ -874,7 +881,7 @@
                   on:click={() =>
                     searchOutcome &&
                     league &&
-                    openTrade(searchJewel, searchConqueror, searchOutcome.raw, platform.value, league.value, 'international', buyout, faceToFace)}
+                    openTrade(searchJewel, searchConqueror, searchOutcome.raw, platform.value, league.value, 'international', tradeCondition)}
                   disabled={!searchOutcome || !league}>
                   國際服交易
                 </button>
@@ -890,7 +897,7 @@
                   on:click={() =>
                     searchOutcome &&
                     twLeague &&
-                    openTrade(searchJewel, searchConqueror, searchOutcome.raw, 'PC', twLeague.value, 'tw', buyout, faceToFace)}
+                    openTrade(searchJewel, searchConqueror, searchOutcome.raw, 'PC', twLeague.value, 'tw', tradeCondition)}
                   disabled={!searchOutcome || !twLeague}>
                   台服交易
                 </button>
@@ -1057,8 +1064,7 @@
               platform={platform.value}
               league={league.value}
               twLeague={twLeague.value}
-              {buyout}
-              {faceToFace} />
+              {tradeCondition} />
           {/if}
 
         </div>
@@ -1113,8 +1119,7 @@
               {entry}
               league={league?.value || 'Standard'}
               twLeague={twLeague?.value || 'Standard'}
-              {buyout}
-              {faceToFace}
+              {tradeCondition}
               onEdit={editFavorite}
               onDelete={deleteFavorite} />
           {/each}
