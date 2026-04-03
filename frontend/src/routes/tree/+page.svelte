@@ -1,0 +1,1707 @@
+<script lang="ts">
+  import Select from 'svelte-select';
+  import { browser } from '$app/environment';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { proxy } from 'comlink';
+  import { onMount } from 'svelte';
+  import SkillTree from '../../lib/components/SkillTree.svelte';
+  import FavoriteJewelCard from '../../lib/components/FavoriteJewelCard.svelte';
+  import FavoriteJewelForm from '../../lib/components/FavoriteJewelForm.svelte';
+  import SearchResults from '../../lib/components/SearchResults.svelte';
+  import {
+    buildSavedJewelId,
+    favoriteJewels,
+    findFavoriteJewel,
+    importFavoriteJewels,
+    removeFavoriteJewel,
+    serializeFavoriteJewels,
+    upsertFavoriteJewel,
+    type FavoriteSnapshotSkill,
+    type SavedJewelDraft,
+    type SavedJewelEntry
+  } from '../../lib/favorite_jewels';
+  import { pickCurrentLeagueValue, type LeagueLike } from '../../lib/leagues';
+  import {
+    formatBilingualStatHtml,
+    getAffectedNodes,
+    openTrade,
+    skillTree,
+    splitBilingualStatText,
+    translateStatBilingual,
+    type ReverseSearchConfig,
+    type SearchResults as SearchResultsType,
+    type SearchWithSeed,
+    type StatConfig
+  } from '../../lib/skill_tree';
+  import type { Node } from '../../lib/skill_tree_types';
+  import { data, calculator } from '../../lib/types';
+  import { statValues } from '../../lib/values';
+  import { syncWrap } from '../../lib/worker';
+  import { translateConquerorName, translateJewelName, translateLeagueName } from '../../lib/zh_tw';
+
+  type SelectOption<T> = {
+    value: T;
+    label: string;
+  };
+
+  type CalculatedSeedResult = {
+    node: number;
+    result: data.AlternatePassiveSkillInformation;
+  };
+
+  const searchParams = $page.url.searchParams;
+  const timelessJewels = data.TimelessJewels || {};
+  const timelessJewelConquerors = data.TimelessJewelConquerors || {};
+  const treeToPassive = data.TreeToPassive || {};
+  const timelessJewelSeedRanges = data.TimelessJewelSeedRanges || {};
+  const allPossibleStats: Record<string, Record<string, number>> = data.PossibleStats ? JSON.parse(data.PossibleStats) : {};
+
+  const readBooleanPreference = (key: string, fallback: boolean): boolean => {
+    if (!browser) {
+      return fallback;
+    }
+
+    const raw = localStorage.getItem(key);
+    return raw === null ? fallback : raw === 'true';
+  };
+
+  const readStringPreference = (key: string, fallback: string): string => {
+    if (!browser) {
+      return fallback;
+    }
+
+    return localStorage.getItem(key) || fallback;
+  };
+
+  const uniqueStrings = (values: string[]): string[] => Array.from(new Set(values));
+
+  const jewels = Object.keys(timelessJewels).map((key) => ({
+    value: parseInt(key),
+    label: translateJewelName(parseInt(key), timelessJewels[parseInt(key)] || '')
+  }));
+
+  let selectedJewel: SelectOption<number> | undefined = searchParams.has('jewel')
+    ? jewels.find((jewel) => jewel.value.toString() === searchParams.get('jewel'))
+    : undefined;
+
+  $: selectedJewelValue = selectedJewel?.value;
+  $: currentConquerors = selectedJewelValue !== undefined ? (timelessJewelConquerors[selectedJewelValue] || {}) : {};
+  $: selectedSeedRanges = selectedJewelValue !== undefined ? timelessJewelSeedRanges[selectedJewelValue] : undefined;
+  $: minSeed = selectedSeedRanges?.Min || 0;
+  $: maxSeed = selectedSeedRanges?.Max || 0;
+
+  $: conquerors = selectedJewel
+    ? Object.keys(currentConquerors).map((key) => ({
+        value: key,
+        label: translateConquerorName(key)
+      }))
+    : [];
+
+  let selectedConqueror: SelectOption<string> | undefined = searchParams.has('conqueror')
+    ? {
+        value: searchParams.get('conqueror') || '',
+        label: translateConquerorName(searchParams.get('conqueror') || '')
+      }
+    : undefined;
+
+  $: if (selectedConqueror && selectedJewelValue !== undefined && !currentConquerors[selectedConqueror.value]) {
+    selectedConqueror = undefined;
+  }
+
+  let seed = searchParams.has('seed') ? parseInt(searchParams.get('seed') || '0') : 0;
+  let circledNode: number | undefined = searchParams.has('location')
+    ? parseInt(searchParams.get('location') || '0')
+    : undefined;
+
+  $: affectedNodes = circledNode !== undefined && skillTree.nodes[circledNode]
+    ? getAffectedNodes(skillTree.nodes[circledNode]).filter((node) => !node.isJewelSocket && !node.isMastery)
+    : [];
+
+  $: selectedConquerorValue = selectedConqueror?.value || '';
+  $: seedResults =
+    !seed ||
+    !selectedJewel ||
+    !selectedConquerorValue ||
+    !currentConquerors[selectedConquerorValue]
+      ? []
+      : affectedNodes
+          .filter((node) => node.skill !== undefined && !!treeToPassive[node.skill])
+          .map((node) => {
+            const skillId = node.skill;
+            if (skillId === undefined) {
+              return null;
+            }
+
+            const entry = treeToPassive[skillId];
+            return {
+              node: skillId,
+              result: calculator.Calculate(
+                entry ? entry.Index : 0,
+                seed,
+                selectedJewel?.value || 0,
+                selectedConquerorValue
+              )
+            };
+          })
+          .filter((result): result is CalculatedSeedResult => result !== null);
+
+  let selectedStats: Record<string, StatConfig> = {};
+  if (searchParams.has('stat')) {
+    searchParams.getAll('stat').forEach((stat) => {
+      const statId = parseInt(stat);
+      selectedStats[statId] = {
+        id: statId,
+        min: 0,
+        weight: 1
+      };
+    });
+  }
+
+  let mode = searchParams.get('mode') || 'seed';
+  let disabled = new Set<number>();
+  const hasDisabledFromQuery = searchParams.has('disabled');
+  let defaultDisabledInitializedNode: number | undefined = undefined;
+  if (searchParams.has('disabled')) {
+    searchParams.getAll('disabled').forEach((value) => disabled.add(parseInt(value)));
+  }
+
+  $: if (!hasDisabledFromQuery && circledNode !== undefined && affectedNodes.length > 0 && defaultDisabledInitializedNode !== circledNode) {
+    const defaultDisabled = new Set<number>();
+    affectedNodes.forEach((node) => {
+      if (node.skill !== undefined && !node.isNotable) {
+        defaultDisabled.add(node.skill);
+      }
+    });
+    disabled = defaultDisabled;
+    defaultDisabledInitializedNode = circledNode;
+    updateUrl();
+  }
+
+  const updateUrl = () => {
+    if (!browser) {
+      return;
+    }
+
+    const url = new URL(window.location.origin + window.location.pathname);
+    selectedJewel && url.searchParams.append('jewel', selectedJewel.value.toString());
+    selectedConqueror && url.searchParams.append('conqueror', selectedConqueror.value);
+    seed && url.searchParams.append('seed', seed.toString());
+    circledNode && url.searchParams.append('location', circledNode.toString());
+    mode && url.searchParams.append('mode', mode);
+    disabled.forEach((value) => url.searchParams.append('disabled', value.toString()));
+    Object.keys(selectedStats).forEach((value) => url.searchParams.append('stat', value));
+    goto(url.toString(), { keepFocus: true, noScroll: true, replaceState: true });
+  };
+
+  const setMode = (newMode: string) => {
+    mode = newMode;
+    updateUrl();
+  };
+
+  const clickNode = (node: Node) => {
+    if (node.isJewelSocket && node.skill !== undefined) {
+      circledNode = node.skill;
+      updateUrl();
+      return;
+    }
+
+    if (!node.isMastery && node.skill !== undefined) {
+      if (disabled.has(node.skill)) {
+        disabled.delete(node.skill);
+      } else {
+        disabled.add(node.skill);
+      }
+
+      disabled = disabled;
+      updateUrl();
+    }
+  };
+
+  const getStatValue = (id: string): number => (statValues as Record<string, number>)[id] || 0;
+
+  $: availableStats = selectedJewelValue !== undefined ? Object.keys(allPossibleStats[selectedJewelValue.toString()] || {}) : [];
+  $: statItems = availableStats
+    .map((statId) => {
+      const id = parseInt(statId);
+      return {
+        label: translateStatBilingual(id),
+        value: id
+      };
+    })
+    .filter((stat) => !(stat.value in selectedStats));
+
+  let statSelector: Select;
+  const selectStat = (event: CustomEvent<{ value: number }>) => {
+    selectedStats[event.detail.value] = {
+      id: event.detail.value,
+      min: 0,
+      weight: 1
+    };
+    selectedStats = selectedStats;
+    statSelector?.handleClear();
+    updateUrl();
+  };
+
+  const removeStat = (id: number) => {
+    delete selectedStats[id];
+    selectedStats = selectedStats;
+    updateUrl();
+  };
+
+  const changeJewel = () => {
+    selectedConqueror = undefined;
+    selectedStats = {};
+    seed = 0;
+    results = false;
+    searchOutcome = undefined;
+    highlighted = [];
+    updateUrl();
+  };
+
+  let results = false;
+  let minTotalWeight = 0;
+  let searching = false;
+  let currentSeed = 0;
+  let searchOutcome: SearchResultsType | undefined;
+  let searchJewel = 1;
+  let searchConqueror = '';
+  const search = () => {
+    if (!circledNode || !selectedJewel || !selectedConqueror) {
+      return;
+    }
+
+    searchJewel = selectedJewel.value;
+    searchConqueror = selectedConqueror.value;
+    searching = true;
+    searchOutcome = undefined;
+
+    const query: ReverseSearchConfig = {
+      jewel: selectedJewel.value,
+      conqueror: selectedConqueror.value,
+      nodes: affectedNodes
+        .filter((node) => node.skill !== undefined && !disabled.has(node.skill))
+        .map((node) => (node.skill !== undefined ? treeToPassive[node.skill] : undefined))
+        .filter((node): node is data.PassiveSkill => !!node)
+        .map((node) => node.Index),
+      stats: Object.values(selectedStats),
+      minTotalWeight
+    };
+
+    if (!syncWrap) {
+      searching = false;
+      return;
+    }
+
+    syncWrap
+      .search(
+        query,
+        proxy(async (seedValue) => {
+          currentSeed = seedValue;
+        })
+      )
+      .then((result) => {
+        searchOutcome = result;
+        searching = false;
+        results = true;
+      })
+      .catch(() => {
+        searching = false;
+      });
+  };
+
+  let highlighted: number[] = [];
+  const highlight = (newSeed: number, passives: number[]) => {
+    seed = newSeed;
+    highlighted = passives;
+    updateUrl();
+  };
+
+  const selectAll = () => {
+    disabled.clear();
+    disabled = disabled;
+  };
+
+  const selectAllNotables = () => {
+    affectedNodes.forEach((node) => {
+      if (node.isNotable && node.skill !== undefined) {
+        disabled.delete(node.skill);
+      }
+    });
+    disabled = disabled;
+  };
+
+  const selectAllPassives = () => {
+    affectedNodes.forEach((node) => {
+      if (!node.isNotable && node.skill !== undefined) {
+        disabled.delete(node.skill);
+      }
+    });
+    disabled = disabled;
+  };
+
+  const deselectAll = () => {
+    affectedNodes
+      .filter((node) => !node.isJewelSocket && !node.isMastery && node.skill !== undefined)
+      .forEach((node) => {
+        if (node.skill !== undefined) {
+          disabled.add(node.skill);
+        }
+      });
+    disabled = disabled;
+  };
+
+  let groupResults = readBooleanPreference('groupResults', true);
+  $: if (browser) localStorage.setItem('groupResults', groupResults ? 'true' : 'false');
+
+  type CombinedResult = {
+    id: string;
+    rawStat: string;
+    stat: string;
+    passives: number[];
+  };
+
+  const colorKeys = {
+    physical: '#c79d93',
+    cast: '#b3f8fe',
+    fire: '#ff9a77',
+    cold: '#93d8ff',
+    lightning: '#f8cb76',
+    attack: '#da814d',
+    life: '#c96e6e',
+    chaos: '#d8a7d3',
+    unique: '#af6025',
+    critical: '#b2a7d6'
+  };
+
+  const colorMessage = (message: string): string => {
+    Object.keys(colorKeys).forEach((key) => {
+      const value = colorKeys[key as keyof typeof colorKeys];
+      message = message.replace(
+        new RegExp(`(${key}(?:$|\\s))|((?:^|\\s)${key})`, 'gi'),
+        `<span style='color: ${value}; font-weight: bold'>$1$2</span>`
+      );
+    });
+
+    return message;
+  };
+
+  const escapeHtml = (value: string): string =>
+    value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+  const renderBilingualStatHtml = (message: string, highlightEnglishKeyword: boolean): string => {
+    const parts = splitBilingualStatText(message);
+    const localizedHtml = escapeHtml(parts.localized);
+    if (!parts.english) {
+      return `<span style="color:#f4ead5">${localizedHtml}</span>`;
+    }
+
+    const englishText = escapeHtml(parts.english);
+    const englishHtml = highlightEnglishKeyword ? colorMessage(englishText) : englishText;
+    return `<span style="color:#f4ead5">${localizedHtml}</span><span style="color:rgba(200,169,110,0.62)"> / </span><span style="color:#9cc3ff">${englishHtml}</span>`;
+  };
+
+  const combineResults = (
+    rawResults: CalculatedSeedResult[],
+    withColors: boolean,
+    only: 'notables' | 'passives' | 'all'
+  ): CombinedResult[] => {
+    const mappedStats: Record<number, number[]> = {};
+
+    rawResults.forEach((entry) => {
+      if (skillTree.nodes[entry.node].isKeystone) {
+        return;
+      }
+
+      if (only !== 'all') {
+        if (only === 'notables' && !skillTree.nodes[entry.node].isNotable) {
+          return;
+        }
+
+        if (only === 'passives' && skillTree.nodes[entry.node].isNotable) {
+          return;
+        }
+      }
+
+      if (entry.result.AlternatePassiveSkill?.StatsKeys) {
+        entry.result.AlternatePassiveSkill.StatsKeys.forEach((key) => {
+          mappedStats[key] = [...(mappedStats[key] || []), entry.node];
+        });
+      }
+
+      entry.result.AlternatePassiveAdditionInformations?.forEach((info) => {
+        info.AlternatePassiveAddition?.StatsKeys?.forEach((key) => {
+          mappedStats[key] = [...(mappedStats[key] || []), entry.node];
+        });
+      });
+    });
+
+    return Object.keys(mappedStats).map((statIdString) => {
+      const statId = parseInt(statIdString);
+      const translated = translateStatBilingual(statId);
+      return {
+        id: statIdString,
+        rawStat: translated,
+        stat: renderBilingualStatHtml(translated, withColors),
+        passives: mappedStats[statId]
+      };
+    });
+  };
+
+  const sortCombined = (combinedResults: CombinedResult[], order: 'count' | 'alphabet' | 'rarity' | 'value') => {
+    switch (order) {
+      case 'alphabet':
+        return combinedResults.sort((left, right) =>
+          left.rawStat
+            .replace(/[#+%]/gi, '')
+            .trim()
+            .toLowerCase()
+            .localeCompare(right.rawStat.replace(/[#+%]/gi, '').trim().toLowerCase())
+        );
+      case 'count':
+        return combinedResults.sort((left, right) => right.passives.length - left.passives.length);
+      case 'rarity':
+        return combinedResults.sort((left, right) => {
+          const jewelValue = selectedJewel?.value?.toString() || '';
+          const possibleStatsForJewel = allPossibleStats[jewelValue] || {};
+          return (possibleStatsForJewel[left.id] || 0) - (possibleStatsForJewel[right.id] || 0);
+        });
+      case 'value':
+        return combinedResults.sort((left, right) => {
+          const leftValue = (statValues as Record<string, number>)[left.id] || 0;
+          const rightValue = (statValues as Record<string, number>)[right.id] || 0;
+          if (leftValue !== rightValue) {
+            return rightValue - leftValue;
+          }
+
+          const jewelValue = selectedJewel?.value?.toString() || '';
+          const possibleStatsForJewel = allPossibleStats[jewelValue] || {};
+          return (possibleStatsForJewel[left.id] || 0) - (possibleStatsForJewel[right.id] || 0);
+        });
+    }
+
+    return combinedResults;
+  };
+
+  const sortResults = [
+    { label: '出現次數', value: 'count' },
+    { label: '詞綴字母', value: 'alphabet' },
+    { label: '稀有度', value: 'rarity' },
+    { label: '估值', value: 'value' }
+  ] as const;
+
+  let sortOrder = sortResults.find((item) => item.value === readStringPreference('sortOrder', 'count')) || sortResults[0];
+  $: if (browser && sortOrder) localStorage.setItem('sortOrder', sortOrder.value);
+
+  let colored = readBooleanPreference('colored', true);
+  $: if (browser) localStorage.setItem('colored', colored ? 'true' : 'false');
+
+  let split = readBooleanPreference('split', true);
+  $: if (browser) localStorage.setItem('split', split ? 'true' : 'false');
+
+  const onPaste = (event: ClipboardEvent) => {
+    const paste = event.clipboardData?.getData('text') || '';
+    const lines = paste.split('\n');
+    if (lines.length < 14) {
+      return;
+    }
+
+    const pastedJewel = jewels.find((jewel) => jewel.label === lines[2] || timelessJewels[jewel.value] === lines[2]);
+    if (!pastedJewel) {
+      return;
+    }
+
+    let newSeed: number | undefined;
+    let conquerorValue: string | undefined;
+    const currentJewelConquerors = timelessJewelConquerors[pastedJewel.value] || {};
+
+    for (let index = 10; index < lines.length; index += 1) {
+      conquerorValue = Object.keys(currentJewelConquerors).find(
+        (key) => lines[index].includes(key) || lines[index].includes(translateConquerorName(key))
+      );
+      if (!conquerorValue) {
+        continue;
+      }
+
+      const matches = /(\d+)/.exec(lines[index]);
+      if (!matches) {
+        continue;
+      }
+
+      newSeed = parseInt(matches[1]);
+      break;
+    }
+
+    if (!conquerorValue || !newSeed) {
+      return;
+    }
+
+    results = false;
+    mode = 'seed';
+    seed = newSeed;
+    selectedJewel = pastedJewel;
+    selectedConqueror = { label: translateConquerorName(conquerorValue), value: conquerorValue };
+    updateUrl();
+  };
+
+  let collapsed = false;
+  const platform = { value: 'PC', label: 'PC' };
+  const selectFloatingConfig = { strategy: 'fixed' };
+
+  type LeagueOption = SelectOption<string>;
+
+  const toLeagueOptions = (rawLeagues: LeagueLike[]): LeagueOption[] => {
+    const mapped = rawLeagues
+      .map((leagueItem) => (leagueItem.id || leagueItem.name || '').trim())
+      .filter(Boolean)
+      .map((value) => ({
+        value,
+        label: translateLeagueName(value)
+      }));
+
+    return mapped.filter((option, index, array) => array.findIndex((candidate) => candidate.value === option.value) === index);
+  };
+
+  const resolveLeagueSelection = (rawLeagues: LeagueLike[], fallback: string) => {
+    const options = toLeagueOptions(rawLeagues);
+    const selectedValue = pickCurrentLeagueValue(rawLeagues, fallback);
+    return {
+      options,
+      selected: options.find((option) => option.value === selectedValue) || options[0] || { value: fallback, label: translateLeagueName(fallback) }
+    };
+  };
+
+  let leagues: LeagueOption[] = [];
+  let league: LeagueOption | undefined;
+  const getLeagues = async () => {
+    try {
+      const response = await fetch('https://api.poe.watch/leagues');
+      if (!response.ok) {
+        throw new Error('failed');
+      }
+
+      const rawLeagues: LeagueLike[] = await response.json();
+      const resolved = resolveLeagueSelection(rawLeagues, 'Standard');
+      leagues = resolved.options;
+      league = resolved.selected;
+    } catch {
+      leagues = [{ value: 'Standard', label: translateLeagueName('Standard') }];
+      league = leagues[0];
+    }
+  };
+
+  let twLeagues: LeagueOption[] = [];
+  let twLeague: LeagueOption | undefined;
+  const getTWLeaguesData = async () => {
+    try {
+      const response = await fetch('https://api.poe.watch/leagues?realm=garena');
+      if (!response.ok) {
+        throw new Error('failed');
+      }
+
+      const rawLeagues: LeagueLike[] = await response.json();
+      const resolved = resolveLeagueSelection(rawLeagues, 'Standard');
+      twLeagues = resolved.options;
+      twLeague = resolved.selected;
+    } catch {
+      twLeagues = [
+        { value: 'Standard', label: translateLeagueName('Standard') },
+        { value: 'Hardcore', label: translateLeagueName('Hardcore') }
+      ];
+      twLeague = twLeagues[0];
+    }
+  };
+
+  let buyout = true;
+  let faceToFace = true;
+  const extractTranslatedStats = (result: data.AlternatePassiveSkillInformation): string[] => {
+    const translatedStats: string[] = [];
+
+    if (result.AlternatePassiveSkill?.StatsKeys && result.StatRolls) {
+      Object.values(result.StatRolls).forEach((rollValue, index) => {
+        const statIndex = result.AlternatePassiveSkill?.StatsKeys?.[index];
+        if (statIndex !== undefined) {
+          translatedStats.push(translateStatBilingual(statIndex, rollValue));
+        }
+      });
+    }
+
+    result.AlternatePassiveAdditionInformations?.forEach((info) => {
+      if (!info.AlternatePassiveAddition?.StatsKeys || !info.StatRolls) {
+        return;
+      }
+
+      Object.values(info.StatRolls).forEach((rollValue, index) => {
+        const statIndex = info.AlternatePassiveAddition?.StatsKeys?.[index];
+        if (statIndex !== undefined) {
+          translatedStats.push(translateStatBilingual(statIndex, rollValue));
+        }
+      });
+    });
+
+    return uniqueStrings(translatedStats);
+  };
+
+  const buildSnapshotFromCalculatedResult = (entry: CalculatedSeedResult): FavoriteSnapshotSkill | null => {
+    const stats = extractTranslatedStats(entry.result);
+    if (stats.length === 0) {
+      return null;
+    }
+
+    return {
+      passive: entry.node,
+      passiveName: skillTree.nodes[entry.node]?.name || entry.node.toString(),
+      stats
+    };
+  };
+
+  const buildSnapshotFromSearchResult = (set: SearchWithSeed): FavoriteSnapshotSkill[] =>
+    set.skills
+      .map((skill) => ({
+        passive: skill.passive,
+        passiveName: skillTree.nodes[skill.passive]?.name || skill.passive.toString(),
+        stats: uniqueStrings(
+          Object.entries(skill.stats).map(([statId, rollValue]) => translateStatBilingual(statId, rollValue as number))
+        )
+      }))
+      .filter((skill) => skill.stats.length > 0);
+
+  const collectImportantStats = (snapshot: FavoriteSnapshotSkill[]): string[] =>
+    uniqueStrings(snapshot.flatMap((passive) => passive.stats)).slice(0, 8);
+
+  const mergeDraftWithExisting = (draft: SavedJewelDraft): SavedJewelDraft => {
+    const existing = findFavoriteJewel(draft.id);
+    if (!existing) {
+      return draft;
+    }
+
+    return {
+      ...draft,
+      buildName: existing.buildName,
+      importantStats: existing.importantStats.length > 0 ? existing.importantStats : draft.importantStats,
+      estimatedValue: existing.estimatedValue
+    };
+  };
+
+  const createFavoriteDraft = (seedValue: number, snapshot: FavoriteSnapshotSkill[]): SavedJewelDraft | null => {
+    if (!selectedJewel || !selectedConqueror) {
+      return null;
+    }
+
+    return mergeDraftWithExisting({
+      id: buildSavedJewelId(selectedJewel.value, selectedConqueror.value, seedValue),
+      jewel: selectedJewel.value,
+      jewelLabel: selectedJewel.label,
+      conqueror: selectedConqueror.value,
+      conquerorLabel: selectedConqueror.label,
+      seed: seedValue,
+      buildName: '',
+      importantStats: collectImportantStats(snapshot),
+      estimatedValue: '',
+      snapshot
+    });
+  };
+
+  let favoriteDraft: SavedJewelDraft | null = null;
+  let favoriteFeedback = '';
+  let favoriteImportInput: HTMLInputElement;
+  let favoriteDrawerOpen = false;
+  $: favoriteCount = $favoriteJewels.length;
+  $: canSaveCurrentSeed =
+    mode === 'seed' &&
+    !!selectedJewel &&
+    !!selectedConqueror &&
+    seed >= minSeed &&
+    seed <= maxSeed &&
+    seedResults.length > 0;
+
+  const openFavoriteForCurrentSeed = () => {
+    const snapshot = seedResults
+      .map(buildSnapshotFromCalculatedResult)
+      .filter((entry): entry is FavoriteSnapshotSkill => !!entry);
+    const draft = createFavoriteDraft(seed, snapshot);
+    if (!draft) {
+      return;
+    }
+
+    favoriteDraft = draft;
+    favoriteDrawerOpen = true;
+    favoriteFeedback = '';
+  };
+
+  const openFavoriteForSearchResult = (set: SearchWithSeed) => {
+    const draft = createFavoriteDraft(set.seed, buildSnapshotFromSearchResult(set));
+    if (!draft) {
+      return;
+    }
+
+    favoriteDraft = draft;
+    favoriteDrawerOpen = true;
+    favoriteFeedback = '';
+  };
+
+  const saveFavoriteDraft = (draft: SavedJewelDraft) => {
+    const existing = findFavoriteJewel(draft.id);
+    const now = new Date().toISOString();
+    const replaced = upsertFavoriteJewel({
+      ...draft,
+      createdAt: existing?.createdAt || now,
+      updatedAt: now
+    });
+
+    favoriteFeedback = replaced ? '已更新收藏珠寶。' : '已加入收藏珠寶。';
+    favoriteDraft = null;
+  };
+
+  const editFavorite = (entry: SavedJewelEntry) => {
+    favoriteDraft = {
+      ...entry
+    };
+    favoriteDrawerOpen = true;
+    favoriteFeedback = '';
+    results = false;
+  };
+
+  const deleteFavorite = (entry: SavedJewelEntry) => {
+    removeFavoriteJewel(entry.id);
+    favoriteFeedback = `已刪除收藏：${entry.jewelLabel} / Seed ${entry.seed}`;
+    if (favoriteDraft?.id === entry.id) {
+      favoriteDraft = null;
+    }
+  };
+
+  const exportFavorites = () => {
+    if (!browser) {
+      return;
+    }
+
+    const blob = new Blob([serializeFavoriteJewels()], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `timeless-jewels-favorites-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    favoriteFeedback = `已匯出 ${favoriteCount} 筆收藏。`;
+  };
+
+  const openImportDialog = () => favoriteImportInput?.click();
+
+  const handleImportFavorites = async (event: Event) => {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      const result = importFavoriteJewels(await file.text());
+      favoriteFeedback = `匯入完成：新增 ${result.imported}、覆蓋 ${result.replaced}、略過 ${result.skipped}。`;
+    } catch (error) {
+      favoriteFeedback = error instanceof Error ? error.message : '匯入失敗。';
+    } finally {
+      input.value = '';
+    }
+  };
+
+  onMount(() => {
+    getLeagues();
+    getTWLeaguesData();
+  });
+</script>
+
+<svelte:window on:paste={onPaste} />
+
+<SkillTree
+  {clickNode}
+  {circledNode}
+  selectedJewel={selectedJewel?.value || 0}
+  selectedConqueror={selectedConqueror?.value || ''}
+  {highlighted}
+  seed={seed || 0}
+  highlightJewels={!circledNode}
+  disabled={[...disabled]}>
+  {#if !collapsed}
+    <div class="tree-panel panel-left themed">
+      <div class="panel-shell">
+        <div class="panel-header">
+          <div class="panel-title-row">
+            <div class="panel-title-group">
+              <button class="burger-menu" aria-label="收起面板" title="收起面板" on:click={() => (collapsed = true)}>
+                <span class="burger-icon" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </span>
+                <span class="menu-label">收起面板</span>
+              </button>
+              <div>
+                <h3>{results ? '反查結果' : '永恆珠寶查詢'}</h3>
+                <p>可在 Seed 與反查結果之間切換，並將重要珠寶加入收藏清單。</p>
+              </div>
+            </div>
+            <div class="panel-title-actions">
+              <button class="secondary-toggle favorite-entry-toggle" on:click={() => (favoriteDrawerOpen = !favoriteDrawerOpen)}>
+                {favoriteDrawerOpen ? '收合收藏珠寶' : `收藏珠寶 (${favoriteCount})`}
+              </button>
+            </div>
+          </div>
+
+          {#if searchOutcome}
+            <div class="trade-panel">
+              <div class="trade-row compact-row">
+                <span class="trade-label">交易條件</span>
+                <button class="trade-toggle" class:trade-toggle-active={buyout} on:click={() => (buyout = !buyout)}>
+                  即刻購買
+                </button>
+                <button class="trade-toggle" class:trade-toggle-active={faceToFace} on:click={() => (faceToFace = !faceToFace)}>
+                  面對面交易
+                </button>
+              </div>
+
+              <div class="trade-row">
+                <span class="trade-label">國際服聯盟</span>
+                <div class="trade-select">
+                  <Select items={leagues} bind:value={league} clearable={false} floatingConfig={selectFloatingConfig} />
+                </div>
+                <button
+                  class="trade-action intl-action"
+                  on:click={() =>
+                    searchOutcome &&
+                    league &&
+                    openTrade(searchJewel, searchConqueror, searchOutcome.raw, platform.value, league.value, 'international', buyout, faceToFace)}
+                  disabled={!searchOutcome || !league}>
+                  國際服交易
+                </button>
+              </div>
+
+              <div class="trade-row">
+                <span class="trade-label">台服聯盟</span>
+                <div class="trade-select">
+                  <Select items={twLeagues} bind:value={twLeague} clearable={false} floatingConfig={selectFloatingConfig} />
+                </div>
+                <button
+                  class="trade-action tw-action"
+                  on:click={() =>
+                    searchOutcome &&
+                    twLeague &&
+                    openTrade(searchJewel, searchConqueror, searchOutcome.raw, 'PC', twLeague.value, 'tw', buyout, faceToFace)}
+                  disabled={!searchOutcome || !twLeague}>
+                  台服交易
+                </button>
+              </div>
+
+              <div class="trade-row compact-row">
+                <button class="secondary-toggle" class:grouped={groupResults} on:click={() => (groupResults = !groupResults)} disabled={!searchOutcome}>
+                  {groupResults ? '分組顯示中' : '已關閉分組'}
+                </button>
+                <button class="secondary-toggle" on:click={() => (results = !results)}>
+                  {results ? '返回條件設定' : '查看反查結果'}
+                </button>
+              </div>
+            </div>
+          {/if}
+        </div>
+
+        <div class="panel-body">
+          {#if !results}
+            <section class="control-section">
+              <div class="field-stack">
+                <Select class="hero-select" items={jewels} bind:value={selectedJewel} on:change={changeJewel} placeholder="選擇永恆珠寶" floatingConfig={selectFloatingConfig} />
+              </div>
+
+              {#if selectedJewel}
+                <div class="field-stack">
+                  <h3>將軍</h3>
+                  <Select class="hero-select" items={conquerors} bind:value={selectedConqueror} on:change={updateUrl} placeholder="選擇將軍" floatingConfig={selectFloatingConfig} />
+                </div>
+
+                {#if selectedConqueror && selectedJewelValue !== undefined && Object.keys(timelessJewelConquerors[selectedJewelValue] || {}).includes(selectedConqueror.value)}
+                  <div class="mode-toggle-row">
+                    <button class="selection-button" class:selected={mode === 'seed'} on:click={() => setMode('seed')}>
+                      依 Seed
+                    </button>
+                    <button class="selection-button" class:selected={mode === 'stats'} on:click={() => setMode('stats')}>
+                      依詞綴反查
+                    </button>
+                  </div>
+
+                  {#if mode === 'seed'}
+                    <div class="field-stack">
+                      <h3>Seed</h3>
+                      <input type="number" bind:value={seed} on:blur={updateUrl} min={minSeed} max={maxSeed} />
+                      {#if seed < minSeed || seed > maxSeed}
+                        <div class="warning-text">Seed 範圍需介於 {minSeed} 到 {maxSeed}。</div>
+                      {/if}
+                    </div>
+
+                    {#if canSaveCurrentSeed}
+                      <div class="seed-toolbar">
+                        <button class="primary-toggle" on:click={openFavoriteForCurrentSeed}>加入收藏（目前 Seed）</button>
+                        <div class="toolbar-group">
+                          <Select items={sortResults} bind:value={sortOrder} floatingConfig={selectFloatingConfig} />
+                          <button class="secondary-toggle" class:selected={colored} on:click={() => (colored = !colored)}>關鍵字上色</button>
+                          <button class="secondary-toggle" class:selected={split} on:click={() => (split = !split)}>分開顯示</button>
+                        </div>
+                      </div>
+
+                      {#if !split}
+                        <div class="combined-results" class:rainbow={colored}>
+                          {#each sortCombined(combineResults(seedResults, colored, 'all'), sortOrder.value) as result}
+                            <div class="combined-row" role="button" tabindex="0" on:click={() => highlight(seed, result.passives)} on:keydown={(event) => (event.key === 'Enter' || event.key === ' ') && highlight(seed, result.passives)}>
+                              <span class="count-pill" class:text-white={getStatValue(result.id) < 3}>({result.passives.length})</span>
+                              <span class="text-white">{@html result.stat}</span>
+                            </div>
+                          {/each}
+                        </div>
+                      {:else}
+                        <div class="combined-results split-results">
+                          <div>
+                            <h3>強力天賦</h3>
+                            <div class:rainbow={colored}>
+                              {#each sortCombined(combineResults(seedResults, colored, 'notables'), sortOrder.value) as result}
+                                <div class="combined-row" role="button" tabindex="0" on:click={() => highlight(seed, result.passives)} on:keydown={(event) => (event.key === 'Enter' || event.key === ' ') && highlight(seed, result.passives)}>
+                                  <span class="count-pill" class:text-white={getStatValue(result.id) < 3}>({result.passives.length})</span>
+                                  <span class="text-white">{@html result.stat}</span>
+                                </div>
+                              {/each}
+                            </div>
+                          </div>
+                          <div>
+                            <h3>小天賦</h3>
+                            <div class:rainbow={colored}>
+                              {#each sortCombined(combineResults(seedResults, colored, 'passives'), sortOrder.value) as result}
+                                <div class="combined-row" role="button" tabindex="0" on:click={() => highlight(seed, result.passives)} on:keydown={(event) => (event.key === 'Enter' || event.key === ' ') && highlight(seed, result.passives)}>
+                                  <span class="count-pill" class:text-white={getStatValue(result.id) < 3}>({result.passives.length})</span>
+                                  <span class="text-white">{@html result.stat}</span>
+                                </div>
+                              {/each}
+                            </div>
+                          </div>
+                        </div>
+                      {/if}
+                    {/if}
+                  {:else if mode === 'stats'}
+                    <div class="field-stack">
+                      <h3>新增目標詞綴</h3>
+                      <Select items={statItems} on:change={selectStat} bind:this={statSelector} placeholder="選擇要反查的詞綴" floatingConfig={selectFloatingConfig} />
+                    </div>
+
+                    {#if Object.keys(selectedStats).length > 0}
+                      <div class="selected-stats">
+                        {#each Object.keys(selectedStats) as statId}
+                          <div class="selected-stat-card">
+                            <div class="selected-stat-top">
+                              <button class="remove-stat" on:click={() => removeStat(selectedStats[statId].id)}>移除</button>
+                              <span>{@html formatBilingualStatHtml(translateStatBilingual(selectedStats[statId].id))}</span>
+                            </div>
+                            <div class="selected-stat-inputs">
+                              <label>
+                                <span>最低數量</span>
+                                <input type="number" min="0" bind:value={selectedStats[statId].min} />
+                              </label>
+                              <label>
+                                <span>權重</span>
+                                <input type="number" min="0" bind:value={selectedStats[statId].weight} />
+                              </label>
+                            </div>
+                          </div>
+                        {/each}
+                      </div>
+
+                      <div class="field-stack compact-field">
+                        <label class="inline-label">
+                          <span>最低總權重</span>
+                          <input type="number" min="0" bind:value={minTotalWeight} />
+                        </label>
+                      </div>
+
+                      <div class="bulk-actions">
+                        <button class="secondary-toggle" on:click={selectAll} disabled={searching || disabled.size === 0}>全選</button>
+                        <button class="secondary-toggle" on:click={selectAllNotables} disabled={searching || disabled.size === 0}>全選強力天賦</button>
+                        <button class="secondary-toggle" on:click={selectAllPassives} disabled={searching || disabled.size === 0}>全選小天賦</button>
+                        <button class="secondary-toggle" on:click={deselectAll} disabled={searching || disabled.size >= affectedNodes.length}>全部排除</button>
+                      </div>
+
+                      <button class="primary-toggle search-button" on:click={search} disabled={searching}>
+                        {#if searching && selectedJewel}
+                          搜尋中 {currentSeed} / {maxSeed}
+                        {:else}
+                          開始反查
+                        {/if}
+                      </button>
+                    {/if}
+                  {/if}
+
+                  {#if !circledNode}
+                    <h2 class="panel-note">請先在技能樹點選一個珠寶插槽，才會顯示可影響的天賦與反查結果。</h2>
+                  {/if}
+                {/if}
+              {/if}
+            </section>
+          {/if}
+
+          {#if searchOutcome && results && league && twLeague}
+            <SearchResults
+              searchResults={searchOutcome}
+              {groupResults}
+              {highlight}
+              onSave={openFavoriteForSearchResult}
+              jewel={searchJewel}
+              conqueror={searchConqueror}
+              platform={platform.value}
+              league={league.value}
+              twLeague={twLeague.value}
+              {buyout}
+              {faceToFace} />
+          {/if}
+
+        </div>
+      </div>
+    </div>
+  {:else}
+    <button class="burger-menu collapsed-trigger" aria-label="展開面板" title="展開面板" on:click={() => (collapsed = false)}>
+      <span class="burger-icon" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+      <span class="menu-label">展開面板</span>
+    </button>
+  {/if}
+
+  {#if favoriteDrawerOpen}
+    <section class="favorite-panel favorite-drawer">
+      <div class="favorite-header">
+        <div>
+          <h3>收藏珠寶</h3>
+          <p>目前共 {favoriteCount} 筆，可匯入、匯出與快速交易。</p>
+        </div>
+        <div class="favorite-actions">
+          <button class="secondary-toggle" on:click={exportFavorites} disabled={favoriteCount === 0}>匯出 JSON</button>
+          <button class="secondary-toggle" on:click={openImportDialog}>匯入 JSON</button>
+          <button class="secondary-toggle" on:click={() => (favoriteDrawerOpen = false)}>關閉</button>
+          <input bind:this={favoriteImportInput} class="hidden-input" type="file" accept="application/json" on:change={handleImportFavorites} />
+        </div>
+      </div>
+
+      {#if favoriteFeedback}
+        <div class="favorite-feedback">{favoriteFeedback}</div>
+      {/if}
+
+      {#if favoriteDraft}
+        {#key `${favoriteDraft.id}:${favoriteDraft.snapshot.length}:${favoriteDraft.buildName}:${favoriteDraft.estimatedValue}`}
+          <FavoriteJewelForm
+            draft={favoriteDraft}
+            existing={!!findFavoriteJewel(favoriteDraft.id)}
+            onSave={saveFavoriteDraft}
+            onCancel={() => (favoriteDraft = null)} />
+        {/key}
+      {/if}
+
+      {#if favoriteCount === 0}
+        <div class="favorite-empty">目前還沒有收藏珠寶，可先在 Seed 結果或反查結果按「加入收藏」。</div>
+      {:else}
+        <div class="favorite-list">
+          {#each $favoriteJewels as entry}
+            <FavoriteJewelCard
+              {entry}
+              league={league?.value || 'Standard'}
+              twLeague={twLeague?.value || 'Standard'}
+              {buyout}
+              {faceToFace}
+              onEdit={editFavorite}
+              onDelete={deleteFavorite} />
+          {/each}
+        </div>
+      {/if}
+    </section>
+  {/if}
+
+  <div class="repo-link-wrap">
+    <a href="https://github.com/Vilsol/timeless-jewels" target="_blank" rel="noopener">前往 GitHub 原始專案</a>
+  </div>
+</SkillTree>
+
+<style lang="postcss">
+  :global(.tree-panel) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(13, 13, 15, 0.9) !important;
+    border-right: 1px solid rgba(200, 169, 110, 0.15);
+    border-bottom: 1px solid rgba(200, 169, 110, 0.15);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(18px);
+    width: 50vw;
+    max-width: 50vw;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: visible;
+    z-index: 30;
+  }
+
+  .panel-left {
+    border-bottom-right-radius: 24px;
+  }
+
+  .panel-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: visible;
+  }
+
+  .panel-header {
+    padding: 20px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .panel-body {
+    padding: 20px;
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: visible;
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .panel-title-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .favorite-entry-toggle {
+    white-space: nowrap;
+  }
+
+  .panel-title-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .panel-title-group h3 {
+    margin: 0;
+    color: #f1e2c1;
+    font-size: 20px;
+    line-height: 1.5;
+  }
+
+  .panel-title-group p {
+    margin: 4px 0 0;
+    color: rgba(200, 169, 110, 0.64);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .burger-menu {
+    min-height: 44px;
+    height: 44px;
+    padding: 10px 12px;
+    border-radius: 16px;
+    background: rgba(200, 169, 110, 0.08);
+    border: 1px solid rgba(200, 169, 110, 0.16);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+
+  .burger-menu:hover {
+    transform: scale(0.98);
+    background: rgba(200, 169, 110, 0.14);
+    border-color: rgba(200, 169, 110, 0.28);
+  }
+
+  .burger-icon {
+    width: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+
+  .burger-icon span {
+    width: 100%;
+    height: 2px;
+    border-radius: 999px;
+    background: #c8a96e;
+  }
+
+  .menu-label {
+    color: #f1e2c1;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  .collapsed-trigger {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 16px;
+    background: rgba(8, 8, 10, 0.96);
+    border-color: rgba(200, 169, 110, 0.28);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px);
+  }
+
+  .control-section,
+  .favorite-panel,
+  .trade-panel {
+    border-radius: 24px;
+    border: 1px solid rgba(200, 169, 110, 0.16);
+    background: rgba(18, 18, 22, 0.78);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .control-section,
+  .favorite-panel {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: visible;
+    position: relative;
+    z-index: 5;
+  }
+
+  .field-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+
+  .field-stack:focus-within {
+    z-index: 40;
+  }
+
+  .field-stack h3,
+  .favorite-header h3,
+  .split-results h3 {
+    margin: 0;
+    color: #f1e2c1;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .warning-text,
+  .favorite-feedback,
+  .favorite-empty,
+  .panel-note {
+    border-radius: 16px;
+    padding: 12px 14px;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .warning-text {
+    background: rgba(194, 65, 12, 0.14);
+    border: 1px solid rgba(194, 65, 12, 0.28);
+    color: #fca5a5;
+  }
+
+  .favorite-feedback {
+    background: rgba(59, 130, 246, 0.14);
+    border: 1px solid rgba(59, 130, 246, 0.22);
+    color: #bfdbfe;
+  }
+
+  .favorite-empty,
+  .panel-note {
+    background: rgba(200, 169, 110, 0.06);
+    border: 1px solid rgba(200, 169, 110, 0.12);
+    color: rgba(200, 169, 110, 0.8);
+  }
+
+  .mode-toggle-row,
+  .bulk-actions,
+  .favorite-actions,
+  .trade-row,
+  .compact-row,
+  .seed-toolbar,
+  .toolbar-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .selection-button,
+  .secondary-toggle,
+  .primary-toggle,
+  .trade-toggle,
+  .trade-action,
+  .remove-stat {
+    border-radius: 16px;
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  }
+
+  .selection-button {
+    flex: 1;
+    padding: 12px 16px;
+    background: rgba(200, 169, 110, 0.08);
+    border: 1px solid rgba(200, 169, 110, 0.14);
+    color: rgba(200, 169, 110, 0.84);
+    font-size: 13px;
+  }
+
+  .selection-button:hover,
+  .secondary-toggle:hover,
+  .primary-toggle:hover,
+  .trade-toggle:hover,
+  .trade-action:hover,
+  .remove-stat:hover {
+    transform: scale(0.98);
+  }
+
+  .selected {
+    background: rgba(200, 169, 110, 0.22) !important;
+    color: #c8a96e !important;
+    border-color: rgba(200, 169, 110, 0.4) !important;
+  }
+
+  .trade-panel {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .trade-label {
+    color: rgba(200, 169, 110, 0.68);
+    font-size: 12px;
+    min-width: 76px;
+  }
+
+  .trade-select {
+    flex: 1;
+  }
+
+  .trade-toggle,
+  .secondary-toggle {
+    padding: 10px 12px;
+    background: rgba(200, 169, 110, 0.08);
+    border: 1px solid rgba(200, 169, 110, 0.16);
+    color: rgba(200, 169, 110, 0.84);
+    font-size: 12px;
+  }
+
+  .trade-toggle-active,
+  .grouped {
+    background: rgba(200, 169, 110, 0.2) !important;
+    border-color: rgba(200, 169, 110, 0.4) !important;
+    color: #f1e2c1 !important;
+  }
+
+  .trade-action,
+  .primary-toggle,
+  .search-button {
+    padding: 10px 14px;
+    color: white;
+    font-size: 12px;
+  }
+
+  .intl-action {
+    background: rgba(59, 130, 246, 0.26);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #bfdbfe;
+  }
+
+  .tw-action {
+    background: rgba(249, 115, 22, 0.26);
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    color: #fdba74;
+  }
+
+  .primary-toggle,
+  .search-button {
+    background: rgba(16, 185, 129, 0.22);
+    border: 1px solid rgba(16, 185, 129, 0.28);
+    color: #d1fae5;
+  }
+
+  .seed-toolbar {
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .toolbar-group {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .combined-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: auto;
+  }
+
+  .split-results {
+    gap: 16px;
+  }
+
+  .combined-row {
+    border-radius: 16px;
+    padding: 10px 12px;
+    background: rgba(8, 8, 10, 0.54);
+    border: 1px solid rgba(200, 169, 110, 0.1);
+    color: #e8d8b8;
+    line-height: 1.7;
+    cursor: pointer;
+  }
+
+  .combined-row:hover {
+    border-color: rgba(200, 169, 110, 0.24);
+  }
+
+  .count-pill {
+    display: inline-block;
+    min-width: 52px;
+    color: #c8a96e;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .selected-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .selected-stat-card {
+    border-radius: 20px;
+    padding: 14px;
+    background: rgba(8, 8, 10, 0.52);
+    border: 1px solid rgba(200, 169, 110, 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .selected-stat-top {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: #f1e2c1;
+    line-height: 1.6;
+  }
+
+  .remove-stat {
+    padding: 8px 12px;
+    background: rgba(239, 68, 68, 0.18);
+    border: 1px solid rgba(239, 68, 68, 0.28);
+    color: #fca5a5;
+  }
+
+  .selected-stat-inputs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .selected-stat-inputs label,
+  .inline-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: rgba(200, 169, 110, 0.74);
+    font-size: 12px;
+  }
+
+  .compact-field {
+    gap: 0;
+  }
+
+  .inline-label {
+    width: 100%;
+  }
+
+  .control-section > .field-stack > input[type='number'],
+  .selected-stat-card input[type='number'],
+  .inline-label > input[type='number'] {
+    border-radius: 16px;
+    border: 1px solid rgba(200, 169, 110, 0.16);
+    background: rgba(8, 8, 10, 0.72);
+    color: #f4ead5;
+    padding: 12px 14px;
+    line-height: 1.6;
+  }
+
+  .favorite-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .favorite-header p {
+    margin: 4px 0 0;
+    color: rgba(200, 169, 110, 0.68);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .favorite-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .favorite-drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50vw;
+    max-width: 50vw;
+    max-height: 100vh;
+    height: 100vh;
+    overflow: auto;
+    z-index: 24;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 0;
+    background: #111317;
+    border: 1px solid rgba(200, 169, 110, 0.24);
+    backdrop-filter: none;
+  }
+
+  .favorite-drawer .favorite-list {
+    max-height: calc(100vh - 260px);
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  :global(.tree-panel .svelte-select) {
+    --background: rgba(12, 14, 18, 0.94);
+    --border: 1px solid rgba(200, 169, 110, 0.2);
+    --border-hover: 1px solid rgba(200, 169, 110, 0.34);
+    --border-focused: 1px solid rgba(58, 151, 255, 0.95);
+    --border-radius: 16px;
+    --border-radius-focused: 16px;
+    --height: 46px;
+    --placeholder-color: rgba(200, 169, 110, 0.55);
+    --input-color: #f4ead5;
+    --selected-item-color: #f4ead5;
+    --item-color: #f4ead5;
+    --item-hover-bg: rgba(200, 169, 110, 0.16);
+    --item-is-active-bg: rgba(59, 130, 246, 0.34);
+    --item-is-active-color: #dbeafe;
+    --list-background: #141820;
+    --list-border: 1px solid rgba(200, 169, 110, 0.22);
+    --list-border-radius: 16px;
+    --list-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+    --list-max-height: 320px;
+    --clear-select-color: rgba(200, 169, 110, 0.75);
+    --list-z-index: 3000;
+    position: relative;
+  }
+
+  :global(.tree-panel .svelte-select.hero-select) {
+    --height: 54px;
+    --font-size: 17px;
+    --input-padding: 0 0 0 2px;
+    --selected-item-padding: 0 24px 0 0;
+  }
+
+  :global(.tree-panel .svelte-select input) {
+    color: #f4ead5 !important;
+    caret-color: #f4ead5;
+  }
+
+  :global(.tree-panel .svelte-select input::placeholder) {
+    color: rgba(200, 169, 110, 0.55);
+    opacity: 1;
+  }
+
+  :global(.tree-panel .svelte-select .selected-item) {
+    color: #f4ead5;
+  }
+
+  :global(.tree-panel .svelte-select.list-open) {
+    z-index: 3001;
+  }
+
+  :global(.tree-panel .svelte-select-list) {
+    z-index: 3000 !important;
+  }
+
+  .favorite-drawer.favorite-panel {
+    box-shadow: -10px 0 28px rgba(0, 0, 0, 0.45);
+  }
+
+  @media (max-width: 1024px) {
+    :global(.tree-panel),
+    .favorite-drawer {
+      width: 100vw;
+      max-width: 100vw;
+    }
+  }
+
+  .hidden-input {
+    display: none;
+  }
+
+  .rainbow {
+    animation: colorRotate 2s linear 0s infinite;
+  }
+
+  .repo-link-wrap {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin: 12px;
+  }
+
+  .repo-link-wrap a {
+    color: rgba(200, 169, 110, 0.56);
+    font-size: 11px;
+    text-decoration: none;
+  }
+
+  @keyframes colorRotate {
+    from {
+      color: hsl(0, 100%, 50%);
+    }
+    25% {
+      color: hsl(90, 100%, 50%);
+    }
+    50% {
+      color: hsl(180, 100%, 50%);
+    }
+    75% {
+      color: hsl(270, 100%, 50%);
+    }
+    100% {
+      color: hsl(359, 100%, 50%);
+    }
+  }
+</style>
+

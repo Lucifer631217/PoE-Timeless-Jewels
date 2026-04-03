@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --poe-gold: #c8a96e;
+  --poe-gold-light: #e8c98e;
+  --poe-gold-dark: #a07840;
+  --poe-orange: #c2410c;
+  --poe-bg: #0d0d0f;
+  --poe-bg-card: #161618;
+  --poe-bg-raised: #1e1e22;
+  --poe-border: rgba(200, 169, 110, 0.25);
+  --poe-border-hover: rgba(200, 169, 110, 0.6);
+  --glass-bg: rgba(22, 22, 26, 0.85);
+  --glass-border: rgba(200, 169, 110, 0.2);
+}
+
+html,
+body {
+  @apply text-white;
+  background-color: var(--poe-bg);
+  background-image: radial-gradient(ellipse at 20% 50%, rgba(120, 80, 30, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(100, 60, 20, 0.06) 0%, transparent 50%);
+  font-family: 'Noto Sans TC', 'Roboto', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+h1 {
+  @apply font-bold;
+  font-family: 'Noto Serif TC', 'Noto Sans TC', serif;
+  font-size: 1.75rem;
+  color: var(--poe-gold);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 30px rgba(200, 169, 110, 0.3);
+}
+
+h2 {
+  @apply font-bold;
+  font-size: 1.35rem;
+  color: var(--poe-gold-light);
+  letter-spacing: 0.02em;
+}
+
+h3 {
+  @apply font-medium;
+  font-size: 0.85rem;
+  color: rgba(200, 169, 110, 0.8);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* PoE 主題 Select 元件 */
+.themed {
+  --background: #1c1c20;
+  --list-background: #1c1c20;
+  --item-hover-bg: rgba(194, 65, 12, 0.35);
+  --item-is-active-bg: rgba(200, 169, 110, 0.2);
+  --border-focus-color: var(--poe-gold);
+  --input-color: #f0e8d8;
+  --border: rgba(200, 169, 110, 0.3);
+  --border-radius: 10px;
+  --item-color: #e8d8b8;
+  --list-border-radius: 10px;
+  --font-size: 13px;
+}
+
+/* Input 輸入框 */
+input[type='number'],
+input[type='text'] {
+  background: #1c1c20;
+  border: 1px solid rgba(200, 169, 110, 0.25);
+  color: #f0e8d8;
+  height: 40px;
+  padding: 0 14px;
+  width: 100%;
+  border-radius: 10px;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 13px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  outline: none;
+}
+
+input[type='number']:focus,
+input[type='text']:focus {
+  border-color: var(--poe-gold);
+  box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.12);
+}
+
+input[type='number']::-webkit-inner-spin-button {
+  opacity: 0.5;
+}
+
+/* 漢堡選單 */
+.burger-menu > div {
+  @apply my-1;
+  width: 20px;
+  height: 2px;
+  background: var(--poe-gold);
+  border-radius: 2px;
+  transition: opacity 0.2s;
+}
+
+.burger-menu:hover > div {
+  opacity: 0.7;
+}
+
+/* 玻璃卡片效果 */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(200, 169, 110, 0.1) inset;
+}
+
+/* PoE 分隔線 */
+.poe-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--poe-gold-dark), transparent);
+  margin: 8px 0;
+  opacity: 0.5;
+}
+
+/* 標籤按鈕 */
+.poe-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  background: rgba(200, 169, 110, 0.12);
+  border: 1px solid rgba(200, 169, 110, 0.25);
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--poe-gold-light);
+  letter-spacing: 0.06em;
+}
