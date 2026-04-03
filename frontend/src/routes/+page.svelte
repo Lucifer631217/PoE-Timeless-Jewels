@@ -7,6 +7,7 @@
   import { calculator, data } from '../lib/types';
   import { translateJewelName, translateConquerorName, translateAlternateSkillName } from '../lib/zh_tw';
   import { translateStat } from '../lib/skill_tree';
+  const appVersion = 'v0.2.0';
 
   const searchParams = $page.url.searchParams;
 
@@ -89,6 +90,7 @@
         <div>
           <h1>永恆珠寶計算器</h1>
           <p class="subtitle">流亡黯道 · Timeless Jewel Calculator</p>
+          <p class="version-chip">版本 {appVersion}</p>
         </div>
       </div>
       <a href="{base}/tree" class="tree-link">
@@ -269,6 +271,20 @@
     color: rgba(200, 169, 110, 0.5);
     letter-spacing: 0.08em;
     margin-top: 2px;
+  }
+
+  .version-chip {
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(200, 169, 110, 0.25);
+    background: rgba(200, 169, 110, 0.1);
+    color: rgba(232, 216, 184, 0.9);
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
   }
 
   .tree-link {

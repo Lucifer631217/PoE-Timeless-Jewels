@@ -1,6 +1,7 @@
 # PoE Timeless Jewels
 
 《流亡黯道》永恆珠寶查詢工具，提供單點 Seed 查詢、天賦樹範圍檢視、詞綴反查，以及交易連結。
+目前版本：`v0.2.0`
 
 ## 功能
 - 永恆珠寶 / 將軍 / Seed 查詢
@@ -22,6 +23,7 @@
 ### 2026-04-04 部署策略調整（最新）
 - 停用 Firebase Hosting GitHub Actions 自動部署，改為手動部署。
 - 手動部署指令：`firebase deploy --only hosting --project poe-timeless-jewels`
+- 版本號更新：`v0.2.0`
 
 ### 2026-04-04 致謝與來源補充
 - 本專案目前維護版 GitHub：`https://github.com/Lucifer631217/PoE-Timeless-Jewels.git`
@@ -75,5 +77,4 @@
 - 新增收藏 JSON 匯入與匯出。
 - 網站開啟時改為預設選取當季聯盟。
 - README 重整，移除先前衝突標記與損壞內容。
-
 
