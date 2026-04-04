@@ -6,6 +6,7 @@
   export let searchResults: SearchResults;
   export let highlight: (newSeed: number, passives: number[]) => void;
   export let onSave: ((set: SearchWithSeed) => void) | undefined = undefined;
+  export let onSaveGroup: ((sets: SearchWithSeed[]) => void) | undefined = undefined;
   export let groupResults = true;
   export let jewel: number;
   export let conqueror: string;
@@ -37,6 +38,13 @@
           </span>
         </button>
         <div class="group-trade-actions">
+          {#if onSaveGroup}
+            <button
+              class="group-trade-btn group-save"
+              on:click|stopPropagation={() => onSaveGroup?.(searchResults.grouped[k])}>
+              本組加入收藏
+            </button>
+          {/if}
           <button
             class="group-trade-btn intl-trade"
             on:click|stopPropagation={() =>
@@ -78,6 +86,13 @@
   </div>
 {:else}
   <div class="flat-list">
+    {#if onSaveGroup && searchResults.raw.length > 0}
+      <div class="flat-list-actions">
+        <button class="group-trade-btn group-save" on:click={() => onSaveGroup?.(searchResults.raw)}>
+          全部加入收藏
+        </button>
+      </div>
+    {/if}
     <VirtualList
       height="auto"
       overscanCount={15}
@@ -180,6 +195,17 @@
     font-weight: 500;
   }
 
+  .group-save {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #a7f3d0;
+  }
+
+  .group-save:hover {
+    background: rgba(16, 185, 129, 0.4);
+    border-color: rgba(16, 185, 129, 0.45);
+  }
+
   .intl-trade {
     background: rgba(59, 130, 246, 0.25);
     border: 1px solid rgba(59, 130, 246, 0.3);
@@ -207,5 +233,11 @@
     display: flex;
     flex-direction: column;
     overflow: auto;
+  }
+
+  .flat-list-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
   }
 </style>

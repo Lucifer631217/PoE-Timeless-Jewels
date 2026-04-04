@@ -5,6 +5,8 @@ import type { SearchWithSeed } from './skill_tree';
 export const FAVORITE_JEWELS_STORAGE_KEY = 'timelessJewelFavorites:v1';
 export const FAVORITE_JEWELS_EXPORT_VERSION = 1;
 
+export type FavoriteEntryType = 'single' | 'group';
+
 export interface FavoriteSnapshotSkill {
   passive: number;
   passiveName: string;
@@ -17,9 +19,11 @@ export interface SavedJewelEntry {
   jewelLabel: string;
   conqueror: string;
   conquerorLabel: string;
+  entryType: FavoriteEntryType;
   seed: number;
+  seeds: number[];
   buildName: string;
-  importantStats: string[];
+  note: string;
   estimatedValue: string;
   snapshot: FavoriteSnapshotSkill[];
   createdAt: string;
@@ -55,6 +59,24 @@ const normalizeStringArray = (value: unknown): string[] => {
     .filter(Boolean);
 };
 
+const normalizeSeeds = (value: unknown, fallbackSeed?: unknown): number[] => {
+  const seedSet = new Set<number>();
+
+  if (Array.isArray(value)) {
+    value.forEach((item) => {
+      if (typeof item === 'number' && Number.isFinite(item)) {
+        seedSet.add(Math.trunc(item));
+      }
+    });
+  }
+
+  if (typeof fallbackSeed === 'number' && Number.isFinite(fallbackSeed)) {
+    seedSet.add(Math.trunc(fallbackSeed));
+  }
+
+  return [...seedSet].sort((left, right) => left - right);
+};
+
 const isFavoriteSnapshotSkill = (value: unknown): value is FavoriteSnapshotSkill => {
   if (!isRecord(value)) {
     return false;
@@ -77,48 +99,70 @@ const sanitizeSnapshot = (snapshot: unknown): FavoriteSnapshotSkill[] => {
   return snapshot
     .filter(isFavoriteSnapshotSkill)
     .map((item) => ({
-      passive: item.passive,
+      passive: Math.trunc(item.passive),
       passiveName: item.passiveName.trim() || item.passive.toString(),
       stats: normalizeStringArray(item.stats)
     }))
     .filter((item) => item.stats.length > 0);
 };
 
-const isSavedJewelEntry = (value: unknown): value is SavedJewelEntry => {
+const sanitizeEntryFromUnknown = (value: unknown): SavedJewelEntry | null => {
   if (!isRecord(value)) {
-    return false;
+    return null;
   }
 
-  return (
-    typeof value.id === 'string' &&
-    typeof value.jewel === 'number' &&
-    typeof value.jewelLabel === 'string' &&
-    typeof value.conqueror === 'string' &&
-    typeof value.conquerorLabel === 'string' &&
-    typeof value.seed === 'number' &&
-    typeof value.buildName === 'string' &&
-    Array.isArray(value.importantStats) &&
-    typeof value.estimatedValue === 'string' &&
-    Array.isArray(value.snapshot) &&
-    typeof value.createdAt === 'string' &&
-    typeof value.updatedAt === 'string'
-  );
+  if (
+    typeof value.id !== 'string' ||
+    typeof value.jewel !== 'number' ||
+    !Number.isFinite(value.jewel) ||
+    typeof value.jewelLabel !== 'string' ||
+    typeof value.conqueror !== 'string' ||
+    typeof value.conquerorLabel !== 'string'
+  ) {
+    return null;
+  }
+
+  const seeds = normalizeSeeds(value.seeds, value.seed);
+  if (seeds.length === 0) {
+    return null;
+  }
+
+  const legacyImportantStats = normalizeStringArray(value.importantStats);
+  const rawNote = typeof value.note === 'string' ? value.note.trim() : legacyImportantStats.join('、');
+
+  const now = new Date().toISOString();
+  const createdAt = typeof value.createdAt === 'string' && value.createdAt ? value.createdAt : now;
+  const updatedAt = typeof value.updatedAt === 'string' && value.updatedAt ? value.updatedAt : now;
+
+  const declaredEntryType = value.entryType === 'group' || value.entryType === 'single' ? value.entryType : undefined;
+  const entryType: FavoriteEntryType = declaredEntryType || (seeds.length > 1 ? 'group' : 'single');
+
+  return {
+    id: value.id,
+    jewel: Math.trunc(value.jewel),
+    jewelLabel: value.jewelLabel.trim(),
+    conqueror: value.conqueror.trim(),
+    conquerorLabel: value.conquerorLabel.trim(),
+    entryType,
+    seed: seeds[0],
+    seeds,
+    buildName: typeof value.buildName === 'string' ? value.buildName.trim() : '',
+    note: rawNote,
+    estimatedValue: typeof value.estimatedValue === 'string' ? value.estimatedValue.trim() : '',
+    snapshot: sanitizeSnapshot(value.snapshot),
+    createdAt,
+    updatedAt
+  };
 };
 
-const sanitizeEntry = (entry: SavedJewelEntry): SavedJewelEntry => ({
-  id: entry.id,
-  jewel: entry.jewel,
-  jewelLabel: entry.jewelLabel.trim(),
-  conqueror: entry.conqueror.trim(),
-  conquerorLabel: entry.conquerorLabel.trim(),
-  seed: entry.seed,
-  buildName: entry.buildName.trim(),
-  importantStats: normalizeStringArray(entry.importantStats),
-  estimatedValue: entry.estimatedValue.trim(),
-  snapshot: sanitizeSnapshot(entry.snapshot),
-  createdAt: entry.createdAt,
-  updatedAt: entry.updatedAt
-});
+const sanitizeEntry = (entry: SavedJewelEntry): SavedJewelEntry => {
+  const sanitized = sanitizeEntryFromUnknown(entry);
+  if (!sanitized) {
+    throw new Error('Invalid favorite jewel entry.');
+  }
+
+  return sanitized;
+};
 
 const sortEntries = (entries: SavedJewelEntry[]): SavedJewelEntry[] =>
   [...entries].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
@@ -136,7 +180,7 @@ const parseEntries = (raw: string | null): SavedJewelEntry[] => {
         ? parsed.entries
         : [];
 
-    return sortEntries(entries.filter(isSavedJewelEntry).map(sanitizeEntry));
+    return sortEntries(entries.map(sanitizeEntryFromUnknown).filter((entry): entry is SavedJewelEntry => !!entry));
   } catch {
     return [];
   }
@@ -164,6 +208,9 @@ export const favoriteJewels = createFavoriteStore();
 
 export const buildSavedJewelId = (jewel: number, conqueror: string, seed: number): string =>
   `${jewel}:${conqueror}:${seed}`;
+
+export const buildSavedJewelGroupId = (jewel: number, conqueror: string, seeds: number[]): string =>
+  `${jewel}:${conqueror}:group:${normalizeSeeds(seeds).join(',')}`;
 
 export const findFavoriteJewel = (id: string): SavedJewelEntry | undefined =>
   get(favoriteJewels).find((entry) => entry.id === id);
@@ -221,12 +268,12 @@ export const importFavoriteJewels = (text: string): FavoriteJewelImportResult =>
   let skipped = 0;
 
   for (const rawEntry of parsed.entries) {
-    if (!isSavedJewelEntry(rawEntry)) {
+    const entry = sanitizeEntryFromUnknown(rawEntry);
+    if (!entry) {
       skipped += 1;
       continue;
     }
 
-    const entry = sanitizeEntry(rawEntry);
     if (mergedEntries.has(entry.id)) {
       replaced += 1;
     } else {

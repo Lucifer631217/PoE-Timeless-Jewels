@@ -1,25 +1,41 @@
 ﻿<script lang="ts">
   import type { SavedJewelDraft } from '../favorite_jewels';
-  import { formatBilingualStatHtml } from '../skill_tree';
 
   export let draft: SavedJewelDraft;
   export let existing = false;
   export let onSave: (draft: SavedJewelDraft) => void;
   export let onCancel: () => void;
 
+  const normalizeSeeds = (seeds: number[], fallbackSeed: number): number[] => {
+    const values = seeds.length > 0 ? seeds : [fallbackSeed];
+    return [...new Set(values)].sort((left, right) => left - right);
+  };
+
+  const summarizeSeeds = (seeds: number[]): string => {
+    if (seeds.length <= 1) {
+      return `Seed ${seeds[0] || draft.seed}`;
+    }
+
+    if (seeds.length <= 8) {
+      return `Seed ${seeds.join(', ')}`;
+    }
+
+    return `Seed ${seeds.slice(0, 8).join(', ')} ...（共 ${seeds.length} 筆）`;
+  };
+
   let buildName = draft.buildName;
   let estimatedValue = draft.estimatedValue;
-  let importantStatsText = draft.importantStats.join('\n');
+  let note = draft.note;
+
+  $: normalizedSeeds = normalizeSeeds(draft.seeds, draft.seed);
+  $: seedSummary = summarizeSeeds(normalizedSeeds);
 
   const handleSave = () => {
     onSave({
       ...draft,
       buildName: buildName.trim(),
       estimatedValue: estimatedValue.trim(),
-      importantStats: importantStatsText
-        .split(/\n|,/)
-        .map((item) => item.trim())
-        .filter(Boolean)
+      note: note.trim()
     });
   };
 </script>
@@ -28,7 +44,15 @@
   <div class="editor-header">
     <div>
       <h3>{existing ? '更新收藏珠寶' : '加入收藏珠寶'}</h3>
-      <p>{draft.jewelLabel} / {draft.conquerorLabel} / Seed {draft.seed}</p>
+      <p>
+        {draft.jewelLabel} / {draft.conquerorLabel} /
+        {#if draft.entryType === 'group'}
+          整組收藏
+        {:else}
+          單顆收藏
+        {/if}
+      </p>
+      <p class="seed-summary">{seedSummary}</p>
     </div>
     <button class="editor-close" type="button" on:click={onCancel}>關閉</button>
   </div>
@@ -44,30 +68,9 @@
   </label>
 
   <label class="editor-field">
-    <span>重要屬性</span>
-    <textarea
-      bind:value={importantStatsText}
-      rows="4"
-      placeholder="每行一個詞綴，也可用逗號分隔"></textarea>
+    <span>備註</span>
+    <textarea bind:value={note} rows="3" placeholder="可記錄用途、交易條件、角色需求等"></textarea>
   </label>
-
-  {#if draft.snapshot.length > 0}
-    <div class="editor-preview">
-      <div class="preview-label">結果摘要</div>
-      {#each draft.snapshot as passive}
-        <div class="preview-item">
-          <div class="preview-passive">{passive.passiveName}</div>
-          {#if passive.stats.length > 0}
-            <ul>
-              {#each passive.stats as stat}
-                <li>{@html formatBilingualStatHtml(stat)}</li>
-              {/each}
-            </ul>
-          {/if}
-        </div>
-      {/each}
-    </div>
-  {/if}
 
   <div class="editor-actions">
     <button class="primary-action" type="button" on:click={handleSave}>
@@ -109,6 +112,10 @@
     line-height: 1.6;
   }
 
+  .seed-summary {
+    color: #9cc3ff;
+  }
+
   .editor-close {
     border: 1px solid rgba(200, 169, 110, 0.18);
     background: rgba(200, 169, 110, 0.08);
@@ -130,8 +137,7 @@
     gap: 6px;
   }
 
-  .editor-field span,
-  .preview-label {
+  .editor-field span {
     color: rgba(200, 169, 110, 0.72);
     font-size: 12px;
     letter-spacing: 0.04em;
@@ -149,37 +155,7 @@
 
   .editor-field textarea {
     resize: vertical;
-    min-height: 96px;
-  }
-
-  .editor-preview {
-    border-radius: 16px;
-    background: rgba(200, 169, 110, 0.05);
-    border: 1px solid rgba(200, 169, 110, 0.12);
-    padding: 12px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .preview-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .preview-passive {
-    color: #e8d8b8;
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .preview-item ul {
-    margin: 0;
-    padding-left: 18px;
-    color: rgba(238, 226, 203, 0.84);
-    font-size: 12px;
-    line-height: 1.6;
+    min-height: 88px;
   }
 
   .editor-actions {

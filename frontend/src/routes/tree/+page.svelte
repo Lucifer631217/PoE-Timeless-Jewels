@@ -11,6 +11,7 @@
   import SearchResults from '../../lib/components/SearchResults.svelte';
   import {
     buildSavedJewelId,
+    buildSavedJewelGroupId,
     favoriteJewels,
     findFavoriteJewel,
     importFavoriteJewels,
@@ -184,7 +185,7 @@
     });
   }
 
-  let mode = searchParams.get('mode') || 'seed';
+  let mode = searchParams.get('mode') || 'stats';
   let disabled = new Set<number>();
   const hasDisabledFromQuery = searchParams.has('disabled');
   let defaultDisabledInitializedNode: number | undefined = undefined;
@@ -762,8 +763,35 @@
       }))
       .filter((skill) => skill.stats.length > 0);
 
-  const collectImportantStats = (snapshot: FavoriteSnapshotSkill[]): string[] =>
-    uniqueStrings(snapshot.flatMap((passive) => passive.stats)).slice(0, 8);
+  const normalizeSeedList = (values: number[]): number[] =>
+    [...new Set(values.filter((value) => Number.isFinite(value)).map((value) => Math.trunc(value)))].sort(
+      (left, right) => left - right
+    );
+
+  const collectSnapshotNote = (snapshot: FavoriteSnapshotSkill[]): string =>
+    uniqueStrings(snapshot.flatMap((passive) => passive.stats))
+      .slice(0, 6)
+      .join('、');
+
+  const mergeSnapshotSkills = (snapshots: FavoriteSnapshotSkill[][]): FavoriteSnapshotSkill[] => {
+    const merged = new Map<number, FavoriteSnapshotSkill>();
+
+    snapshots.flat().forEach((item) => {
+      const existing = merged.get(item.passive);
+      if (existing) {
+        existing.stats = uniqueStrings([...existing.stats, ...item.stats]);
+        return;
+      }
+
+      merged.set(item.passive, {
+        passive: item.passive,
+        passiveName: item.passiveName,
+        stats: uniqueStrings(item.stats)
+      });
+    });
+
+    return [...merged.values()].sort((left, right) => left.passive - right.passive);
+  };
 
   const mergeDraftWithExisting = (draft: SavedJewelDraft): SavedJewelDraft => {
     const existing = findFavoriteJewel(draft.id);
@@ -774,33 +802,52 @@
     return {
       ...draft,
       buildName: existing.buildName,
-      importantStats: existing.importantStats.length > 0 ? existing.importantStats : draft.importantStats,
+      note: existing.note,
       estimatedValue: existing.estimatedValue
     };
   };
 
-  const createFavoriteDraft = (
-    seedValue: number,
-    snapshot: FavoriteSnapshotSkill[],
-    conquerorOverride?: string
-  ): SavedJewelDraft | null => {
+  const createFavoriteDraft = ({
+    seeds,
+    snapshot,
+    entryType,
+    conquerorOverride
+  }: {
+    seeds: number[];
+    snapshot: FavoriteSnapshotSkill[];
+    entryType?: 'single' | 'group';
+    conquerorOverride?: string;
+  }): SavedJewelDraft | null => {
     if (!selectedJewel || !selectedConqueror) {
       return null;
     }
 
+    const normalizedSeeds = normalizeSeedList(seeds);
+    if (normalizedSeeds.length === 0) {
+      return null;
+    }
+
+    const resolvedEntryType = entryType || (normalizedSeeds.length > 1 ? 'group' : 'single');
     const conquerorValue = conquerorOverride || selectedConqueror.value;
     const conquerorLabel =
       conquerorValue === ANY_CONQUEROR ? anyConquerorOption.label : translateConquerorName(conquerorValue);
+    const primarySeed = normalizedSeeds[0];
+    const id =
+      resolvedEntryType === 'group'
+        ? buildSavedJewelGroupId(selectedJewel.value, conquerorValue, normalizedSeeds)
+        : buildSavedJewelId(selectedJewel.value, conquerorValue, primarySeed);
 
     return mergeDraftWithExisting({
-      id: buildSavedJewelId(selectedJewel.value, conquerorValue, seedValue),
+      id,
       jewel: selectedJewel.value,
       jewelLabel: selectedJewel.label,
       conqueror: conquerorValue,
       conquerorLabel,
-      seed: seedValue,
+      entryType: resolvedEntryType,
+      seed: primarySeed,
+      seeds: normalizedSeeds,
       buildName: '',
-      importantStats: collectImportantStats(snapshot),
+      note: collectSnapshotNote(snapshot),
       estimatedValue: '',
       snapshot
     });
@@ -823,7 +870,11 @@
     const snapshot = seedResults
       .map(buildSnapshotFromCalculatedResult)
       .filter((entry): entry is FavoriteSnapshotSkill => !!entry);
-    const draft = createFavoriteDraft(seed, snapshot);
+    const draft = createFavoriteDraft({
+      seeds: [seed],
+      snapshot,
+      entryType: 'single'
+    });
     if (!draft) {
       return;
     }
@@ -834,7 +885,43 @@
   };
 
   const openFavoriteForSearchResult = (set: SearchWithSeed) => {
-    const draft = createFavoriteDraft(set.seed, buildSnapshotFromSearchResult(set), set.conqueror);
+    const draft = createFavoriteDraft({
+      seeds: [set.seed],
+      snapshot: buildSnapshotFromSearchResult(set),
+      entryType: 'single',
+      conquerorOverride: set.conqueror
+    });
+    if (!draft) {
+      return;
+    }
+
+    favoriteDraft = draft;
+    favoriteDrawerOpen = true;
+    favoriteFeedback = '';
+  };
+
+  const saveFavoriteGroup = (sets: SearchWithSeed[]) => {
+    if (!sets.length) {
+      return;
+    }
+
+    const seeds = normalizeSeedList(sets.map((set) => set.seed));
+    if (seeds.length === 0) {
+      return;
+    }
+
+    const conquerorCandidates = uniqueStrings(sets.map((set) => set.conqueror || '').filter(Boolean));
+    const conquerorOverride =
+      conquerorCandidates.length === 1
+        ? conquerorCandidates[0]
+        : selectedConqueror?.value || selectedConquerorValue || ANY_CONQUEROR;
+    const snapshot = mergeSnapshotSkills(sets.map((set) => buildSnapshotFromSearchResult(set)));
+    const draft = createFavoriteDraft({
+      seeds,
+      snapshot,
+      entryType: 'group',
+      conquerorOverride
+    });
     if (!draft) {
       return;
     }
@@ -853,7 +940,13 @@
       updatedAt: now
     });
 
-    favoriteFeedback = replaced ? '已更新收藏珠寶。' : '已加入收藏珠寶。';
+    favoriteFeedback = replaced
+      ? draft.entryType === 'group'
+        ? '已更新整組收藏。'
+        : '已更新收藏珠寶。'
+      : draft.entryType === 'group'
+      ? '已加入整組收藏。'
+      : '已加入收藏珠寶。';
     favoriteDraft = null;
   };
 
@@ -868,7 +961,10 @@
 
   const deleteFavorite = (entry: SavedJewelEntry) => {
     removeFavoriteJewel(entry.id);
-    favoriteFeedback = `已刪除收藏：${entry.jewelLabel} / Seed ${entry.seed}`;
+    favoriteFeedback =
+      entry.entryType === 'group'
+        ? `已刪除整組收藏：${entry.jewelLabel} / 共 ${entry.seeds.length} 筆 Seed`
+        : `已刪除收藏：${entry.jewelLabel} / Seed ${entry.seed}`;
     if (favoriteDraft?.id === entry.id) {
       favoriteDraft = null;
     }
@@ -1266,6 +1362,7 @@
               {groupResults}
               {highlight}
               onSave={openFavoriteForSearchResult}
+              onSaveGroup={saveFavoriteGroup}
               jewel={searchJewel}
               conqueror={searchConqueror}
               platform={platform.value}
@@ -1316,7 +1413,7 @@
       {/if}
 
       {#if favoriteDraft}
-        {#key `${favoriteDraft.id}:${favoriteDraft.snapshot.length}:${favoriteDraft.buildName}:${favoriteDraft.estimatedValue}`}
+        {#key `${favoriteDraft.id}:${favoriteDraft.entryType}:${favoriteDraft.seeds.join(',')}:${favoriteDraft.snapshot.length}:${favoriteDraft.buildName}:${favoriteDraft.estimatedValue}:${favoriteDraft.note}`}
           <FavoriteJewelForm
             draft={favoriteDraft}
             existing={!!findFavoriteJewel(favoriteDraft.id)}
@@ -1896,9 +1993,10 @@
   }
 
   .favorite-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+    align-items: start;
   }
 
   .favorite-drawer {
@@ -1924,6 +2022,12 @@
     max-height: calc(100vh - 260px);
     overflow: auto;
     padding-right: 4px;
+  }
+
+  @media (max-width: 1280px) {
+    .favorite-list {
+      grid-template-columns: 1fr;
+    }
   }
 
   :global(.tree-panel .svelte-select) {

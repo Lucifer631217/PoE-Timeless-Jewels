@@ -562,17 +562,12 @@ type TradeStatCategory = {
   filters: TradeStatFilter[];
 };
 
-const maxTradeFiltersPerGroup = 45;
-const maxTradeGroups = 4;
-const maxTradeFilters = maxTradeFiltersPerGroup * maxTradeGroups;
-
-const chunkFilters = (filters: TradeStatFilter[]): TradeStatFilter[][] => {
-  const chunks: TradeStatFilter[][] = [];
-  for (let i = 0; i < filters.length && chunks.length < maxTradeGroups; i += maxTradeFiltersPerGroup) {
-    chunks.push(filters.slice(i, i + maxTradeFiltersPerGroup));
-  }
-  return chunks;
+type TradeSeedTarget = {
+  seed: number;
+  statId: string;
 };
+
+const maxTradeResultsPerQuery = 45;
 
 const resolveTradeStatIds = (jewel: number, conqueror: string, server: TradeServer): string[] => {
   if (conqueror === ANY_CONQUEROR) {
@@ -604,27 +599,44 @@ const resolveTradeStatIds = (jewel: number, conqueror: string, server: TradeServ
   return fallback ? [fallback] : [];
 };
 
-const buildSeedFilters = (results: SearchWithSeed[], statIds: string[]): TradeStatFilter[] => {
-  const uniqueSeeds = [...new Set(results.map((entry) => entry.seed).filter((seed) => Number.isFinite(seed)))];
-  const filters: TradeStatFilter[] = [];
+const buildTradeTargets = (
+  jewel: number,
+  conqueror: string,
+  results: SearchWithSeed[],
+  server: TradeServer
+): TradeSeedTarget[] => {
+  const targets: TradeSeedTarget[] = [];
 
-  for (const seed of uniqueSeeds) {
-    for (const statId of statIds) {
-      filters.push({
-        id: statId,
-        value: {
-          min: seed,
-          max: seed
-        }
-      });
-
-      if (filters.length >= maxTradeFilters) {
-        return filters;
-      }
+  results.forEach((entry) => {
+    if (!Number.isFinite(entry.seed)) {
+      return;
     }
+
+    const targetConqueror = entry.conqueror || conqueror;
+    const statIds = resolveTradeStatIds(jewel, targetConqueror, server);
+    statIds.forEach((statId) => {
+      targets.push({
+        seed: entry.seed,
+        statId
+      });
+    });
+  });
+
+  return targets;
+};
+
+const chunkTradeResults = (results: SearchWithSeed[]): SearchWithSeed[][] => {
+  if (results.length === 0) {
+    return [results];
   }
 
-  return filters;
+  const chunks: SearchWithSeed[][] = [];
+
+  for (let i = 0; i < results.length; i += maxTradeResultsPerQuery) {
+    chunks.push(results.slice(i, i + maxTradeResultsPerQuery));
+  }
+
+  return chunks;
 };
 
 const resolveTradeStatusOption = (
@@ -637,21 +649,28 @@ const resolveTradeStatusOption = (
   return 'onlineleague';
 };
 
-export const constructQuery = (
-  jewel: number,
-  conqueror: string,
-  results: SearchWithSeed[],
-  condition: TradeCondition = 'instant_buyout',
-  server: TradeServer = 'international'
+const constructQueryFromTargets = (
+  targets: TradeSeedTarget[],
+  condition: TradeCondition = 'instant_buyout'
 ) => {
   const statusOption = resolveTradeStatusOption(condition);
-  const statIds = resolveTradeStatIds(jewel, conqueror, server);
-  const statFilters = buildSeedFilters(results, statIds);
-  const stats: TradeStatCategory[] = chunkFilters(statFilters).map((filters) => ({
-    type: 'count',
-    value: { min: 1 },
-    filters
+  const statFilters: TradeStatFilter[] = targets.map((target) => ({
+    id: target.statId,
+    value: {
+      min: target.seed,
+      max: target.seed
+    }
   }));
+  const stats: TradeStatCategory[] =
+    statFilters.length > 0
+      ? [
+          {
+            type: 'count',
+            value: { min: 1 },
+            filters: statFilters
+          }
+        ]
+      : [];
 
   const query: Record<string, unknown> = {
     status: {
@@ -668,6 +687,14 @@ export const constructQuery = (
   };
 };
 
+export const constructQuery = (
+  jewel: number,
+  conqueror: string,
+  results: SearchWithSeed[],
+  condition: TradeCondition = 'instant_buyout',
+  server: TradeServer = 'international'
+) => constructQueryFromTargets(buildTradeTargets(jewel, conqueror, results, server), condition);
+
 export const openTrade = (
   jewel: number,
   conqueror: string,
@@ -679,6 +706,7 @@ export const openTrade = (
 ) => {
   const normalizedPlatform = !platform || typeof platform !== 'string' ? 'PC' : platform;
   const normalizedLeague = !league || typeof league !== 'string' ? 'Standard' : league;
+  const resultChunks = chunkTradeResults(results);
   const leagueSegment =
     server === 'tw'
       ? encodeURIComponent(translateLeagueName(normalizedLeague).trim() || translateLeagueName('Standard'))
@@ -693,14 +721,22 @@ export const openTrade = (
     url = new URL(`https://www.pathofexile.com/trade/search${platformSegment}/${leagueSegment}`);
   }
 
-  url.searchParams.set(
-    'q',
-    JSON.stringify(constructQuery(jewel, conqueror, results, condition, server))
-  );
+  resultChunks.forEach((chunk, index) => {
+    const tradeUrl = new URL(url.toString());
+    tradeUrl.searchParams.set(
+      'q',
+      JSON.stringify(constructQueryFromTargets(buildTradeTargets(jewel, conqueror, chunk, server), condition))
+    );
 
-  console.log('opening trade', url);
+    console.log('opening trade', {
+      url: tradeUrl.toString(),
+      batch: index + 1,
+      totalBatches: resultChunks.length,
+      resultSeeds: chunk.map((entry) => `${entry.seed}:${entry.conqueror || conqueror}`)
+    });
 
-  window.open(url, '_blank');
+    window.open(tradeUrl, '_blank');
+  });
 };
 
 
