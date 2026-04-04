@@ -1,11 +1,14 @@
 {
   "name": "frontend",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
     "package": "svelte-kit package",
     "preview": "vite preview",
+    "preview:local": "vite preview --host 127.0.0.1 --port 4175",
+    "preview:open": "powershell -ExecutionPolicy Bypass -File .\\open-local-preview.ps1 -SkipBuild",
+    "preview:open:fresh": "powershell -ExecutionPolicy Bypass -File .\\open-local-preview.ps1",
     "prepare": "svelte-kit sync",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",

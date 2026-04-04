@@ -56,7 +56,7 @@
 
   const anyConquerorOption: SelectOption<string> = {
     value: ANY_CONQUEROR,
-    label: '任何'
+    label: '全部'
   };
   const appVersion = APP_VERSION;
 
