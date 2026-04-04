@@ -15,7 +15,7 @@ export type LeagueLike = {
 };
 
 const getLeagueName = (league: LeagueLike): string =>
-  (league.id || league.name || '').trim();
+  (league.name || league.id || '').trim();
 
 const hasRule = (league: LeagueLike, pattern: RegExp): boolean =>
   (league.rules || []).some((rule) => pattern.test(`${rule.id || ''} ${rule.name || ''}`));

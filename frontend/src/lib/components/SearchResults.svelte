@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import type { SearchResults, SearchWithSeed, TradeCondition } from '../skill_tree';
+  import { openTrade, type SearchResults, type SearchWithSeed, type TradeCondition } from '../skill_tree';
   import SearchResult from './SearchResult.svelte';
   import VirtualList from 'svelte-tiny-virtual-list';
 
@@ -26,15 +26,31 @@
       .map((x) => parseInt(x))
       .sort((a, b) => a - b)
       .reverse() as k}
-      <button class="group-header" on:click={() => (expandedGroup = expandedGroup === k ? '' : k)}>
-        <span class="group-label">
-          {k} 權重
-          <span class="group-count">[{searchResults.grouped[k].length}]</span>
-        </span>
-        <span class="group-arrow">
-          {expandedGroup === k ? '▾' : '▸'}
-        </span>
-      </button>
+      <div class="group-header">
+        <button class="group-toggle" on:click={() => (expandedGroup = expandedGroup === k ? '' : k)}>
+          <span class="group-label">
+            {k} 權重
+            <span class="group-count">[{searchResults.grouped[k].length}]</span>
+          </span>
+          <span class="group-arrow">
+            {expandedGroup === k ? '▾' : '▸'}
+          </span>
+        </button>
+        <div class="group-trade-actions">
+          <button
+            class="group-trade-btn intl-trade"
+            on:click|stopPropagation={() =>
+              openTrade(jewel, conqueror, searchResults.grouped[k], platform, league, 'international', tradeCondition)}>
+            本組國際服交易
+          </button>
+          <button
+            class="group-trade-btn tw-trade"
+            on:click|stopPropagation={() =>
+              openTrade(jewel, conqueror, searchResults.grouped[k], platform, twLeague, 'tw', tradeCondition)}>
+            本組台服交易
+          </button>
+        </div>
+      </div>
 
       {#if expandedGroup === k}
         <div class="group-content">
@@ -93,6 +109,17 @@
   .group-header {
     font-size: 13px;
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .group-toggle {
+    flex: 1;
+    font-size: 13px;
     padding: 8px 14px;
     background: rgba(200, 169, 110, 0.08);
     border: 1px solid rgba(200, 169, 110, 0.2);
@@ -101,13 +128,12 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s, transform 0.18s ease;
     color: #e8d8b8;
   }
 
-  .group-header:hover {
+  .group-toggle:hover {
     background: rgba(200, 169, 110, 0.14);
     border-color: rgba(200, 169, 110, 0.35);
     transform: scale(0.99);
@@ -136,6 +162,44 @@
     overflow: auto;
     min-height: 200px;
     margin-bottom: 6px;
+  }
+
+  .group-trade-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .group-trade-btn {
+    padding: 6px 10px;
+    border-radius: 16px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .intl-trade {
+    background: rgba(59, 130, 246, 0.25);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #93c5fd;
+  }
+
+  .intl-trade:hover {
+    background: rgba(59, 130, 246, 0.45);
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+
+  .tw-trade {
+    background: rgba(249, 115, 22, 0.25);
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    color: #fdba74;
+  }
+
+  .tw-trade:hover {
+    background: rgba(249, 115, 22, 0.45);
+    border-color: rgba(249, 115, 22, 0.5);
   }
 
   .flat-list {

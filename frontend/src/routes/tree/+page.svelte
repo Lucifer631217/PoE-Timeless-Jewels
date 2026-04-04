@@ -634,7 +634,7 @@
   const toLeagueOptions = (rawLeagues: LeagueLike[]): LeagueOption[] => {
     const mapped = rawLeagues
       .filter((leagueItem) => !isSoloSelfFoundLeague(leagueItem))
-      .map((leagueItem) => (leagueItem.id || leagueItem.name || '').trim())
+      .map((leagueItem) => (leagueItem.name || leagueItem.id || '').trim())
       .filter(Boolean)
       .map((value) => ({
         value,
@@ -945,6 +945,9 @@
                 </button>
                 <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'} on:click={() => (tradeCondition = 'in_person_online_in_league')}>
                   面對面交易（聯盟在線）
+                </button>
+                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'instant_buyout_and_in_person'} on:click={() => (tradeCondition = 'instant_buyout_and_in_person')}>
+                  即刻購買以及面對面交易
                 </button>
               </div>
 

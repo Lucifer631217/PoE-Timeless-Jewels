@@ -546,7 +546,10 @@ const twTradeStatNames: { [key: number]: string } = {
 };
 
 type TradeServer = 'international' | 'tw';
-export type TradeCondition = 'instant_buyout' | 'in_person_online_in_league';
+export type TradeCondition =
+  | 'instant_buyout'
+  | 'in_person_online_in_league'
+  | 'instant_buyout_and_in_person';
 export const ANY_CONQUEROR = '__any__';
 
 type TradeStatFilter = {
@@ -640,7 +643,8 @@ export const constructQuery = (
   conqueror: string,
   results: SearchWithSeed[],
   condition: TradeCondition = 'instant_buyout',
-  server: TradeServer = 'international'
+  server: TradeServer = 'international',
+  league?: string
 ) => {
   const statusOption = resolveTradeStatusOption(condition);
   const statIds = resolveTradeStatIds(jewel, conqueror, server);
@@ -657,6 +661,18 @@ export const constructQuery = (
     },
     stats
   };
+
+  if (server === 'tw' && league) {
+    query.filters = {
+      trade_filters: {
+        filters: {
+          league: {
+            option: league
+          }
+        }
+      }
+    };
+  }
 
   return {
     query,
@@ -688,7 +704,10 @@ export const openTrade = (
     url = new URL(`https://www.pathofexile.com/trade/search${platformSegment}/${leagueSegment}`);
   }
 
-  url.searchParams.set('q', JSON.stringify(constructQuery(jewel, conqueror, results, condition, server)));
+  url.searchParams.set(
+    'q',
+    JSON.stringify(constructQuery(jewel, conqueror, results, condition, server, normalizedLeague))
+  );
 
   console.log('opening trade', url);
 
