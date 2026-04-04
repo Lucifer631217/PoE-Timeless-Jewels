@@ -46,20 +46,32 @@ export const conquerorNames: Record<string, string> = {
 };
 
 const exactLeagueNames: Record<string, string> = {
-  Standard: '標準',
-  Hardcore: '專家',
+  Standard: '標準模式',
+  Hardcore: '專家模式',
   'Solo Self-Found': '自力',
   SSF: '自力',
   Ruthless: '殘暴',
-  Mirage: '蜃景',
-  'Hardcore Mirage': '專家蜃景',
-  'Solo Self-Found Mirage': '自力蜃景',
-  'Hardcore Solo Self-Found Mirage': '專家自力蜃景',
-  'SSF Mirage': '自力蜃景',
-  'HC Mirage': '專家蜃景',
-  'Ruthless Mirage': '殘暴蜃景',
-  'Hardcore Ruthless Mirage': '專家殘暴蜃景',
-  'HC Ruthless Mirage': '專家殘暴蜃景'
+  'Hardcore Ruthless': '殘暴（專家）',
+  'Ruthless Hardcore': '殘暴（專家）',
+  'Solo Self-Found Ruthless': '殘暴「自力」',
+  'Ruthless Solo Self-Found': '殘暴「自力」',
+  'SSF Ruthless': '殘暴「自力」',
+  'Ruthless SSF': '殘暴「自力」',
+  'Hardcore Solo Self-Found Ruthless': '殘暴（專家）「自力」',
+  'Hardcore Ruthless Solo Self-Found': '殘暴（專家）「自力」',
+  'Ruthless Hardcore Solo Self-Found': '殘暴（專家）「自力」',
+  'HC Ruthless': '殘暴（專家）',
+  'HC SSF Ruthless': '殘暴（專家）「自力」',
+  'HC Ruthless SSF': '殘暴（專家）「自力」',
+  Mirage: '遠古蜃景',
+  'Hardcore Mirage': '遠古蜃景（專家）',
+  'Solo Self-Found Mirage': '遠古蜃景「自力」',
+  'Hardcore Solo Self-Found Mirage': '遠古蜃景（專家）「自力」',
+  'SSF Mirage': '遠古蜃景「自力」',
+  'HC Mirage': '遠古蜃景（專家）',
+  'Ruthless Mirage': '遠古蜃景. 殘暴',
+  'Hardcore Ruthless Mirage': '遠古蜃景. 殘暴（專家）',
+  'HC Ruthless Mirage': '遠古蜃景. 殘暴（專家）'
 };
 
 const leaguePhraseNames: Array<[string, string]> = [

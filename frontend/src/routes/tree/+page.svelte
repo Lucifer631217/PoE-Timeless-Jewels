@@ -634,7 +634,7 @@
   const toLeagueOptions = (rawLeagues: LeagueLike[]): LeagueOption[] => {
     const mapped = rawLeagues
       .filter((leagueItem) => !isSoloSelfFoundLeague(leagueItem))
-      .map((leagueItem) => (leagueItem.name || leagueItem.id || '').trim())
+      .map((leagueItem) => (leagueItem.id || leagueItem.name || '').trim())
       .filter(Boolean)
       .map((value) => ({
         value,
@@ -676,7 +676,7 @@
   let twLeague: LeagueOption | undefined;
   const getTWLeaguesData = async () => {
     try {
-      const response = await fetch('https://api.poe.watch/leagues?realm=garena');
+      const response = await fetch('https://api.pathofexile.com/leagues?type=main&realm=garena');
       if (!response.ok) {
         throw new Error('failed');
       }
@@ -684,12 +684,9 @@
       const rawLeagues: LeagueLike[] = await response.json();
       const resolved = resolveLeagueSelection(rawLeagues, 'Standard');
       twLeagues = resolved.options;
-      twLeague = resolved.selected;
+      twLeague = twLeagues.find((option) => option.value === twLeague?.value) || resolved.selected;
     } catch {
-      twLeagues = [
-        { value: 'Standard', label: translateLeagueName('Standard') },
-        { value: 'Hardcore', label: translateLeagueName('Hardcore') }
-      ];
+      twLeagues = [{ value: 'Standard', label: translateLeagueName('Standard') }];
       twLeague = twLeagues[0];
     }
   };
@@ -945,9 +942,6 @@
                 </button>
                 <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'} on:click={() => (tradeCondition = 'in_person_online_in_league')}>
                   面對面交易（聯盟在線）
-                </button>
-                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'instant_buyout_and_in_person'} on:click={() => (tradeCondition = 'instant_buyout_and_in_person')}>
-                  即刻購買以及面對面交易
                 </button>
               </div>
 
