@@ -23,6 +23,7 @@
   } from '../../lib/favorite_jewels';
   import { isSoloSelfFoundLeague, pickCurrentLeagueValue, type LeagueLike } from '../../lib/leagues';
   import {
+    ANY_CONQUEROR,
     formatBilingualStatHtml,
     getAffectedNodes,
     openTrade,
@@ -37,6 +38,7 @@
   } from '../../lib/skill_tree';
   import type { Node } from '../../lib/skill_tree_types';
   import { data, calculator } from '../../lib/types';
+  import { APP_VERSION } from '../../lib/version';
   import { statValues } from '../../lib/values';
   import { syncWrap } from '../../lib/worker';
   import { translateConquerorName, translateJewelName, translateLeagueName } from '../../lib/zh_tw';
@@ -48,8 +50,15 @@
 
   type CalculatedSeedResult = {
     node: number;
+    conqueror: string;
     result: data.AlternatePassiveSkillInformation;
   };
+
+  const anyConquerorOption: SelectOption<string> = {
+    value: ANY_CONQUEROR,
+    label: '任何'
+  };
+  const appVersion = APP_VERSION;
 
   const searchParams = $page.url.searchParams;
   const timelessJewels = data.TimelessJewels || {};
@@ -93,20 +102,31 @@
   $: maxSeed = selectedSeedRanges?.Max || 0;
 
   $: conquerors = selectedJewel
-    ? Object.keys(currentConquerors).map((key) => ({
-        value: key,
-        label: translateConquerorName(key)
-      }))
+    ? [
+        anyConquerorOption,
+        ...Object.keys(currentConquerors).map((key) => ({
+          value: key,
+          label: translateConquerorName(key)
+        }))
+      ]
     : [];
 
   let selectedConqueror: SelectOption<string> | undefined = searchParams.has('conqueror')
-    ? {
-        value: searchParams.get('conqueror') || '',
-        label: translateConquerorName(searchParams.get('conqueror') || '')
-      }
+    ? (() => {
+        const value = searchParams.get('conqueror') || '';
+        return {
+          value,
+          label: value === ANY_CONQUEROR ? anyConquerorOption.label : translateConquerorName(value)
+        };
+      })()
     : undefined;
 
-  $: if (selectedConqueror && selectedJewelValue !== undefined && !currentConquerors[selectedConqueror.value]) {
+  $: if (
+    selectedConqueror &&
+    selectedConqueror.value !== ANY_CONQUEROR &&
+    selectedJewelValue !== undefined &&
+    !currentConquerors[selectedConqueror.value]
+  ) {
     selectedConqueror = undefined;
   }
 
@@ -120,32 +140,35 @@
     : [];
 
   $: selectedConquerorValue = selectedConqueror?.value || '';
+  $: selectedConquerorIsAny = selectedConquerorValue === ANY_CONQUEROR;
+  $: selectedConquerorKeys =
+    selectedConquerorIsAny
+      ? Object.keys(currentConquerors)
+      : selectedConquerorValue && currentConquerors[selectedConquerorValue]
+        ? [selectedConquerorValue]
+        : [];
+  $: hasValidConquerorSelection = selectedConquerorKeys.length > 0;
   $: seedResults =
     !seed ||
     !selectedJewel ||
-    !selectedConquerorValue ||
-    !currentConquerors[selectedConquerorValue]
+    !hasValidConquerorSelection
       ? []
       : affectedNodes
           .filter((node) => node.skill !== undefined && !!treeToPassive[node.skill])
-          .map((node) => {
+          .flatMap((node) => {
             const skillId = node.skill;
             if (skillId === undefined) {
-              return null;
+              return [];
             }
 
             const entry = treeToPassive[skillId];
-            return {
+            return selectedConquerorKeys.map((conquerorValue) => ({
               node: skillId,
-              result: calculator.Calculate(
-                entry ? entry.Index : 0,
-                seed,
-                selectedJewel?.value || 0,
-                selectedConquerorValue
-              )
-            };
+              conqueror: conquerorValue,
+              result: calculator.Calculate(entry ? entry.Index : 0, seed, selectedJewel?.value || 0, conquerorValue)
+            }));
           })
-          .filter((result): result is CalculatedSeedResult => result !== null);
+          .filter((result): result is CalculatedSeedResult => !!result.result);
 
   let selectedStats: Record<string, StatConfig> = {};
   if (searchParams.has('stat')) {
@@ -267,8 +290,8 @@
   let searchOutcome: SearchResultsType | undefined;
   let searchJewel = 1;
   let searchConqueror = '';
-  const search = () => {
-    if (!circledNode || !selectedJewel || !selectedConqueror) {
+  const search = async () => {
+    if (!circledNode || !selectedJewel || !selectedConqueror || selectedConquerorKeys.length === 0) {
       return;
     }
 
@@ -277,38 +300,84 @@
     searching = true;
     searchOutcome = undefined;
 
-    const query: ReverseSearchConfig = {
-      jewel: selectedJewel.value,
-      conqueror: selectedConqueror.value,
-      nodes: affectedNodes
-        .filter((node) => node.skill !== undefined && !disabled.has(node.skill))
-        .map((node) => (node.skill !== undefined ? treeToPassive[node.skill] : undefined))
-        .filter((node): node is data.PassiveSkill => !!node)
-        .map((node) => node.Index),
-      stats: Object.values(selectedStats),
-      minTotalWeight
-    };
-
     if (!syncWrap) {
       searching = false;
       return;
     }
 
-    syncWrap
-      .search(
-        query,
-        proxy(async (seedValue) => {
-          currentSeed = seedValue;
-        })
-      )
-      .then((result) => {
-        searchOutcome = result;
-        searching = false;
-        results = true;
-      })
-      .catch(() => {
-        searching = false;
+    const searchNodes = affectedNodes
+      .filter((node) => node.skill !== undefined && !disabled.has(node.skill))
+      .map((node) => (node.skill !== undefined ? treeToPassive[node.skill] : undefined))
+      .filter((node): node is data.PassiveSkill => !!node)
+      .map((node) => node.Index);
+
+    const mergeSearchResults = (
+      entries: { conqueror: string; result: SearchResultsType }[]
+    ): SearchResultsType => {
+      const grouped: SearchResultsType['grouped'] = {};
+      const raw: SearchWithSeed[] = [];
+
+      entries.forEach(({ conqueror, result }) => {
+        Object.keys(result.grouped).forEach((groupKey) => {
+          const key = parseInt(groupKey);
+          const mergedGroup = (result.grouped[key] || []).map((item) => ({
+            ...item,
+            conqueror
+          }));
+          grouped[key] = [...(grouped[key] || []), ...mergedGroup];
+        });
+
+        raw.push(
+          ...result.raw.map((item) => ({
+            ...item,
+            conqueror
+          }))
+        );
       });
+
+      Object.keys(grouped).forEach((groupKey) => {
+        const key = parseInt(groupKey);
+        grouped[key] = grouped[key].sort((left, right) => right.weight - left.weight);
+      });
+
+      return {
+        grouped,
+        raw: raw.sort((left, right) => right.weight - left.weight)
+      };
+    };
+
+    try {
+      const searchResultsByConqueror: { conqueror: string; result: SearchResultsType }[] = [];
+
+      for (const conquerorValue of selectedConquerorKeys) {
+        const query: ReverseSearchConfig = {
+          jewel: selectedJewel.value,
+          conqueror: conquerorValue,
+          nodes: searchNodes,
+          stats: Object.values(selectedStats),
+          minTotalWeight
+        };
+
+        const result = await syncWrap.search(
+          query,
+          proxy(async (seedValue) => {
+            currentSeed = seedValue;
+          })
+        );
+
+        searchResultsByConqueror.push({
+          conqueror: conquerorValue,
+          result
+        });
+      }
+
+      searchOutcome = mergeSearchResults(searchResultsByConqueror);
+      results = true;
+    } catch {
+      // keep existing UI state and only stop spinner
+    } finally {
+      searching = false;
+    }
   };
 
   let highlighted: number[] = [];
@@ -412,7 +481,7 @@
     withColors: boolean,
     only: 'notables' | 'passives' | 'all'
   ): CombinedResult[] => {
-    const mappedStats: Record<number, number[]> = {};
+    const mappedStats: Record<number, Set<number>> = {};
 
     rawResults.forEach((entry) => {
       if (skillTree.nodes[entry.node].isKeystone) {
@@ -431,13 +500,19 @@
 
       if (entry.result.AlternatePassiveSkill?.StatsKeys) {
         entry.result.AlternatePassiveSkill.StatsKeys.forEach((key) => {
-          mappedStats[key] = [...(mappedStats[key] || []), entry.node];
+          if (!mappedStats[key]) {
+            mappedStats[key] = new Set<number>();
+          }
+          mappedStats[key].add(entry.node);
         });
       }
 
       entry.result.AlternatePassiveAdditionInformations?.forEach((info) => {
         info.AlternatePassiveAddition?.StatsKeys?.forEach((key) => {
-          mappedStats[key] = [...(mappedStats[key] || []), entry.node];
+          if (!mappedStats[key]) {
+            mappedStats[key] = new Set<number>();
+          }
+          mappedStats[key].add(entry.node);
         });
       });
     });
@@ -449,7 +524,7 @@
         id: statIdString,
         rawStat: translated,
         stat: renderBilingualStatHtml(translated, withColors),
-        passives: mappedStats[statId]
+        passives: Array.from(mappedStats[statId] || [])
       };
     });
   };
@@ -689,17 +764,25 @@
     };
   };
 
-  const createFavoriteDraft = (seedValue: number, snapshot: FavoriteSnapshotSkill[]): SavedJewelDraft | null => {
+  const createFavoriteDraft = (
+    seedValue: number,
+    snapshot: FavoriteSnapshotSkill[],
+    conquerorOverride?: string
+  ): SavedJewelDraft | null => {
     if (!selectedJewel || !selectedConqueror) {
       return null;
     }
 
+    const conquerorValue = conquerorOverride || selectedConqueror.value;
+    const conquerorLabel =
+      conquerorValue === ANY_CONQUEROR ? anyConquerorOption.label : translateConquerorName(conquerorValue);
+
     return mergeDraftWithExisting({
-      id: buildSavedJewelId(selectedJewel.value, selectedConqueror.value, seedValue),
+      id: buildSavedJewelId(selectedJewel.value, conquerorValue, seedValue),
       jewel: selectedJewel.value,
       jewelLabel: selectedJewel.label,
-      conqueror: selectedConqueror.value,
-      conquerorLabel: selectedConqueror.label,
+      conqueror: conquerorValue,
+      conquerorLabel,
       seed: seedValue,
       buildName: '',
       importantStats: collectImportantStats(snapshot),
@@ -716,7 +799,7 @@
   $: canSaveCurrentSeed =
     mode === 'seed' &&
     !!selectedJewel &&
-    !!selectedConqueror &&
+    hasValidConquerorSelection &&
     seed >= minSeed &&
     seed <= maxSeed &&
     seedResults.length > 0;
@@ -736,7 +819,7 @@
   };
 
   const openFavoriteForSearchResult = (set: SearchWithSeed) => {
-    const draft = createFavoriteDraft(set.seed, buildSnapshotFromSearchResult(set));
+    const draft = createFavoriteDraft(set.seed, buildSnapshotFromSearchResult(set), set.conqueror);
     if (!draft) {
       return;
     }
@@ -822,7 +905,7 @@
   {clickNode}
   {circledNode}
   selectedJewel={selectedJewel?.value || 0}
-  selectedConqueror={selectedConqueror?.value || ''}
+  selectedConqueror={selectedConquerorValue === ANY_CONQUEROR ? '' : selectedConquerorValue}
   {highlighted}
   seed={seed || 0}
   highlightJewels={!circledNode}
@@ -861,13 +944,7 @@
                   即刻購買
                 </button>
                 <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'} on:click={() => (tradeCondition = 'in_person_online_in_league')}>
-                  面對面（聯盟上線）
-                </button>
-                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'in_person_online'} on:click={() => (tradeCondition = 'in_person_online')}>
-                  面對面（上線）
-                </button>
-                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'any'} on:click={() => (tradeCondition = 'any')}>
-                  不限
+                  面對面交易（聯盟在線）
                 </button>
               </div>
 
@@ -918,24 +995,39 @@
         <div class="panel-body">
           {#if !results}
             <section class="control-section">
-              <div class="field-stack">
-                <Select class="hero-select" items={jewels} bind:value={selectedJewel} on:change={changeJewel} placeholder="選擇永恆珠寶" floatingConfig={selectFloatingConfig} />
+              <div class="inline-select-row">
+                <div class="field-stack field-stack-half">
+                  <h3>珠寶</h3>
+                  <Select class="hero-select" items={jewels} bind:value={selectedJewel} on:change={changeJewel} placeholder="選擇永恆珠寶" floatingConfig={selectFloatingConfig} />
+                </div>
+
+                {#if selectedJewel}
+                  <div class="field-stack field-stack-half">
+                    <h3>將軍</h3>
+                    <Select class="hero-select" items={conquerors} bind:value={selectedConqueror} on:change={updateUrl} placeholder="選擇將軍" floatingConfig={selectFloatingConfig} />
+                  </div>
+                {/if}
               </div>
 
               {#if selectedJewel}
-                <div class="field-stack">
-                  <h3>將軍</h3>
-                  <Select class="hero-select" items={conquerors} bind:value={selectedConqueror} on:change={updateUrl} placeholder="選擇將軍" floatingConfig={selectFloatingConfig} />
-                </div>
-
-                {#if selectedConqueror && selectedJewelValue !== undefined && Object.keys(timelessJewelConquerors[selectedJewelValue] || {}).includes(selectedConqueror.value)}
-                  <div class="mode-toggle-row">
-                    <button class="selection-button" class:selected={mode === 'seed'} on:click={() => setMode('seed')}>
-                      依 Seed
-                    </button>
-                    <button class="selection-button" class:selected={mode === 'stats'} on:click={() => setMode('stats')}>
-                      依詞綴反查
-                    </button>
+                {#if selectedConqueror && hasValidConquerorSelection}
+                  <div class="mode-header-row">
+                    <div class="mode-toggle-row">
+                      <button class="selection-button" class:selected={mode === 'seed'} on:click={() => setMode('seed')}>
+                        依 Seed
+                      </button>
+                      <button class="selection-button" class:selected={mode === 'stats'} on:click={() => setMode('stats')}>
+                        依詞綴反查
+                      </button>
+                    </div>
+                    {#if mode === 'stats'}
+                      <div class="bulk-actions bulk-actions-inline">
+                        <button class="secondary-toggle" on:click={selectAll} disabled={searching || disabled.size === 0}>全選</button>
+                        <button class="secondary-toggle" on:click={selectAllNotables} disabled={searching || disabled.size === 0}>全選強力天賦</button>
+                        <button class="secondary-toggle" on:click={selectAllPassives} disabled={searching || disabled.size === 0}>全選小天賦</button>
+                        <button class="secondary-toggle" on:click={deselectAll} disabled={searching || disabled.size >= affectedNodes.length}>全部排除</button>
+                      </div>
+                    {/if}
                   </div>
 
                   {#if mode === 'seed'}
@@ -994,9 +1086,18 @@
                       {/if}
                     {/if}
                   {:else if mode === 'stats'}
-                    <div class="field-stack">
+                    <div class="field-stack field-stack-inline">
                       <h3>新增目標詞綴</h3>
-                      <Select items={statItems} on:change={selectStat} bind:this={statSelector} placeholder="選擇要反查的詞綴" floatingConfig={selectFloatingConfig} />
+                      <div class="stat-picker">
+                        <Select items={statItems} on:change={selectStat} bind:this={statSelector} placeholder="選擇要反查的詞綴" floatingConfig={selectFloatingConfig}>
+                          <svelte:fragment slot="item" let:item>
+                            <span>{@html formatBilingualStatHtml(item.label)}</span>
+                          </svelte:fragment>
+                          <svelte:fragment slot="selection" let:selection>
+                            <span>{@html formatBilingualStatHtml(selection.label)}</span>
+                          </svelte:fragment>
+                        </Select>
+                      </div>
                     </div>
 
                     {#if Object.keys(selectedStats).length > 0}
@@ -1005,14 +1106,14 @@
                           <div class="selected-stat-card">
                             <div class="selected-stat-top">
                               <button class="remove-stat" on:click={() => removeStat(selectedStats[statId].id)}>移除</button>
-                              <span>{@html formatBilingualStatHtml(translateStatBilingual(selectedStats[statId].id))}</span>
+                              <span class="selected-stat-text">{@html formatBilingualStatHtml(translateStatBilingual(selectedStats[statId].id))}</span>
                             </div>
                             <div class="selected-stat-inputs">
-                              <label>
+                              <label class="inline-label inline-label-compact">
                                 <span>最低數量</span>
                                 <input type="number" min="0" bind:value={selectedStats[statId].min} />
                               </label>
-                              <label>
+                              <label class="inline-label inline-label-compact">
                                 <span>權重</span>
                                 <input type="number" min="0" bind:value={selectedStats[statId].weight} />
                               </label>
@@ -1022,17 +1123,10 @@
                       </div>
 
                       <div class="field-stack compact-field">
-                        <label class="inline-label">
+                        <label class="inline-label inline-label-compact inline-label-total">
                           <span>最低總權重</span>
                           <input type="number" min="0" bind:value={minTotalWeight} />
                         </label>
-                      </div>
-
-                      <div class="bulk-actions">
-                        <button class="secondary-toggle" on:click={selectAll} disabled={searching || disabled.size === 0}>全選</button>
-                        <button class="secondary-toggle" on:click={selectAllNotables} disabled={searching || disabled.size === 0}>全選強力天賦</button>
-                        <button class="secondary-toggle" on:click={selectAllPassives} disabled={searching || disabled.size === 0}>全選小天賦</button>
-                        <button class="secondary-toggle" on:click={deselectAll} disabled={searching || disabled.size >= affectedNodes.length}>全部排除</button>
                       </div>
 
                       <button class="primary-toggle search-button" on:click={search} disabled={searching}>
@@ -1129,7 +1223,7 @@
   {/if}
 
   <div class="repo-link-wrap">
-    <a href="https://github.com/Vilsol/timeless-jewels" target="_blank" rel="noopener">前往 GitHub 原始專案</a>
+    <span>版本 {appVersion}</span>
   </div>
 </SkillTree>
 
@@ -1303,8 +1397,48 @@
     position: relative;
   }
 
+  .inline-select-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .field-stack-half {
+    min-width: 0;
+  }
+
+  .mode-header-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .mode-header-row .mode-toggle-row {
+    flex-wrap: nowrap;
+    flex: 0 0 auto;
+  }
+
   .field-stack:focus-within {
     z-index: 40;
+  }
+
+  .field-stack-inline {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .field-stack-inline h3 {
+    white-space: nowrap;
+    margin: 0;
+  }
+
+  .stat-picker {
+    flex: 1;
+    min-width: 0;
   }
 
   .field-stack h3,
@@ -1358,6 +1492,11 @@
     align-items: center;
   }
 
+  .bulk-actions-inline {
+    justify-content: flex-end;
+    flex: 1;
+  }
+
   .selection-button,
   .secondary-toggle,
   .primary-toggle,
@@ -1375,6 +1514,7 @@
     border: 1px solid rgba(200, 169, 110, 0.14);
     color: rgba(200, 169, 110, 0.84);
     font-size: 13px;
+    white-space: nowrap;
   }
 
   .selection-button:hover,
@@ -1506,8 +1646,10 @@
     background: rgba(8, 8, 10, 0.52);
     border: 1px solid rgba(200, 169, 110, 0.12);
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
   }
 
   .selected-stat-top {
@@ -1516,6 +1658,12 @@
     align-items: center;
     color: #f1e2c1;
     line-height: 1.6;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .selected-stat-text {
+    min-width: 0;
   }
 
   .remove-stat {
@@ -1527,8 +1675,9 @@
 
   .selected-stat-inputs {
     display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 10px;
+    flex-wrap: nowrap;
+    align-items: center;
   }
 
   .selected-stat-inputs label,
@@ -1546,6 +1695,25 @@
 
   .inline-label {
     width: 100%;
+  }
+
+  .inline-label-compact {
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 8px !important;
+    white-space: nowrap;
+    width: auto;
+  }
+
+  .inline-label-compact input {
+    width: 86px;
+    min-width: 72px;
+    padding: 8px 10px !important;
+  }
+
+  .inline-label-total input {
+    width: 110px;
   }
 
   .control-section > .field-stack > input[type='number'],
@@ -1668,6 +1836,30 @@
       width: 100vw;
       max-width: 100vw;
     }
+
+    .inline-select-row {
+      grid-template-columns: 1fr;
+    }
+
+    .bulk-actions-inline {
+      justify-content: flex-start;
+      width: 100%;
+      flex: none;
+    }
+
+    .field-stack-inline {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .selected-stat-card {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .selected-stat-inputs {
+      flex-wrap: wrap;
+    }
   }
 
   .hidden-input {
@@ -1685,10 +1877,9 @@
     margin: 12px;
   }
 
-  .repo-link-wrap a {
+  .repo-link-wrap span {
     color: rgba(200, 169, 110, 0.56);
     font-size: 11px;
-    text-decoration: none;
   }
 
   @keyframes colorRotate {
@@ -1709,4 +1900,8 @@
     }
   }
 </style>
+
+
+
+
 

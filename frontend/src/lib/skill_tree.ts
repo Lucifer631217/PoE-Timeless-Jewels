@@ -1,6 +1,7 @@
 import type { Translation, Node, SkillTreeData, Group, Sprite, TranslationFile } from './skill_tree_types';
 import { data } from './types';
-import { getStatDescription, translateLeagueName, translateStatText } from './zh_tw';
+import { englishFallbackTranslations, getStatDescription, translateLeagueName } from './zh_tw';
+import { officialTimelessTwStatTemplates } from './timeless_tw_stat_templates';
 
 export let skillTree: SkillTreeData;
 
@@ -336,6 +337,7 @@ export interface SearchWithSeed {
   seed: number;
   weight: number;
   statCounts: Record<number, number>;
+  conqueror?: string;
   skills: {
     passive: number;
     stats: { [key: string]: number };
@@ -385,7 +387,29 @@ export const formatBilingualStatHtml = (value: string): string => {
     return `<span style="color:#f4ead5">${localizedHtml}</span>`;
   }
 
-  const englishHtml = escapeHtml(parts.english);
+  const keywordColors: Record<string, string> = {
+    physical: '#c79d93',
+    cast: '#b3f8fe',
+    fire: '#ff9a77',
+    cold: '#93d8ff',
+    lightning: '#f8cb76',
+    attack: '#da814d',
+    life: '#c96e6e',
+    chaos: '#d8a7d3',
+    unique: '#af6025',
+    critical: '#b2a7d6'
+  };
+
+  const colorizeEnglishKeywords = (raw: string): string => {
+    let result = escapeHtml(raw);
+    Object.entries(keywordColors).forEach(([keyword, color]) => {
+      const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+      result = result.replace(regex, (match) => `<span style="color:${color};font-weight:600">${match}</span>`);
+    });
+    return result;
+  };
+
+  const englishHtml = colorizeEnglishKeywords(parts.english);
   return `<span style="color:#f4ead5">${localizedHtml}</span><span style="color:rgba(200,169,110,0.62)"> / </span><span style="color:#9cc3ff">${englishHtml}</span>`;
 };
 
@@ -459,10 +483,11 @@ const applyRollToTemplate = (template: string, roll?: number): string => {
 export const translateStat = (id: number | string, roll?: number | undefined): string => {
   const nId = typeof id === 'string' ? parseInt(id) : id;
   const translationText = getEnglishStatTemplate(nId, roll);
-
-  const localizedTemplate = getStatDescription(nId, translationText);
+  // Prefer exact EN->TW template mapping first to keep bilingual lines aligned.
+  const localizedTemplate =
+    englishFallbackTranslations[translationText] || officialTimelessTwStatTemplates[nId] || getStatDescription(nId, translationText);
   if (roll !== undefined) {
-    return translateStatText(nId, localizedTemplate, roll);
+    return applyRollToTemplate(localizedTemplate, roll);
   }
 
   return localizedTemplate;
@@ -521,7 +546,8 @@ const twTradeStatNames: { [key: number]: string } = {
 };
 
 type TradeServer = 'international' | 'tw';
-export type TradeCondition = 'any' | 'instant_buyout' | 'in_person_online_in_league' | 'in_person_online';
+export type TradeCondition = 'instant_buyout' | 'in_person_online_in_league';
+export const ANY_CONQUEROR = '__any__';
 
 type TradeStatFilter = {
   id: string;
@@ -547,6 +573,22 @@ const chunkFilters = (filters: TradeStatFilter[]): TradeStatFilter[][] => {
 };
 
 const resolveTradeStatIds = (jewel: number, conqueror: string, server: TradeServer): string[] => {
+  if (conqueror === ANY_CONQUEROR) {
+    const allConquerorStatIds = Array.from(
+      new Set(Object.values(tradeStatNames[jewel] || {}).filter((value): value is string => !!value))
+    );
+    if (allConquerorStatIds.length > 0) {
+      return allConquerorStatIds;
+    }
+
+    if (server === 'tw') {
+      const twFallback = twTradeStatNames[jewel];
+      if (twFallback) {
+        return [twFallback];
+      }
+    }
+  }
+
   const primary = tradeStatNames[jewel]?.[conqueror];
   if (primary) {
     return [primary];
@@ -583,28 +625,14 @@ const buildSeedFilters = (results: SearchWithSeed[], statIds: string[]): TradeSt
   return filters;
 };
 
-const resolveSaleTypeOption = (_server: TradeServer, condition: TradeCondition): string | undefined => {
-  if (condition === 'any') {
-    return undefined;
+const resolveTradeStatusOption = (
+  condition: TradeCondition
+): 'onlineleague' | 'securable' => {
+  if (condition === 'instant_buyout') {
+    return 'securable';
   }
 
-  return condition === 'instant_buyout' ? 'buyout' : 'facetoface';
-};
-
-const resolveTradeStatusOption = (server: TradeServer, condition: TradeCondition): 'any' | 'online' | 'onlineleague' => {
-  if (condition === 'in_person_online_in_league') {
-    return 'onlineleague';
-  }
-
-  if (condition === 'in_person_online') {
-    return 'online';
-  }
-
-  if (condition === 'instant_buyout' && server === 'tw') {
-    return 'online';
-  }
-
-  return 'any';
+  return 'onlineleague';
 };
 
 export const constructQuery = (
@@ -614,8 +642,7 @@ export const constructQuery = (
   condition: TradeCondition = 'instant_buyout',
   server: TradeServer = 'international'
 ) => {
-  const saleTypeOption = resolveSaleTypeOption(server, condition);
-  const statusOption = resolveTradeStatusOption(server, condition);
+  const statusOption = resolveTradeStatusOption(condition);
   const statIds = resolveTradeStatIds(jewel, conqueror, server);
   const statFilters = buildSeedFilters(results, statIds);
   const stats: TradeStatCategory[] = chunkFilters(statFilters).map((filters) => ({
@@ -630,18 +657,6 @@ export const constructQuery = (
     },
     stats
   };
-
-  if (saleTypeOption) {
-    query.filters = {
-      trade_filters: {
-        filters: {
-          sale_type: {
-            option: saleTypeOption
-          }
-        }
-      }
-    };
-  }
 
   return {
     query,

@@ -54,12 +54,12 @@
   {#if draft.snapshot.length > 0}
     <div class="editor-preview">
       <div class="preview-label">結果摘要</div>
-      {#each draft.snapshot.slice(0, 4) as passive}
+      {#each draft.snapshot as passive}
         <div class="preview-item">
           <div class="preview-passive">{passive.passiveName}</div>
           {#if passive.stats.length > 0}
             <ul>
-              {#each passive.stats.slice(0, 4) as stat}
+              {#each passive.stats as stat}
                 <li>{@html formatBilingualStatHtml(stat)}</li>
               {/each}
             </ul>

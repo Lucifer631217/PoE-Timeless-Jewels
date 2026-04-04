@@ -5,9 +5,10 @@
   import { page } from '$app/stores';
   import { base, assets } from '$app/paths';
   import { calculator, data } from '../lib/types';
+  import { APP_VERSION } from '../lib/version';
   import { translateJewelName, translateConquerorName, translateAlternateSkillName } from '../lib/zh_tw';
   import { translateStat } from '../lib/skill_tree';
-  const appVersion = 'v0.2.0';
+  const appVersion = APP_VERSION;
 
   const searchParams = $page.url.searchParams;
 

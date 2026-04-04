@@ -1,6 +1,7 @@
-﻿<script lang="ts">
+<script lang="ts">
   import type { SearchWithSeed, TradeCondition } from '../skill_tree';
   import { formatBilingualStatHtml, skillTree, translateStatBilingual, openTrade } from '../skill_tree';
+  import { translateConquerorName } from '../zh_tw';
 
   export let highlight: (newSeed: number, passives: number[]) => void;
   export let onSave: ((set: SearchWithSeed) => void) | undefined = undefined;
@@ -11,6 +12,8 @@
   export let league: string;
   export let twLeague: string;
   export let tradeCondition: TradeCondition = 'instant_buyout';
+
+  $: resultConqueror = set.conqueror || conqueror;
 </script>
 
 <div
@@ -30,6 +33,9 @@
   <div class="result-header">
     <div class="seed-label">
       Seed {set.seed}
+      {#if set.conqueror}
+        <span class="weight-label">將軍 {translateConquerorName(set.conqueror)}</span>
+      {/if}
       <span class="weight-label">權重 {set.weight}</span>
     </div>
     <div class="trade-actions">
@@ -39,13 +45,13 @@
       <button
         class="trade-btn intl-trade"
         on:click|stopPropagation={() =>
-          openTrade(jewel, conqueror, [set], platform, league, 'international', tradeCondition)}>
+          openTrade(jewel, resultConqueror, [set], platform, league, 'international', tradeCondition)}>
         國際服交易
       </button>
       <button
         class="trade-btn tw-trade"
         on:click|stopPropagation={() =>
-          openTrade(jewel, conqueror, [set], platform, twLeague, 'tw', tradeCondition)}>
+          openTrade(jewel, resultConqueror, [set], platform, twLeague, 'tw', tradeCondition)}>
         台服交易
       </button>
     </div>

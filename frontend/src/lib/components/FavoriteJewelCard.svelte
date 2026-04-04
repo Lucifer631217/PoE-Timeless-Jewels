@@ -43,12 +43,12 @@
 
   {#if entry.snapshot.length > 0}
     <div class="snapshot-list">
-      {#each entry.snapshot.slice(0, 4) as passive}
+      {#each entry.snapshot as passive}
         <div class="snapshot-item">
           <div class="snapshot-passive">{passive.passiveName}</div>
           {#if passive.stats.length > 0}
             <ul>
-              {#each passive.stats.slice(0, 3) as stat}
+              {#each passive.stats as stat}
                 <li>{@html formatBilingualStatHtml(stat)}</li>
               {/each}
             </ul>

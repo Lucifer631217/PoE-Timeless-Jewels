@@ -1,0 +1,95 @@
+﻿{
+    "totalTimelessStats":  159,
+    "statsWithOfficialTw":  159,
+    "appFallbackToEnglishCount":  0,
+    "appDifferentFromOfficialTwCount":  98,
+    "sampleFallbackToEnglish":  {
+
+                                },
+    "sampleDifferentFromOfficialTw":  [
+                                          {
+                                              "StatIndex":  9441,
+                                              "StatId":  "keystone_eternal_youth",
+                                              "En":  "Eternal Youth",
+                                              "TwOfficial":  "青春永駐",
+                                              "AppZh":  "永恆青春"
+                                          },
+                                          {
+                                              "StatIndex":  26,
+                                              "StatId":  "physical_damage_+%",
+                                              "En":  "#% increased Global Physical Damage",
+                                              "TwOfficial":  "增加 #% 全域物理傷害",
+                                              "AppZh":  "增加 #% 物理傷害"
+                                          },
+                                          {
+                                              "StatIndex":  490,
+                                              "StatId":  "minion_damage_+%",
+                                              "En":  "Minions deal #% increased Damage",
+                                              "TwOfficial":  "增加 #% 召喚物所造成的傷害",
+                                              "AppZh":  "召喚生物增加 #% 傷害"
+                                          },
+                                          {
+                                              "StatIndex":  95,
+                                              "StatId":  "base_critical_strike_multiplier_+",
+                                              "En":  "+#% to Global Critical Strike Multiplier",
+                                              "TwOfficial":  "+#% 全域暴擊加成",
+                                              "AppZh":  "+#% 暴擊加成"
+                                          },
+                                          {
+                                              "StatIndex":  613,
+                                              "StatId":  "base_chance_to_ignite_%",
+                                              "En":  "#% chance to Ignite",
+                                              "TwOfficial":  "#% 機率使用火焰傷害擊中敵人造成點燃效果",
+                                              "AppZh":  "有 #% 機率點燃"
+                                          },
+                                          {
+                                              "StatIndex":  457,
+                                              "StatId":  "base_chance_to_freeze_%",
+                                              "En":  "Always Freezes Enemies on Hit",
+                                              "TwOfficial":  "擊中時必定冰凍敵人",
+                                              "AppZh":  "擊中時總是凍結敵人"
+                                          },
+                                          {
+                                              "StatIndex":  661,
+                                              "StatId":  "base_chance_to_shock_%",
+                                              "En":  "#% chance to Shock",
+                                              "TwOfficial":  "#% 機率使用閃電傷害擊中敵人造成感電效果",
+                                              "AppZh":  "有 #% 機率感電"
+                                          },
+                                          {
+                                              "StatIndex":  217,
+                                              "StatId":  "skill_effect_duration_+%",
+                                              "En":  "#% increased Skill Effect Duration",
+                                              "TwOfficial":  "增加 #% 技能效果持續時間",
+                                              "AppZh":  "增加 #% 技能持續時間"
+                                          },
+                                          {
+                                              "StatIndex":  125,
+                                              "StatId":  "maximum_life_+%",
+                                              "En":  "#% increased maximum Life",
+                                              "TwOfficial":  "增加 #% 最大生命",
+                                              "AppZh":  "增加 #% 生命最大值"
+                                          },
+                                          {
+                                              "StatIndex":  131,
+                                              "StatId":  "mana_regeneration_rate_+%",
+                                              "En":  "#% increased Mana Regeneration Rate",
+                                              "TwOfficial":  "增加 #% 魔力回復率",
+                                              "AppZh":  "增加 #% 魔法回復速度"
+                                          },
+                                          {
+                                              "StatIndex":  135,
+                                              "StatId":  "maximum_energy_shield_+%",
+                                              "En":  "#% increased maximum Energy Shield",
+                                              "TwOfficial":  "增加 #% 最大能量護盾",
+                                              "AppZh":  "增加 #% 能量護盾最大值"
+                                          },
+                                          {
+                                              "StatIndex":  1084,
+                                              "StatId":  "additional_block_%",
+                                              "En":  "+#% Chance to Block Attack Damage",
+                                              "TwOfficial":  "+#% 攻擊傷害格擋率",
+                                              "AppZh":  "增加 #% 攻擊格擋機率"
+                                          }
+                                      ]
+}
