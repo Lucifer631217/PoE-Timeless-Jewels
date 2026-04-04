@@ -22,6 +22,7 @@ export interface SavedJewelEntry {
   entryType: FavoriteEntryType;
   seed: number;
   seeds: number[];
+  seedTotal: number;
   buildName: string;
   note: string;
   estimatedValue: string;
@@ -136,6 +137,9 @@ const sanitizeEntryFromUnknown = (value: unknown): SavedJewelEntry | null => {
 
   const declaredEntryType = value.entryType === 'group' || value.entryType === 'single' ? value.entryType : undefined;
   const entryType: FavoriteEntryType = declaredEntryType || (seeds.length > 1 ? 'group' : 'single');
+  const rawSeedTotal =
+    typeof value.seedTotal === 'number' && Number.isFinite(value.seedTotal) ? Math.trunc(value.seedTotal) : seeds.length;
+  const seedTotal = entryType === 'group' ? Math.max(seeds.length, rawSeedTotal) : 1;
 
   return {
     id: value.id,
@@ -146,6 +150,7 @@ const sanitizeEntryFromUnknown = (value: unknown): SavedJewelEntry | null => {
     entryType,
     seed: seeds[0],
     seeds,
+    seedTotal,
     buildName: typeof value.buildName === 'string' ? value.buildName.trim() : '',
     note: rawNote,
     estimatedValue: typeof value.estimatedValue === 'string' ? value.estimatedValue.trim() : '',

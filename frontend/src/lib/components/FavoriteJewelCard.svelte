@@ -23,6 +23,7 @@
   };
 
   $: normalizedSeeds = entry.seeds.length > 0 ? entry.seeds : [entry.seed];
+  $: groupSeedTotal = Math.max(normalizedSeeds.length, entry.seedTotal || normalizedSeeds.length);
   $: tradeSeeds = normalizedSeeds.map((seed) => createTradeSeedResult(seed));
   $: seedSummary = summarizeSeeds(normalizedSeeds);
 </script>
@@ -34,7 +35,7 @@
       <div class="favorite-meta">
         <span>{entry.conquerorLabel}</span>
         {#if entry.entryType === 'group'}
-          <span>整組收藏（{normalizedSeeds.length} 筆）</span>
+          <span>整組收藏（種子總數 {groupSeedTotal}）</span>
         {:else}
           <span>Seed {entry.seed}</span>
         {/if}

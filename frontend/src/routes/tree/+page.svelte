@@ -811,12 +811,14 @@
     seeds,
     snapshot,
     entryType,
-    conquerorOverride
+    conquerorOverride,
+    seedTotal
   }: {
     seeds: number[];
     snapshot: FavoriteSnapshotSkill[];
     entryType?: 'single' | 'group';
     conquerorOverride?: string;
+    seedTotal?: number;
   }): SavedJewelDraft | null => {
     if (!selectedJewel || !selectedConqueror) {
       return null;
@@ -846,6 +848,10 @@
       entryType: resolvedEntryType,
       seed: primarySeed,
       seeds: normalizedSeeds,
+      seedTotal:
+        resolvedEntryType === 'group'
+          ? Math.max(normalizedSeeds.length, Math.trunc(seedTotal ?? normalizedSeeds.length))
+          : 1,
       buildName: '',
       note: collectSnapshotNote(snapshot),
       estimatedValue: '',
@@ -920,7 +926,8 @@
       seeds,
       snapshot,
       entryType: 'group',
-      conquerorOverride
+      conquerorOverride,
+      seedTotal: sets.length
     });
     if (!draft) {
       return;
