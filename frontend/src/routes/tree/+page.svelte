@@ -65,7 +65,9 @@
   const timelessJewelConquerors = data.TimelessJewelConquerors || {};
   const treeToPassive = data.TreeToPassive || {};
   const timelessJewelSeedRanges = data.TimelessJewelSeedRanges || {};
-  const allPossibleStats: Record<string, Record<string, number>> = data.PossibleStats ? JSON.parse(data.PossibleStats) : {};
+  const allPossibleStats: Record<string, Record<string, number>> = data.PossibleStats
+    ? JSON.parse(data.PossibleStats)
+    : {};
 
   const readBooleanPreference = (key: string, fallback: boolean): boolean => {
     if (!browser) {
@@ -96,7 +98,7 @@
     : undefined;
 
   $: selectedJewelValue = selectedJewel?.value;
-  $: currentConquerors = selectedJewelValue !== undefined ? (timelessJewelConquerors[selectedJewelValue] || {}) : {};
+  $: currentConquerors = selectedJewelValue !== undefined ? timelessJewelConquerors[selectedJewelValue] || {} : {};
   $: selectedSeedRanges = selectedJewelValue !== undefined ? timelessJewelSeedRanges[selectedJewelValue] : undefined;
   $: minSeed = selectedSeedRanges?.Min || 0;
   $: maxSeed = selectedSeedRanges?.Max || 0;
@@ -135,23 +137,21 @@
     ? parseInt(searchParams.get('location') || '0')
     : undefined;
 
-  $: affectedNodes = circledNode !== undefined && skillTree.nodes[circledNode]
-    ? getAffectedNodes(skillTree.nodes[circledNode]).filter((node) => !node.isJewelSocket && !node.isMastery)
-    : [];
+  $: affectedNodes =
+    circledNode !== undefined && skillTree.nodes[circledNode]
+      ? getAffectedNodes(skillTree.nodes[circledNode]).filter((node) => !node.isJewelSocket && !node.isMastery)
+      : [];
 
   $: selectedConquerorValue = selectedConqueror?.value || '';
   $: selectedConquerorIsAny = selectedConquerorValue === ANY_CONQUEROR;
-  $: selectedConquerorKeys =
-    selectedConquerorIsAny
-      ? Object.keys(currentConquerors)
-      : selectedConquerorValue && currentConquerors[selectedConquerorValue]
-        ? [selectedConquerorValue]
-        : [];
+  $: selectedConquerorKeys = selectedConquerorIsAny
+    ? Object.keys(currentConquerors)
+    : selectedConquerorValue && currentConquerors[selectedConquerorValue]
+    ? [selectedConquerorValue]
+    : [];
   $: hasValidConquerorSelection = selectedConquerorKeys.length > 0;
   $: seedResults =
-    !seed ||
-    !selectedJewel ||
-    !hasValidConquerorSelection
+    !seed || !selectedJewel || !hasValidConquerorSelection
       ? []
       : affectedNodes
           .filter((node) => node.skill !== undefined && !!treeToPassive[node.skill])
@@ -190,7 +190,12 @@
     searchParams.getAll('disabled').forEach((value) => disabled.add(parseInt(value)));
   }
 
-  $: if (!hasDisabledFromQuery && circledNode !== undefined && affectedNodes.length > 0 && defaultDisabledInitializedNode !== circledNode) {
+  $: if (
+    !hasDisabledFromQuery &&
+    circledNode !== undefined &&
+    affectedNodes.length > 0 &&
+    defaultDisabledInitializedNode !== circledNode
+  ) {
     const defaultDisabled = new Set<number>();
     affectedNodes.forEach((node) => {
       if (node.skill !== undefined && !node.isNotable) {
@@ -244,7 +249,8 @@
 
   const getStatValue = (id: string): number => (statValues as Record<string, number>)[id] || 0;
 
-  $: availableStats = selectedJewelValue !== undefined ? Object.keys(allPossibleStats[selectedJewelValue.toString()] || {}) : [];
+  $: availableStats =
+    selectedJewelValue !== undefined ? Object.keys(allPossibleStats[selectedJewelValue.toString()] || {}) : [];
   $: statItems = availableStats
     .map((statId) => {
       const id = parseInt(statId);
@@ -311,9 +317,7 @@
       .filter((node): node is data.PassiveSkill => !!node)
       .map((node) => node.Index);
 
-    const mergeSearchResults = (
-      entries: { conqueror: string; result: SearchResultsType }[]
-    ): SearchResultsType => {
+    const mergeSearchResults = (entries: { conqueror: string; result: SearchResultsType }[]): SearchResultsType => {
       const grouped: SearchResultsType['grouped'] = {};
       const raw: SearchWithSeed[] = [];
 
@@ -571,7 +575,8 @@
     { label: '估值', value: 'value' }
   ] as const;
 
-  let sortOrder = sortResults.find((item) => item.value === readStringPreference('sortOrder', 'count')) || sortResults[0];
+  let sortOrder =
+    sortResults.find((item) => item.value === readStringPreference('sortOrder', 'count')) || sortResults[0];
   $: if (browser && sortOrder) localStorage.setItem('sortOrder', sortOrder.value);
 
   let colored = readBooleanPreference('colored', true);
@@ -641,7 +646,9 @@
         label: translateLeagueName(value)
       }));
 
-    return mapped.filter((option, index, array) => array.findIndex((candidate) => candidate.value === option.value) === index);
+    return mapped.filter(
+      (option, index, array) => array.findIndex((candidate) => candidate.value === option.value) === index
+    );
   };
 
   const resolveLeagueSelection = (rawLeagues: LeagueLike[], fallback: string) => {
@@ -649,7 +656,8 @@
     const selectedValue = pickCurrentLeagueValue(rawLeagues, fallback);
     return {
       options,
-      selected: options.find((option) => option.value === selectedValue) || options[0] || { value: fallback, label: translateLeagueName(fallback) }
+      selected: options.find((option) => option.value === selectedValue) ||
+        options[0] || { value: fallback, label: translateLeagueName(fallback) }
     };
   };
 
@@ -927,7 +935,9 @@
               </div>
             </div>
             <div class="panel-title-actions">
-              <button class="secondary-toggle favorite-entry-toggle" on:click={() => (favoriteDrawerOpen = !favoriteDrawerOpen)}>
+              <button
+                class="secondary-toggle favorite-entry-toggle"
+                on:click={() => (favoriteDrawerOpen = !favoriteDrawerOpen)}>
                 {favoriteDrawerOpen ? '收合收藏珠寶' : `收藏珠寶 (${favoriteCount})`}
               </button>
             </div>
@@ -937,10 +947,16 @@
             <div class="trade-panel">
               <div class="trade-row compact-row">
                 <span class="trade-label">交易條件</span>
-                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'instant_buyout'} on:click={() => (tradeCondition = 'instant_buyout')}>
+                <button
+                  class="trade-toggle"
+                  class:trade-toggle-active={tradeCondition === 'instant_buyout'}
+                  on:click={() => (tradeCondition = 'instant_buyout')}>
                   即刻購買
                 </button>
-                <button class="trade-toggle" class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'} on:click={() => (tradeCondition = 'in_person_online_in_league')}>
+                <button
+                  class="trade-toggle"
+                  class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'}
+                  on:click={() => (tradeCondition = 'in_person_online_in_league')}>
                   面對面交易（聯盟在線）
                 </button>
               </div>
@@ -955,7 +971,15 @@
                   on:click={() =>
                     searchOutcome &&
                     league &&
-                    openTrade(searchJewel, searchConqueror, searchOutcome.raw, platform.value, league.value, 'international', tradeCondition)}
+                    openTrade(
+                      searchJewel,
+                      searchConqueror,
+                      searchOutcome.raw,
+                      platform.value,
+                      league.value,
+                      'international',
+                      tradeCondition
+                    )}
                   disabled={!searchOutcome || !league}>
                   國際服交易
                 </button>
@@ -964,27 +988,63 @@
               <div class="trade-row">
                 <span class="trade-label">台服聯盟</span>
                 <div class="trade-select">
-                  <Select items={twLeagues} bind:value={twLeague} clearable={false} floatingConfig={selectFloatingConfig} />
+                  <Select
+                    items={twLeagues}
+                    bind:value={twLeague}
+                    clearable={false}
+                    floatingConfig={selectFloatingConfig} />
                 </div>
                 <button
                   class="trade-action tw-action"
                   on:click={() =>
                     searchOutcome &&
                     twLeague &&
-                    openTrade(searchJewel, searchConqueror, searchOutcome.raw, 'PC', twLeague.value, 'tw', tradeCondition)}
+                    openTrade(
+                      searchJewel,
+                      searchConqueror,
+                      searchOutcome.raw,
+                      'PC',
+                      twLeague.value,
+                      'tw',
+                      tradeCondition
+                    )}
                   disabled={!searchOutcome || !twLeague}>
                   台服交易
                 </button>
               </div>
+            </div>
+          {/if}
 
-              <div class="trade-row compact-row">
-                <button class="secondary-toggle" class:grouped={groupResults} on:click={() => (groupResults = !groupResults)} disabled={!searchOutcome}>
-                  {groupResults ? '分組顯示中' : '已關閉分組'}
-                </button>
-                <button class="secondary-toggle" on:click={() => (results = !results)}>
-                  {results ? '返回條件設定' : '查看反查結果'}
-                </button>
-              </div>
+          {#if searchOutcome || (selectedConqueror && hasValidConquerorSelection && mode === 'stats')}
+            <div class="trade-row compact-row control-toolbar-row">
+              <button
+                class="secondary-toggle"
+                class:grouped={groupResults}
+                on:click={() => (groupResults = !groupResults)}
+                disabled={!searchOutcome}>
+                {groupResults ? '分組顯示中' : '已關閉分組'}
+              </button>
+              <button class="secondary-toggle" on:click={() => (results = !results)} disabled={!searchOutcome}>
+                {results ? '返回條件設定' : '查看反查結果'}
+              </button>
+              {#if selectedConqueror && hasValidConquerorSelection && mode === 'stats'}
+                <div class="bulk-actions bulk-actions-inline compact-row-actions">
+                  <button class="secondary-toggle" on:click={selectAll} disabled={searching || disabled.size === 0}
+                    >全選</button>
+                  <button
+                    class="secondary-toggle"
+                    on:click={selectAllNotables}
+                    disabled={searching || disabled.size === 0}>全選強力天賦</button>
+                  <button
+                    class="secondary-toggle"
+                    on:click={selectAllPassives}
+                    disabled={searching || disabled.size === 0}>全選小天賦</button>
+                  <button
+                    class="secondary-toggle"
+                    on:click={deselectAll}
+                    disabled={searching || disabled.size >= affectedNodes.length}>全部排除</button>
+                </div>
+              {/if}
             </div>
           {/if}
         </div>
@@ -992,41 +1052,53 @@
         <div class="panel-body">
           {#if !results}
             <section class="control-section">
-              <div class="inline-select-row">
+              <div class="inline-select-row" class:with-mode-toggle={selectedConqueror && hasValidConquerorSelection}>
                 <div class="field-stack field-stack-half">
                   <h3>珠寶</h3>
-                  <Select class="hero-select" items={jewels} bind:value={selectedJewel} on:change={changeJewel} placeholder="選擇永恆珠寶" floatingConfig={selectFloatingConfig} />
+                  <Select
+                    class="hero-select"
+                    items={jewels}
+                    bind:value={selectedJewel}
+                    on:change={changeJewel}
+                    placeholder="選擇永恆珠寶"
+                    floatingConfig={selectFloatingConfig} />
                 </div>
 
                 {#if selectedJewel}
                   <div class="field-stack field-stack-half">
                     <h3>將軍</h3>
-                    <Select class="hero-select" items={conquerors} bind:value={selectedConqueror} on:change={updateUrl} placeholder="選擇將軍" floatingConfig={selectFloatingConfig} />
+                    <Select
+                      class="hero-select"
+                      items={conquerors}
+                      bind:value={selectedConqueror}
+                      on:change={updateUrl}
+                      placeholder="選擇將軍"
+                      floatingConfig={selectFloatingConfig} />
+                  </div>
+                {/if}
+
+                {#if selectedConqueror && hasValidConquerorSelection}
+                  <div class="field-stack field-stack-mode">
+                    <div class="mode-toggle-row inline-mode-toggle">
+                      <button
+                        class="selection-button"
+                        class:selected={mode === 'seed'}
+                        on:click={() => setMode('seed')}>
+                        依 Seed
+                      </button>
+                      <button
+                        class="selection-button"
+                        class:selected={mode === 'stats'}
+                        on:click={() => setMode('stats')}>
+                        依詞綴反查
+                      </button>
+                    </div>
                   </div>
                 {/if}
               </div>
 
               {#if selectedJewel}
                 {#if selectedConqueror && hasValidConquerorSelection}
-                  <div class="mode-header-row">
-                    <div class="mode-toggle-row">
-                      <button class="selection-button" class:selected={mode === 'seed'} on:click={() => setMode('seed')}>
-                        依 Seed
-                      </button>
-                      <button class="selection-button" class:selected={mode === 'stats'} on:click={() => setMode('stats')}>
-                        依詞綴反查
-                      </button>
-                    </div>
-                    {#if mode === 'stats'}
-                      <div class="bulk-actions bulk-actions-inline">
-                        <button class="secondary-toggle" on:click={selectAll} disabled={searching || disabled.size === 0}>全選</button>
-                        <button class="secondary-toggle" on:click={selectAllNotables} disabled={searching || disabled.size === 0}>全選強力天賦</button>
-                        <button class="secondary-toggle" on:click={selectAllPassives} disabled={searching || disabled.size === 0}>全選小天賦</button>
-                        <button class="secondary-toggle" on:click={deselectAll} disabled={searching || disabled.size >= affectedNodes.length}>全部排除</button>
-                      </div>
-                    {/if}
-                  </div>
-
                   {#if mode === 'seed'}
                     <div class="field-stack">
                       <h3>Seed</h3>
@@ -1038,19 +1110,31 @@
 
                     {#if canSaveCurrentSeed}
                       <div class="seed-toolbar">
-                        <button class="primary-toggle" on:click={openFavoriteForCurrentSeed}>加入收藏（目前 Seed）</button>
+                        <button class="primary-toggle" on:click={openFavoriteForCurrentSeed}
+                          >加入收藏（目前 Seed）</button>
                         <div class="toolbar-group">
                           <Select items={sortResults} bind:value={sortOrder} floatingConfig={selectFloatingConfig} />
-                          <button class="secondary-toggle" class:selected={colored} on:click={() => (colored = !colored)}>關鍵字上色</button>
-                          <button class="secondary-toggle" class:selected={split} on:click={() => (split = !split)}>分開顯示</button>
+                          <button
+                            class="secondary-toggle"
+                            class:selected={colored}
+                            on:click={() => (colored = !colored)}>關鍵字上色</button>
+                          <button class="secondary-toggle" class:selected={split} on:click={() => (split = !split)}
+                            >分開顯示</button>
                         </div>
                       </div>
 
                       {#if !split}
                         <div class="combined-results" class:rainbow={colored}>
                           {#each sortCombined(combineResults(seedResults, colored, 'all'), sortOrder.value) as result}
-                            <div class="combined-row" role="button" tabindex="0" on:click={() => highlight(seed, result.passives)} on:keydown={(event) => (event.key === 'Enter' || event.key === ' ') && highlight(seed, result.passives)}>
-                              <span class="count-pill" class:text-white={getStatValue(result.id) < 3}>({result.passives.length})</span>
+                            <div
+                              class="combined-row"
+                              role="button"
+                              tabindex="0"
+                              on:click={() => highlight(seed, result.passives)}
+                              on:keydown={(event) =>
+                                (event.key === 'Enter' || event.key === ' ') && highlight(seed, result.passives)}>
+                              <span class="count-pill" class:text-white={getStatValue(result.id) < 3}
+                                >({result.passives.length})</span>
                               <span class="text-white">{@html result.stat}</span>
                             </div>
                           {/each}
@@ -1061,8 +1145,15 @@
                             <h3>強力天賦</h3>
                             <div class:rainbow={colored}>
                               {#each sortCombined(combineResults(seedResults, colored, 'notables'), sortOrder.value) as result}
-                                <div class="combined-row" role="button" tabindex="0" on:click={() => highlight(seed, result.passives)} on:keydown={(event) => (event.key === 'Enter' || event.key === ' ') && highlight(seed, result.passives)}>
-                                  <span class="count-pill" class:text-white={getStatValue(result.id) < 3}>({result.passives.length})</span>
+                                <div
+                                  class="combined-row"
+                                  role="button"
+                                  tabindex="0"
+                                  on:click={() => highlight(seed, result.passives)}
+                                  on:keydown={(event) =>
+                                    (event.key === 'Enter' || event.key === ' ') && highlight(seed, result.passives)}>
+                                  <span class="count-pill" class:text-white={getStatValue(result.id) < 3}
+                                    >({result.passives.length})</span>
                                   <span class="text-white">{@html result.stat}</span>
                                 </div>
                               {/each}
@@ -1072,8 +1163,15 @@
                             <h3>小天賦</h3>
                             <div class:rainbow={colored}>
                               {#each sortCombined(combineResults(seedResults, colored, 'passives'), sortOrder.value) as result}
-                                <div class="combined-row" role="button" tabindex="0" on:click={() => highlight(seed, result.passives)} on:keydown={(event) => (event.key === 'Enter' || event.key === ' ') && highlight(seed, result.passives)}>
-                                  <span class="count-pill" class:text-white={getStatValue(result.id) < 3}>({result.passives.length})</span>
+                                <div
+                                  class="combined-row"
+                                  role="button"
+                                  tabindex="0"
+                                  on:click={() => highlight(seed, result.passives)}
+                                  on:keydown={(event) =>
+                                    (event.key === 'Enter' || event.key === ' ') && highlight(seed, result.passives)}>
+                                  <span class="count-pill" class:text-white={getStatValue(result.id) < 3}
+                                    >({result.passives.length})</span>
                                   <span class="text-white">{@html result.stat}</span>
                                 </div>
                               {/each}
@@ -1086,7 +1184,12 @@
                     <div class="field-stack field-stack-inline">
                       <h3>新增目標詞綴</h3>
                       <div class="stat-picker">
-                        <Select items={statItems} on:change={selectStat} bind:this={statSelector} placeholder="選擇要反查的詞綴" floatingConfig={selectFloatingConfig}>
+                        <Select
+                          items={statItems}
+                          on:change={selectStat}
+                          bind:this={statSelector}
+                          placeholder="選擇要反查的詞綴"
+                          floatingConfig={selectFloatingConfig}>
                           <svelte:fragment slot="item" let:item>
                             <span>{@html formatBilingualStatHtml(item.label)}</span>
                           </svelte:fragment>
@@ -1102,8 +1205,12 @@
                         {#each Object.keys(selectedStats) as statId}
                           <div class="selected-stat-card">
                             <div class="selected-stat-top">
-                              <button class="remove-stat" on:click={() => removeStat(selectedStats[statId].id)}>移除</button>
-                              <span class="selected-stat-text">{@html formatBilingualStatHtml(translateStatBilingual(selectedStats[statId].id))}</span>
+                              <button class="remove-stat" on:click={() => removeStat(selectedStats[statId].id)}
+                                >移除</button>
+                              <span class="selected-stat-text"
+                                >{@html formatBilingualStatHtml(
+                                  translateStatBilingual(selectedStats[statId].id)
+                                )}</span>
                             </div>
                             <div class="selected-stat-inputs">
                               <label class="inline-label inline-label-compact">
@@ -1119,20 +1226,19 @@
                         {/each}
                       </div>
 
-                      <div class="field-stack compact-field">
+                      <div class="field-stack compact-field search-control-row">
                         <label class="inline-label inline-label-compact inline-label-total">
                           <span>最低總權重</span>
                           <input type="number" min="0" bind:value={minTotalWeight} />
                         </label>
+                        <button class="primary-toggle search-button" on:click={search} disabled={searching}>
+                          {#if searching && selectedJewel}
+                            搜尋中 {currentSeed} / {maxSeed}
+                          {:else}
+                            開始反查
+                          {/if}
+                        </button>
                       </div>
-
-                      <button class="primary-toggle search-button" on:click={search} disabled={searching}>
-                        {#if searching && selectedJewel}
-                          搜尋中 {currentSeed} / {maxSeed}
-                        {:else}
-                          開始反查
-                        {/if}
-                      </button>
                     {/if}
                   {/if}
 
@@ -1157,12 +1263,15 @@
               twLeague={twLeague.value}
               {tradeCondition} />
           {/if}
-
         </div>
       </div>
     </div>
   {:else}
-    <button class="burger-menu collapsed-trigger" aria-label="展開面板" title="展開面板" on:click={() => (collapsed = false)}>
+    <button
+      class="burger-menu collapsed-trigger"
+      aria-label="展開面板"
+      title="展開面板"
+      on:click={() => (collapsed = false)}>
       <span class="burger-icon" aria-hidden="true">
         <span></span>
         <span></span>
@@ -1183,7 +1292,12 @@
           <button class="secondary-toggle" on:click={exportFavorites} disabled={favoriteCount === 0}>匯出 JSON</button>
           <button class="secondary-toggle" on:click={openImportDialog}>匯入 JSON</button>
           <button class="secondary-toggle" on:click={() => (favoriteDrawerOpen = false)}>關閉</button>
-          <input bind:this={favoriteImportInput} class="hidden-input" type="file" accept="application/json" on:change={handleImportFavorites} />
+          <input
+            bind:this={favoriteImportInput}
+            class="hidden-input"
+            type="file"
+            accept="application/json"
+            on:change={handleImportFavorites} />
         </div>
       </div>
 
@@ -1325,7 +1439,10 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    transition:
+      transform 0.18s ease,
+      background 0.18s ease,
+      border-color 0.18s ease;
   }
 
   .burger-menu:hover {
@@ -1401,21 +1518,16 @@
     align-items: end;
   }
 
+  .inline-select-row.with-mode-toggle {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  }
+
   .field-stack-half {
     min-width: 0;
   }
 
-  .mode-header-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .mode-header-row .mode-toggle-row {
-    flex-wrap: nowrap;
-    flex: 0 0 auto;
+  .field-stack-mode {
+    min-width: max-content;
   }
 
   .field-stack:focus-within {
@@ -1494,6 +1606,19 @@
     flex: 1;
   }
 
+  .inline-mode-toggle {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .control-toolbar-row {
+    justify-content: space-between;
+  }
+
+  .compact-row-actions {
+    margin-left: auto;
+  }
+
   .selection-button,
   .secondary-toggle,
   .primary-toggle,
@@ -1501,7 +1626,11 @@
   .trade-action,
   .remove-stat {
     border-radius: 16px;
-    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    transition:
+      transform 0.18s ease,
+      background 0.18s ease,
+      border-color 0.18s ease,
+      color 0.18s ease;
   }
 
   .selection-button {
@@ -1690,6 +1819,14 @@
     gap: 0;
   }
 
+  .search-control-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
   .inline-label {
     width: 100%;
   }
@@ -1711,6 +1848,16 @@
 
   .inline-label-total input {
     width: 110px;
+  }
+
+  .search-control-row .inline-label-total {
+    width: auto;
+    flex: 1;
+  }
+
+  .search-control-row .search-button {
+    margin-left: auto;
+    white-space: nowrap;
   }
 
   .control-section > .field-stack > input[type='number'],
@@ -1838,10 +1985,19 @@
       grid-template-columns: 1fr;
     }
 
+    .inline-mode-toggle,
     .bulk-actions-inline {
       justify-content: flex-start;
       width: 100%;
       flex: none;
+    }
+
+    .field-stack-mode {
+      min-width: 0;
+    }
+
+    .compact-row-actions {
+      margin-left: 0;
     }
 
     .field-stack-inline {
@@ -1897,8 +2053,3 @@
     }
   }
 </style>
-
-
-
-
-
