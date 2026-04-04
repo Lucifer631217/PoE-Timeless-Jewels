@@ -12,10 +12,14 @@
 
   const searchParams = $page.url.searchParams;
 
-  $: jewels = data?.TimelessJewels ? Object.keys(data.TimelessJewels).map((k) => ({
-    value: parseInt(k),
-    label: translateJewelName(parseInt(k), (data.TimelessJewels as any)[k])
-  })) : [];
+  $: jewels = data?.TimelessJewels
+    ? Object.keys(data.TimelessJewels)
+        .map((k) => ({
+          value: parseInt(k),
+          label: translateJewelName(parseInt(k), (data.TimelessJewels as any)[k])
+        }))
+        .sort((left, right) => left.value - right.value)
+    : [];
 
   let selectedJewel: { label: string; value: number } | undefined;
 

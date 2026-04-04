@@ -88,10 +88,12 @@
 
   const uniqueStrings = (values: string[]): string[] => Array.from(new Set(values));
 
-  const jewels = Object.keys(timelessJewels).map((key) => ({
-    value: parseInt(key),
-    label: translateJewelName(parseInt(key), timelessJewels[parseInt(key)] || '')
-  }));
+  const jewels = Object.keys(timelessJewels)
+    .map((key) => ({
+      value: parseInt(key),
+      label: translateJewelName(parseInt(key), timelessJewels[parseInt(key)] || '')
+    }))
+    .sort((left, right) => left.value - right.value);
 
   let selectedJewel: SelectOption<number> | undefined = searchParams.has('jewel')
     ? jewels.find((jewel) => jewel.value.toString() === searchParams.get('jewel'))
@@ -339,14 +341,22 @@
         );
       });
 
+      const sortBySeedThenConqueror = (left: SearchWithSeed, right: SearchWithSeed): number =>
+        left.seed - right.seed || (left.conqueror || '').localeCompare(right.conqueror || '');
+
       Object.keys(grouped).forEach((groupKey) => {
         const key = parseInt(groupKey);
-        grouped[key] = grouped[key].sort((left, right) => right.weight - left.weight);
+        grouped[key] = grouped[key].sort(sortBySeedThenConqueror);
       });
 
       return {
         grouped,
-        raw: raw.sort((left, right) => right.weight - left.weight)
+        raw: raw.sort(
+          (left, right) =>
+            right.weight - left.weight ||
+            left.seed - right.seed ||
+            (left.conqueror || '').localeCompare(right.conqueror || '')
+        )
       };
     };
 
