@@ -1,6 +1,9 @@
 package data
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type Stat struct {
 	Index    uint32  `json:"_key"`
@@ -99,7 +102,7 @@ func (a *AlternatePassiveSkill) UnmarshalJSON(data []byte) error {
 
 	var decoded signedAlias
 	if err := json.Unmarshal(data, &decoded); err != nil {
-		return err
+		return fmt.Errorf("unmarshal alternate passive skill: %w", err)
 	}
 
 	*a = AlternatePassiveSkill(decoded.alias)
@@ -162,7 +165,7 @@ func (a *AlternatePassiveAddition) UnmarshalJSON(data []byte) error {
 
 	var decoded signedAlias
 	if err := json.Unmarshal(data, &decoded); err != nil {
-		return err
+		return fmt.Errorf("unmarshal alternate passive addition: %w", err)
 	}
 
 	*a = AlternatePassiveAddition(decoded.alias)

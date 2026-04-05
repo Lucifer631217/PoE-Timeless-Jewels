@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import Select from 'svelte-select';
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
@@ -422,7 +422,7 @@
   const highlight = (newSeed: number, passives: number[], conquerorValue?: string) => {
     seed = newSeed;
     highlighted = [...new Set(passives)];
-    if (conquerorValue && selectedConquerorValue !== ANY_CONQUEROR) {
+    if (conquerorValue && conquerorValue !== ANY_CONQUEROR) {
       const matchedConqueror = conquerors.find((option) => option.value === conquerorValue);
       if (matchedConqueror) {
         selectedConqueror = matchedConqueror;
@@ -922,7 +922,9 @@
       .filter((entry): entry is FavoriteSnapshotSkill => !!entry);
     const draft = createFavoriteDraft({
       seeds: [seed],
-      tradeTargets: [{ seed, conqueror: selectedConquerorValue === ANY_CONQUEROR ? undefined : selectedConquerorValue }],
+      tradeTargets: [
+        { seed, conqueror: selectedConquerorValue === ANY_CONQUEROR ? undefined : selectedConquerorValue }
+      ],
       snapshot,
       entryType: 'single'
     });
@@ -1186,7 +1188,7 @@
                 </button>
               </div>
               <div class="panel-note trade-hint">
-                若一次開啟多個交易分頁，請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。
+                整組交易種子超過180個會一次開啟多個交易分頁；請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。
               </div>
             </div>
           {/if}
@@ -1242,13 +1244,13 @@
 
                 {#if selectedJewel}
                   <div class="field-stack field-stack-half">
-                    <h3>將軍</h3>
+                    <h3>征服者</h3>
                     <Select
                       class="hero-select"
                       items={conquerors}
                       bind:value={selectedConqueror}
                       on:change={updateUrl}
-                      placeholder="選擇將軍"
+                      placeholder="選擇征服者"
                       floatingConfig={selectFloatingConfig} />
                   </div>
                 {/if}

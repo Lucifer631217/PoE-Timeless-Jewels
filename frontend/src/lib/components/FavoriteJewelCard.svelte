@@ -29,9 +29,6 @@
       ? entry.tradeTargets.map((target) => createTradeSeedResult(target.seed, target.conqueror))
       : normalizedSeeds.map((seed) => createTradeSeedResult(seed));
   $: seedSummary = summarizeSeeds(normalizedSeeds);
-  const groupTradeWarning =
-    '整組交易種子超過180個會一次開啟多個交易分頁；請允許此網站的彈出式視窗與重新導向。';
-  $: showGroupTradeWarning = entry.entryType === 'group' && groupSeedTotal > 180;
 </script>
 
 <div class="favorite-card" class:is-group={entry.entryType === 'group'}>
@@ -76,7 +73,6 @@
     <button
       type="button"
       class="intl-trade"
-      title={showGroupTradeWarning ? groupTradeWarning : undefined}
       on:click={() =>
         openTrade(entry.jewel, entry.conqueror, tradeSeeds, 'PC', league, 'international', tradeCondition)}>
       {entry.entryType === 'group' ? '本組國際服交易' : '國際服交易'}
@@ -84,16 +80,10 @@
     <button
       type="button"
       class="tw-trade"
-      title={showGroupTradeWarning ? groupTradeWarning : undefined}
-      on:click={() =>
-        openTrade(entry.jewel, entry.conqueror, tradeSeeds, 'PC', twLeague, 'tw', tradeCondition)}>
+      on:click={() => openTrade(entry.jewel, entry.conqueror, tradeSeeds, 'PC', twLeague, 'tw', tradeCondition)}>
       {entry.entryType === 'group' ? '本組台服交易' : '台服交易'}
     </button>
   </div>
-
-  {#if showGroupTradeWarning}
-    <div class="trade-note">{groupTradeWarning}</div>
-  {/if}
 </div>
 
 <style>
@@ -159,7 +149,10 @@
   .trade-row button {
     border-radius: 16px;
     padding: 8px 12px;
-    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    transition:
+      transform 0.18s ease,
+      border-color 0.18s ease,
+      background 0.18s ease;
   }
 
   .favorite-actions button {
@@ -223,16 +216,6 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-  }
-
-  .trade-note {
-    border-radius: 16px;
-    padding: 10px 12px;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.18);
-    color: #bfdbfe;
-    font-size: 12px;
-    line-height: 1.7;
   }
 
   .intl-trade {

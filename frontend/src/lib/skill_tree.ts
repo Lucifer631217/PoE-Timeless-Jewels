@@ -1,4 +1,4 @@
-﻿import type { Translation, Node, SkillTreeData, Group, Sprite, TranslationFile } from './skill_tree_types';
+import type { Translation, Node, SkillTreeData, Group, Sprite, TranslationFile } from './skill_tree_types';
 import { writable } from 'svelte/store';
 import { data } from './types';
 import { englishFallbackTranslations, getStatDescription, translateLeagueName } from './zh_tw';
@@ -510,16 +510,22 @@ export const translateStat = (id: number | string, roll?: number | undefined): s
   return localizedTemplate;
 };
 
-export const translateStatEnglish = (id: number | string, roll?: number | undefined): string =>
-  applyRollToTemplate(getEnglishStatTemplate(id, roll), roll).trim();
+export const translateStatEnglish = (id: number | string, roll?: number | undefined): string => {
+  const template = getEnglishStatTemplate(id, roll);
+  if (!template) return '';
+  return applyRollToTemplate(template, roll).trim();
+};
 
 export const translateStatBilingual = (id: number | string, roll?: number | undefined): string => {
-  const localized = translateStat(id, roll).trim();
-  const english = translateStatEnglish(id, roll);
+  const localized = (translateStat(id, roll) || '').trim();
+  const english = (translateStatEnglish(id, roll) || '').trim();
 
+  if (!localized && !english) return '';
   if (!english || localized.toLowerCase() === english.toLowerCase()) {
     return localized;
   }
+
+  if (!localized) return english;
 
   return `${localized} / ${english}`;
 };
@@ -557,7 +563,9 @@ export const translateRenderedStatBilingualFromCandidates = (ids: number[], engl
     return trimmedEnglish;
   }
 
-  const matchedIds = ids.filter((id) => buildRenderedStatMatcher(getEnglishStatTemplate(id).trim()).test(trimmedEnglish));
+  const matchedIds = ids.filter((id) =>
+    buildRenderedStatMatcher(getEnglishStatTemplate(id).trim()).test(trimmedEnglish)
+  );
   if (matchedIds.length !== 1) {
     return trimmedEnglish;
   }
@@ -629,9 +637,7 @@ const twTradeStatNames: { [key: number]: string } = {
 };
 
 type TradeServer = 'international' | 'tw';
-export type TradeCondition =
-  | 'instant_buyout'
-  | 'in_person_online_in_league';
+export type TradeCondition = 'instant_buyout' | 'in_person_online_in_league';
 export const ANY_CONQUEROR = '__any__';
 
 type TradeStatFilter = {
@@ -759,9 +765,7 @@ const chunkTradeResults = (
   return chunks;
 };
 
-const resolveTradeStatusOption = (
-  condition: TradeCondition
-): 'onlineleague' | 'securable' => {
+const resolveTradeStatusOption = (condition: TradeCondition): 'onlineleague' | 'securable' => {
   if (condition === 'instant_buyout') {
     return 'securable';
   }
@@ -769,10 +773,7 @@ const resolveTradeStatusOption = (
   return 'onlineleague';
 };
 
-const constructQueryFromTargets = (
-  targets: TradeSeedTarget[],
-  condition: TradeCondition = 'instant_buyout'
-) => {
+const constructQueryFromTargets = (targets: TradeSeedTarget[], condition: TradeCondition = 'instant_buyout') => {
   const statusOption = resolveTradeStatusOption(condition);
   const statFilters: TradeStatFilter[] = targets.map((target) => ({
     id: target.statId,
@@ -920,5 +921,3 @@ export const openTrade = (
     blockedTabs: blockedCount
   };
 };
-
-

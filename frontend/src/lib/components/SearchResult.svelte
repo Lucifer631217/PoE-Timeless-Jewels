@@ -28,14 +28,18 @@
     )}
   on:keydown={(e) => {
     if (e.key === 'Enter' || e.key === ' ') {
-      highlight(set.seed, set.skills.map((s) => s.passive), resultConqueror);
+      highlight(
+        set.seed,
+        set.skills.map((s) => s.passive),
+        resultConqueror
+      );
     }
   }}>
   <div class="result-header">
     <div class="seed-label">
       Seed {set.seed}
       {#if set.conqueror}
-        <span class="weight-label">將軍 {translateConquerorName(set.conqueror)}</span>
+        <span class="weight-label">征服者 {translateConquerorName(set.conqueror)}</span>
       {/if}
       <span class="weight-label">權重 {set.weight}</span>
     </div>
@@ -46,15 +50,7 @@
       <button
         class="trade-btn intl-trade"
         on:click|stopPropagation={() =>
-          openTrade(
-            jewel,
-            resultConqueror,
-            [set],
-            platform,
-            league,
-            'international',
-            tradeCondition
-          )}>
+          openTrade(jewel, resultConqueror, [set], platform, league, 'international', tradeCondition)}>
         國際服交易
       </button>
       <button
@@ -88,7 +84,10 @@
     padding: 10px 12px;
     border-radius: 16px;
     cursor: pointer;
-    transition: border-color 0.2s, background 0.2s, transform 0.18s ease;
+    transition:
+      border-color 0.2s,
+      background 0.2s,
+      transform 0.18s ease;
   }
 
   .result-card:hover {

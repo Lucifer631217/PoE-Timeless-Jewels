@@ -390,16 +390,17 @@
       }));
 
       if (!hoveredNode.isJewelSocket && hoveredNodeActive) {
-        if (hoveredNode.skill !== undefined && seed && selectedJewel && selectedConqueror) {
+        if (hoveredNode.skill !== undefined && seed && selectedJewel && (selectedConqueror || seed)) {
           const passiveEntry = data.TreeToPassive?.[hoveredNode.skill];
           const result = passiveEntry
-            ? calculator.Calculate(passiveEntry.Index, seed, selectedJewel, selectedConqueror)
+            ? calculator.Calculate(passiveEntry.Index, seed, selectedJewel, selectedConqueror || '')
             : undefined;
 
           if (result) {
             if ('AlternatePassiveSkill' in result && result.AlternatePassiveSkill) {
               nodeStats = [];
-              nodeName = translateAlternateSkillName(result.AlternatePassiveSkill.Name);
+              const rawName = result.AlternatePassiveSkill.Name || '';
+              nodeName = translateAlternateSkillName(rawName);
 
               if (result.AlternatePassiveSkill.StatsKeys) {
                 const statRolls = result.StatRolls || {};

@@ -2,6 +2,7 @@ package exposition
 
 import (
 	"github.com/Vilsol/crystalline"
+
 	"github.com/Vilsol/timeless-jewels/calculator"
 	"github.com/Vilsol/timeless-jewels/data"
 )

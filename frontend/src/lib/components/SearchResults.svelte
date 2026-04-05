@@ -18,10 +18,7 @@
     8 + 56 + r.skills.reduce((total, skill) => total + 36 + Object.keys(skill.stats).length * 24, 0);
 
   let expandedGroup: string | number = '';
-  const multiTabTradeHint = '整組交易種子超過180個會一次開啟多個交易分頁；請允許此網站的彈出式視窗與重新導向。';
 </script>
-
-<div class="trade-hint-banner">{multiTabTradeHint}</div>
 
 {#if groupResults}
   <div class="group-list">
@@ -49,22 +46,12 @@
           {/if}
           <button
             class="group-trade-btn intl-trade"
-            title={multiTabTradeHint}
             on:click|stopPropagation={() =>
-              openTrade(
-                jewel,
-                conqueror,
-                searchResults.grouped[k],
-                platform,
-                league,
-                'international',
-                tradeCondition
-              )}>
+              openTrade(jewel, conqueror, searchResults.grouped[k], platform, league, 'international', tradeCondition)}>
             本組國際服交易
           </button>
           <button
             class="group-trade-btn tw-trade"
-            title={multiTabTradeHint}
             on:click|stopPropagation={() =>
               openTrade(jewel, conqueror, searchResults.grouped[k], platform, twLeague, 'tw', tradeCondition)}>
             本組台服交易
@@ -127,17 +114,6 @@
 {/if}
 
 <style>
-  .trade-hint-banner {
-    border-radius: 16px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.18);
-    color: #bfdbfe;
-    font-size: 12px;
-    line-height: 1.7;
-  }
-
   .group-list {
     display: flex;
     flex-direction: column;
@@ -167,7 +143,10 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, transform 0.18s ease;
+    transition:
+      background 0.2s,
+      border-color 0.2s,
+      transform 0.18s ease;
     color: #e8d8b8;
   }
 
