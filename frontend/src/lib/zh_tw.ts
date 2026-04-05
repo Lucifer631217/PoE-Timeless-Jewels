@@ -361,7 +361,7 @@ export const alternateSkillNames: Record<string, string> = {
   'Cult of Chaos': '混沌崇拜',
   'Might of the Vaal': '瓦爾．強權',
   'Legacy of the Vaal': '瓦爾．不朽',
-  Devotion: '奉獻',
+  Devotion: '還願',
   'Heated Devotion': '熱情的奉獻',
   'Calming Devotion': '冷靜的奉獻',
   'Thundrous Devotion': '慷慨的奉獻',
