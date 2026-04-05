@@ -422,7 +422,7 @@
   const highlight = (newSeed: number, passives: number[], conquerorValue?: string) => {
     seed = newSeed;
     highlighted = [...new Set(passives)];
-    if (conquerorValue) {
+    if (conquerorValue && selectedConquerorValue !== ANY_CONQUEROR) {
       const matchedConqueror = conquerors.find((option) => option.value === conquerorValue);
       if (matchedConqueror) {
         selectedConqueror = matchedConqueror;

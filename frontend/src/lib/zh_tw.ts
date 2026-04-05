@@ -628,6 +628,18 @@ export const translateConquerorName = (englishName: string): string => {
 };
 
 export const englishFallbackTranslations: Record<string, string> = {
+  'Divine Flesh': '神聖血肉',
+  'Eternal Youth': '青春永駐',
+  'Immortal Ambition': '不朽野望',
+  'Corrupted Soul': '腐化之魂',
+  'Glancing Blows': '側身之擊',
+  'Wind Dancer': '風魔舞者',
+  'The Agnostic': '不可知論',
+  'Transcendence': '超凡脫俗',
+  'Inner Conviction': '內觀信念',
+  'Power of Purpose': '力量之意',
+  'Supreme Decadence': '至高．頹廢',
+  'Supreme Ego': '至高．自我',
   'Regenerate #% of Life per second': '每秒回復 #% 生命',
   '+# to Strength': '+# 力量',
   '+# to Dexterity': '+# 敏捷',
@@ -782,6 +794,21 @@ export const englishFallbackTranslations: Record<string, string> = {
   '+#% to all Elemental Resistances': '增加 #% 所有元素抗性',
   'Minions have #% increased maximum Life': '召喚生物增加 #% 最大生命',
   'Golems have #% more Life': '魔像有 #% 更多生命',
+  'Life Recovery from Non-Instant Leech is not applied\n2% additional Physical Damage Reduction for every 3% Life Recovery per second from Leech':
+    '來自非立即偷取的生命恢復不會套用\n來自偷取每秒每 3% 生命恢復，有 2% 額外物理傷害減免',
+  '50% of Cold and Lightning Damage taken as Fire Damage\n50% less Cold Resistance\n50% less Lightning Resistance':
+    '受到冰冷和閃電傷害的 50% 視為火焰傷害\n冰冷抗性總降 50%\n閃電抗性總降 50%',
+  'Mana Recovery from Regeneration is not applied\n1 Rage Regenerated for every 25 Mana Regeneration per Second\nDoes not delay Inherent Loss of Rage\nSkills Cost +3 Rage':
+    '不會套用至來自回復的魔力恢復\n每秒每 25 魔力回復產生 1 層盛怒\n無法延緩失去固有盛怒的速度\n技能消耗 +3 盛怒',
+  'Flasks Gain 4 Charges per empty Flask Slot every 5 seconds': '每 5 秒藥劑根據每個空藥劑欄位獲得 4 充能',
+  'Can\'t use Helmets\nYour Critical Strike Chance is Lucky\nYour Damage with Critical Strikes is Lucky\nEnemies\' Damage with Critical Strikes against you is Lucky':
+    '不能使用頭盔\n你的暴擊率是幸運的\n你的暴擊傷害是幸運的\n敵人對你的暴擊傷害是幸運的',
+  'You are Blind\nBlind does not affect your Light Radius\n25% more Melee Critical Strike Chance while Blinded':
+    '你被致盲\n被致盲時不影響你的照亮範圍\n近戰暴擊率在被致盲時總增 25%',
+  'Nearby Allies and Enemies Share Charges with you\nEnemies Hitting you have 10% chance to gain an Endurance, \nFrenzy or Power Charge':
+    '附近友方和敵人與你共享能量球\n擊中你的敵人有 10% 機率獲得 1 顆耐力、\n狂怒或暴擊球',
+  'Ignore Attribute Requirements\nGain no inherent bonuses from Attributes':
+    '無視能力值需求\n不能獲得能力值既定的加成',
   '#% increased Projectile Speed': '增加 #% 投射物速度',
   '#% increased Skill Effect Duration': '增加 #% 技能持續時間',
   'Always Freezes Enemies on Hit': '擊中時總是凍結敵人',
@@ -825,8 +852,20 @@ export const englishFallbackTranslations: Record<string, string> = {
 };
 
 /** 優先使用繁中對照表，沒有時保留原模板，最終以英文字串比對作為防線 */
+const lookupEnglishFallbackTranslation = (englishTemplate: string): string | undefined => {
+  if (!englishTemplate) {
+    return undefined;
+  }
+
+  return (
+    englishFallbackTranslations[englishTemplate] ??
+    englishFallbackTranslations[englishTemplate.replace(/\\n/g, '\n')] ??
+    englishFallbackTranslations[englishTemplate.replace(/\n/g, '\\n')]
+  );
+};
+
 export const getStatDescription = (id: number, englishTemplate: string): string => {
-  return englishFallbackTranslations[englishTemplate] ?? statDescriptions[id] ?? englishTemplate;
+  return lookupEnglishFallbackTranslation(englishTemplate) ?? statDescriptions[id] ?? englishTemplate;
 };
 
 /** 翻譯屬性文字並填入數值 */

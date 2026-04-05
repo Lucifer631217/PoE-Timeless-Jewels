@@ -498,7 +498,11 @@ export const translateStat = (id: number | string, roll?: number | undefined): s
   const translationText = getEnglishStatTemplate(nId, roll);
   // Prefer exact EN->TW template mapping first to keep bilingual lines aligned.
   const localizedTemplate =
-    englishFallbackTranslations[translationText] || officialTimelessTwStatTemplates[nId] || getStatDescription(nId, translationText);
+    englishFallbackTranslations[translationText] ||
+    englishFallbackTranslations[translationText.replace(/\\n/g, '\n')] ||
+    englishFallbackTranslations[translationText.replace(/\n/g, '\\n')] ||
+    officialTimelessTwStatTemplates[nId] ||
+    getStatDescription(nId, translationText);
   if (roll !== undefined) {
     return applyRollToTemplate(localizedTemplate, roll);
   }
