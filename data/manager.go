@@ -39,7 +39,7 @@ func GetAlternatePassiveSkillKeyStone(timelessJewel TimelessJewel) *AlternatePas
 			continue
 		}
 
-		if skill.EnabledWeight == 0 {
+		if timelessJewel.AlternateTreeVersion.Index != uint32(HeroicTragedy) && skill.EnabledWeight == 0 {
 			continue
 		}
 

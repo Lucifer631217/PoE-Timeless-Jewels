@@ -9,6 +9,7 @@ func TestVisibleTimelessJewelConquerorsMatchesCurrent3_28Data(t *testing.T) {
 		BrutalRestraint: {Balbala, Asenath, Nasima},
 		MilitantFaith:   {Maxarius, Dominus, Avarius},
 		ElegantHubris:   {Cadiro, Victario, Caspiro},
+		HeroicTragedy:   {Vorana, Uhtred, Medved},
 	}
 
 	for jewelType, conquerors := range expected {

@@ -40,7 +40,7 @@ func isVisibleTimelessJewelConqueror(jewelType JewelType, conqueror *TimelessJew
 			continue
 		}
 
-		if skill.EnabledWeight == 0 {
+		if requiresEnabledWeightForConquerorVisibility(jewelType) && skill.EnabledWeight == 0 {
 			continue
 		}
 
@@ -52,4 +52,8 @@ func isVisibleTimelessJewelConqueror(jewelType JewelType, conqueror *TimelessJew
 	}
 
 	return false
+}
+
+func requiresEnabledWeightForConquerorVisibility(jewelType JewelType) bool {
+	return jewelType != HeroicTragedy
 }

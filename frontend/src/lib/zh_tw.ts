@@ -9,7 +9,8 @@ export const jewelNames: Record<number, string> = {
   2: '致命的驕傲', // Lethal Pride
   3: '殘酷的紀律', // Brutal Restraint
   4: '激進的信仰', // Militant Faith
-  5: '優雅的高傲' // Elegant Hubris
+  5: '優雅的高傲', // Elegant Hubris
+  6: '英勇的悲劇' // Heroic Tragedy
 };
 
 /** 征服者（傳說人物）名稱 */
@@ -736,6 +737,7 @@ export const englishFallbackTranslations: Record<string, string> = {
   '#% increased Energy Shield Recharge Rate': '增加 #% 能量護盾回復速度',
   '+#% to all Elemental Resistances': '增加 #% 所有元素抗性',
   'Minions have #% increased maximum Life': '召喚生物增加 #% 最大生命',
+  'Golems have #% more Life': '魔像有 #% 更多生命',
   '#% increased Projectile Speed': '增加 #% 投射物速度',
   '#% increased Skill Effect Duration': '增加 #% 技能持續時間',
   'Always Freezes Enemies on Hit': '擊中時總是凍結敵人',
@@ -759,6 +761,7 @@ export const englishFallbackTranslations: Record<string, string> = {
   'Minions have #% increased Movement Speed': '召喚生物增加 #% 移動速度',
   '#% chance to gain a Frenzy Charge on Kill': '擊殺時有 #% 機率獲得 1 個狂怒球',
   '#% increased Attack and Cast Speed': '增加 #% 攻擊與施放速度',
+  '#% increased Attack, Cast and Movement Speed while you have Onslaught': '當你擁有猛攻時，增加 #% 攻擊、施放與移動速度',
   '#% increased Duration of Elemental Ailments on Enemies': '增加 #% 敵人身上的元素異常狀態持續時間',
   '#% increased Damage with Poison': '增加 #% 中毒傷害',
   '#% increased Effect of Non-Damaging Ailments': '增加 #% 非傷害型異常狀態效果',
