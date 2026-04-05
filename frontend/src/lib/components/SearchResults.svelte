@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import { openTrade, type SearchResults, type SearchWithSeed, type TradeCondition, type TradeOpenMode } from '../skill_tree';
+  import { openTrade, type SearchResults, type SearchWithSeed, type TradeCondition } from '../skill_tree';
   import SearchResult from './SearchResult.svelte';
   import VirtualList from 'svelte-tiny-virtual-list';
 
@@ -14,17 +14,11 @@
   export let league: string;
   export let twLeague: string;
   export let tradeCondition: TradeCondition = 'instant_buyout';
-  export let tradeOpenMode: TradeOpenMode = 'multi-tab';
-
   const computeSize = (r: SearchWithSeed) =>
     8 + 56 + r.skills.reduce((total, skill) => total + 36 + Object.keys(skill.stats).length * 24, 0);
 
   let expandedGroup: string | number = '';
-  let multiTabTradeHint = '';
-  $: multiTabTradeHint =
-    tradeOpenMode === 'single-tab'
-      ? '目前為單分頁模式，每次交易只會開啟 1 個分頁。'
-      : '整組交易或大量結果交易可能一次開啟多個分頁；若沒有反應，請允許此網站的彈出式視窗與重新導向。';
+  const multiTabTradeHint = '整組交易種子超過180個會一次開啟多個交易分頁；請允許此網站的彈出式視窗與重新導向。';
 </script>
 
 <div class="trade-hint-banner">{multiTabTradeHint}</div>
@@ -64,8 +58,7 @@
                 platform,
                 league,
                 'international',
-                tradeCondition,
-                tradeOpenMode
+                tradeCondition
               )}>
             本組國際服交易
           </button>
@@ -73,7 +66,7 @@
             class="group-trade-btn tw-trade"
             title={multiTabTradeHint}
             on:click|stopPropagation={() =>
-              openTrade(jewel, conqueror, searchResults.grouped[k], platform, twLeague, 'tw', tradeCondition, tradeOpenMode)}>
+              openTrade(jewel, conqueror, searchResults.grouped[k], platform, twLeague, 'tw', tradeCondition)}>
             本組台服交易
           </button>
         </div>
@@ -96,8 +89,7 @@
                 {platform}
                 {league}
                 {twLeague}
-                {tradeCondition}
-                {tradeOpenMode} />
+                {tradeCondition} />
             </div>
           </VirtualList>
         </div>
@@ -128,8 +120,7 @@
           {platform}
           {league}
           {twLeague}
-          {tradeCondition}
-          {tradeOpenMode} />
+          {tradeCondition} />
       </div>
     </VirtualList>
   </div>

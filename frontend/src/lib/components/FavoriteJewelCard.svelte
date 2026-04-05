@@ -1,13 +1,12 @@
 ﻿<script lang="ts">
   import type { SavedJewelEntry } from '../favorite_jewels';
   import { createTradeSeedResult } from '../favorite_jewels';
-  import { openTrade, type TradeCondition, type TradeOpenMode } from '../skill_tree';
+  import { openTrade, type TradeCondition } from '../skill_tree';
 
   export let entry: SavedJewelEntry;
   export let league = 'Standard';
   export let twLeague = 'Standard';
   export let tradeCondition: TradeCondition = 'instant_buyout';
-  export let tradeOpenMode: TradeOpenMode = 'multi-tab';
   export let onEdit: (entry: SavedJewelEntry) => void;
   export let onDelete: (entry: SavedJewelEntry) => void;
 
@@ -30,11 +29,9 @@
       ? entry.tradeTargets.map((target) => createTradeSeedResult(target.seed, target.conqueror))
       : normalizedSeeds.map((seed) => createTradeSeedResult(seed));
   $: seedSummary = summarizeSeeds(normalizedSeeds);
-  let multiTabTradeHint = '';
-  $: multiTabTradeHint =
-    tradeOpenMode === 'single-tab'
-      ? '目前為單分頁模式，每次交易只會開啟 1 個分頁。'
-      : '整組交易可能一次開啟多個分頁；若沒有反應，請允許此網站的彈出式視窗與重新導向。';
+  const groupTradeWarning =
+    '整組交易種子超過180個會一次開啟多個交易分頁；請允許此網站的彈出式視窗與重新導向。';
+  $: showGroupTradeWarning = entry.entryType === 'group' && groupSeedTotal > 180;
 </script>
 
 <div class="favorite-card" class:is-group={entry.entryType === 'group'}>
@@ -49,7 +46,7 @@
           <span>Seed {entry.seed}</span>
         {/if}
         {#if entry.buildName}
-          <span>{entry.buildName}</span>
+          <span class="build-name">{entry.buildName}</span>
         {/if}
       </div>
       {#if entry.entryType === 'group'}
@@ -79,23 +76,23 @@
     <button
       type="button"
       class="intl-trade"
-      title={entry.entryType === 'group' ? multiTabTradeHint : undefined}
+      title={showGroupTradeWarning ? groupTradeWarning : undefined}
       on:click={() =>
-        openTrade(entry.jewel, entry.conqueror, tradeSeeds, 'PC', league, 'international', tradeCondition, tradeOpenMode)}>
+        openTrade(entry.jewel, entry.conqueror, tradeSeeds, 'PC', league, 'international', tradeCondition)}>
       {entry.entryType === 'group' ? '本組國際服交易' : '國際服交易'}
     </button>
     <button
       type="button"
       class="tw-trade"
-      title={entry.entryType === 'group' ? multiTabTradeHint : undefined}
+      title={showGroupTradeWarning ? groupTradeWarning : undefined}
       on:click={() =>
-        openTrade(entry.jewel, entry.conqueror, tradeSeeds, 'PC', twLeague, 'tw', tradeCondition, tradeOpenMode)}>
+        openTrade(entry.jewel, entry.conqueror, tradeSeeds, 'PC', twLeague, 'tw', tradeCondition)}>
       {entry.entryType === 'group' ? '本組台服交易' : '台服交易'}
     </button>
   </div>
 
-  {#if entry.entryType === 'group'}
-    <div class="trade-note">{multiTabTradeHint}</div>
+  {#if showGroupTradeWarning}
+    <div class="trade-note">{groupTradeWarning}</div>
   {/if}
 </div>
 
@@ -144,6 +141,12 @@
     color: #9cc3ff;
     font-size: 12px;
     line-height: 1.6;
+  }
+
+  .build-name {
+    color: #67e8f9;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(103, 232, 249, 0.22);
   }
 
   .favorite-actions {

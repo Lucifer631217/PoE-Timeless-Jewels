@@ -38,8 +38,7 @@
     type SearchResults as SearchResultsType,
     type SearchWithSeed,
     type StatConfig,
-    type TradeCondition,
-    type TradeOpenMode
+    type TradeCondition
   } from '../../lib/skill_tree';
   import type { Node } from '../../lib/skill_tree_types';
   import { data, calculator } from '../../lib/types';
@@ -741,10 +740,6 @@
   };
 
   let tradeCondition: TradeCondition = 'instant_buyout';
-  let singleTabTradeMode = readBooleanPreference('singleTabTradeMode', false);
-  $: writePreference('singleTabTradeMode', singleTabTradeMode ? 'true' : 'false');
-  let tradeOpenMode: TradeOpenMode = 'multi-tab';
-  $: tradeOpenMode = singleTabTradeMode ? 'single-tab' : 'multi-tab';
   const extractTranslatedStats = (result: data.AlternatePassiveSkillInformation): string[] => {
     const translatedStats: string[] = [];
 
@@ -1111,6 +1106,16 @@
             </div>
           </div>
 
+          {#if $tradeOpenFeedback}
+            <div class="trade-feedback" class:trade-feedback-warning={$tradeOpenFeedback.level === 'warning'}>
+              <div class="trade-feedback-copy">
+                <strong>{$tradeOpenFeedback.title}</strong>
+                <p>{$tradeOpenFeedback.message}</p>
+              </div>
+              <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>關閉</button>
+            </div>
+          {/if}
+
           {#if searchOutcome}
             <div class="trade-panel">
               <div class="trade-row compact-row">
@@ -1126,15 +1131,6 @@
                   class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'}
                   on:click={() => (tradeCondition = 'in_person_online_in_league')}>
                   面對面（聯盟上線）
-                </button>
-                <button
-                  class="trade-toggle"
-                  class:trade-toggle-active={singleTabTradeMode}
-                  on:click={() => {
-                    singleTabTradeMode = !singleTabTradeMode;
-                    clearTradeOpenFeedback();
-                  }}>
-                  {singleTabTradeMode ? '單分頁模式' : '多分頁模式'}
                 </button>
               </div>
 
@@ -1155,8 +1151,7 @@
                       platform.value,
                       league.value,
                       'international',
-                      tradeCondition,
-                      tradeOpenMode
+                      tradeCondition
                     )}
                   disabled={!searchOutcome || !league}>
                   國際服交易
@@ -1184,28 +1179,15 @@
                       'PC',
                       twLeague.value,
                       'tw',
-                      tradeCondition,
-                      tradeOpenMode
+                      tradeCondition
                     )}
                   disabled={!searchOutcome || !twLeague}>
                   台服交易
                 </button>
               </div>
               <div class="panel-note trade-hint">
-                若一次開啟多個交易分頁，請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。              </div>
-              {#if $tradeOpenFeedback}
-                <div
-                  class="trade-feedback"
-                  class:trade-feedback-warning={$tradeOpenFeedback.level === 'warning'}>
-                  <div class="trade-feedback-copy">
-                    <strong>{$tradeOpenFeedback.title}</strong>
-                    <p>{$tradeOpenFeedback.message}</p>
-                  </div>
-                  <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>
-                    關閉
-                  </button>
-                </div>
-              {/if}
+                若一次開啟多個交易分頁，請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。
+              </div>
             </div>
           {/if}
 
@@ -1278,7 +1260,7 @@
                         class="selection-button"
                         class:selected={mode === 'seed'}
                         on:click={() => setMode('seed')}>
-                        靘?Seed
+                        依 Seed
                       </button>
                       <button
                         class="selection-button"
@@ -1336,7 +1318,7 @@
                       {:else}
                         <div class="combined-results split-results">
                           <div>
-                            <h3>撘瑕?憭抵釵</h3>
+                            <h3>強力天賦</h3>
                             <div class:rainbow={colored}>
                               {#each sortCombined(combineResults(seedResults, colored, 'notables'), sortOrder.value) as result}
                                 <div
@@ -1456,8 +1438,7 @@
               platform={platform.value}
               league={league.value}
               twLeague={twLeague.value}
-              {tradeCondition}
-              {tradeOpenMode} />
+              {tradeCondition} />
           {/if}
         </div>
       </div>
@@ -1501,16 +1482,6 @@
         <div class="favorite-feedback">{favoriteFeedback}</div>
       {/if}
 
-      {#if $tradeOpenFeedback}
-        <div class="trade-feedback" class:trade-feedback-warning={$tradeOpenFeedback.level === 'warning'}>
-          <div class="trade-feedback-copy">
-            <strong>{$tradeOpenFeedback.title}</strong>
-            <p>{$tradeOpenFeedback.message}</p>
-          </div>
-          <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>關閉</button>
-        </div>
-      {/if}
-
       {#if favoriteDraft}
         {#key `${favoriteDraft.id}:${favoriteDraft.entryType}:${favoriteDraft.seeds.join(',')}:${favoriteDraft.snapshot.length}:${favoriteDraft.buildName}:${favoriteDraft.estimatedValue}:${favoriteDraft.note}`}
           <FavoriteJewelForm
@@ -1531,7 +1502,6 @@
               league={league?.value || 'Standard'}
               twLeague={twLeague?.value || 'Standard'}
               {tradeCondition}
-              {tradeOpenMode}
               onEdit={editFavorite}
               onDelete={deleteFavorite} />
           {/each}
@@ -2167,7 +2137,7 @@
     max-width: 50vw;
     max-height: 100vh;
     height: 100vh;
-    overflow: auto;
+    overflow: hidden;
     z-index: 24;
     border-top-left-radius: 24px;
     border-top-right-radius: 0;
@@ -2176,12 +2146,15 @@
     background: #111317;
     border: 1px solid rgba(200, 169, 110, 0.24);
     backdrop-filter: none;
+    box-sizing: border-box;
   }
 
   .favorite-drawer .favorite-list {
-    max-height: calc(100vh - 260px);
+    flex: 1;
+    min-height: 0;
     overflow: auto;
     padding-right: 4px;
+    align-content: start;
   }
 
   @media (max-width: 1280px) {

@@ -59,7 +59,7 @@
 
   <label class="editor-field">
     <span>流派 / 角色</span>
-    <input bind:value={buildName} placeholder="例如：毒弓遊俠、冰矛秘術家" />
+    <input class="build-name-input" bind:value={buildName} placeholder="例如：毒弓遊俠、冰矛秘術家" />
   </label>
 
   <label class="editor-field">
@@ -151,6 +151,15 @@
     color: #f4ead5;
     padding: 12px 14px;
     line-height: 1.6;
+  }
+
+  .editor-field .build-name-input {
+    color: #67e8f9;
+    text-shadow: 0 0 12px rgba(103, 232, 249, 0.18);
+  }
+
+  .editor-field .build-name-input::placeholder {
+    color: rgba(103, 232, 249, 0.52);
   }
 
   .editor-field textarea {

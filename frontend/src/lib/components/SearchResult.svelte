@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SearchWithSeed, TradeCondition, TradeOpenMode } from '../skill_tree';
+  import type { SearchWithSeed, TradeCondition } from '../skill_tree';
   import { formatBilingualStatHtml, skillTree, translateStatBilingual, openTrade } from '../skill_tree';
   import { translateConquerorName } from '../zh_tw';
 
@@ -12,7 +12,6 @@
   export let league: string;
   export let twLeague: string;
   export let tradeCondition: TradeCondition = 'instant_buyout';
-  export let tradeOpenMode: TradeOpenMode = 'multi-tab';
 
   $: resultConqueror = set.conqueror || conqueror;
 </script>
@@ -54,15 +53,14 @@
             platform,
             league,
             'international',
-            tradeCondition,
-            tradeOpenMode
+            tradeCondition
           )}>
         國際服交易
       </button>
       <button
         class="trade-btn tw-trade"
         on:click|stopPropagation={() =>
-          openTrade(jewel, resultConqueror, [set], platform, twLeague, 'tw', tradeCondition, tradeOpenMode)}>
+          openTrade(jewel, resultConqueror, [set], platform, twLeague, 'tw', tradeCondition)}>
         台服交易
       </button>
     </div>

@@ -620,7 +620,6 @@ const twTradeStatNames: { [key: number]: string } = {
 };
 
 type TradeServer = 'international' | 'tw';
-export type TradeOpenMode = 'multi-tab' | 'single-tab';
 export type TradeCondition =
   | 'instant_buyout'
   | 'in_person_online_in_league';
@@ -814,8 +813,7 @@ export const openTrade = (
   platform: string,
   league: string,
   server: TradeServer = 'international',
-  condition: TradeCondition = 'instant_buyout',
-  tradeOpenMode: TradeOpenMode = 'multi-tab'
+  condition: TradeCondition = 'instant_buyout'
 ) => {
   if (results.length === 0) {
     clearTradeOpenFeedback();
@@ -843,13 +841,11 @@ export const openTrade = (
     url = new URL(`https://www.pathofexile.com/trade/search${platformSegment}/${leagueSegment}`);
   }
 
-  const chunksToOpen = tradeOpenMode === 'single-tab' ? resultChunks.slice(0, 1) : resultChunks;
-  const unopenedBatches = Math.max(resultChunks.length - chunksToOpen.length, 0);
-  const openedTabs = typeof window !== 'undefined' ? chunksToOpen.map(() => window.open('', '_blank')) : [];
+  const openedTabs = typeof window !== 'undefined' ? resultChunks.map(() => window.open('', '_blank')) : [];
   let openedCount = 0;
   let blockedCount = 0;
 
-  chunksToOpen.forEach((chunk, index) => {
+  resultChunks.forEach((chunk, index) => {
     const tradeUrl = new URL(url.toString());
     tradeUrl.searchParams.set(
       'q',
@@ -890,16 +886,7 @@ export const openTrade = (
       tradeOpenFeedback.set({
         level: 'warning',
         title: '交易分頁被瀏覽器擋下',
-        message: `這次需要開啟 ${chunksToOpen.length} 個分頁，目前成功 ${openedCount} 個、被擋下 ${blockedCount} 個。請允許此網站的彈出式視窗與重新導向後再重試。`,
-        totalTabs: resultChunks.length,
-        openedTabs: openedCount,
-        blockedTabs: blockedCount
-      });
-    } else if (tradeOpenMode === 'single-tab' && unopenedBatches > 0) {
-      tradeOpenFeedback.set({
-        level: 'info',
-        title: '單分頁模式已啟用',
-        message: `這次共 ${resultChunks.length} 批，為避免多分頁彈窗，僅開啟第 1 批。尚有 ${unopenedBatches} 批未開啟。`,
+        message: `這次需要開啟 ${resultChunks.length} 個分頁，目前成功 ${openedCount} 個、被擋下 ${blockedCount} 個。請允許此網站的彈出式視窗與重新導向後再重試。`,
         totalTabs: resultChunks.length,
         openedTabs: openedCount,
         blockedTabs: blockedCount
