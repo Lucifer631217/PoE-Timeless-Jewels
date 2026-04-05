@@ -30,6 +30,7 @@
 - 更新永恆珠寶單點測試與反查測試基準到 3.28，`go test ./...` 與 `go build ./...` 已通過。
 - 補上本機抽取探測腳本與 `third_party/pogo` 相容修正，讓 3.28 `Bundles2` 抽取流程可重現。
 - 修正 `calculator.wasm` / `wasm_exec.js` 舊快取問題：前端載入改附帶版本 query，Firebase Hosting 也加上 `no-cache` header，避免一般模式長時間沿用舊版天賦樹。
+- 新增 `version.json` 版本檢查與分頁聚焦時的自動重整機制，讓重新開站或切回分頁的使用者會自動切到新版，不必手動 `Ctrl + F5`。
 
 ### 2026-04-05 3.28 本機抽取相容性修正與資料同步
 

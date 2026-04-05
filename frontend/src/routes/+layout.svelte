@@ -2,31 +2,96 @@
   import '../app.scss';
   import { assets } from '$app/paths';
   import { browser } from '$app/environment';
+  import { onMount } from 'svelte';
   import { loadSkillTree } from '../lib/skill_tree';
   import { syncWrap } from '../lib/worker';
   import { initializeCrystalline } from '../lib/types';
   import { APP_VERSION } from '../lib/version';
 
   let wasmLoading = true;
+  const VERSION_CHECK_MARKER_KEY = 'app-version-reload-marker';
 
   // eslint-disable-next-line no-undef
   let go: any;
 
-  if (browser) {
+  async function fetchDeployedVersion(): Promise<string | null> {
+    try {
+      const response = await fetch(`${assets}/version.json?t=${Date.now()}`, {
+        cache: 'no-store'
+      });
+      if (!response.ok) return null;
+      const payload = await response.json();
+      return typeof payload?.version === 'string' ? payload.version : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function reloadIfVersionChanged(): Promise<boolean> {
+    const deployedVersion = await fetchDeployedVersion();
+    if (!deployedVersion || deployedVersion === APP_VERSION) {
+      sessionStorage.removeItem(VERSION_CHECK_MARKER_KEY);
+      return false;
+    }
+
+    const reloadMarker = `reloaded:${deployedVersion}`;
+    if (sessionStorage.getItem(VERSION_CHECK_MARKER_KEY) === reloadMarker) {
+      return false;
+    }
+
+    sessionStorage.setItem(VERSION_CHECK_MARKER_KEY, reloadMarker);
+    location.reload();
+    return true;
+  }
+
+  async function bootWasm() {
     // @ts-ignore
     go = new globalThis.Go();
-    fetch(`${assets}/calculator.wasm?v=${APP_VERSION}`)
-      .then((data) => data.arrayBuffer())
-      .then((data) => {
-        WebAssembly.instantiate(data, go.importObject).then((result) => {
-          go.run(result.instance);
-          wasmLoading = false;
-          initializeCrystalline();
-          loadSkillTree();
-        });
+    const response = await fetch(`${assets}/calculator.wasm?v=${APP_VERSION}`, {
+      cache: 'no-store'
+    });
+    const data = await response.arrayBuffer();
+    const result = await WebAssembly.instantiate(data, go.importObject);
+    go.run(result.instance);
+    wasmLoading = false;
+    initializeCrystalline();
+    loadSkillTree();
 
-        if (syncWrap) syncWrap.boot(data);
-      });
+    if (syncWrap) syncWrap.boot(data);
+  }
+
+  if (browser) {
+    onMount(() => {
+      let disposed = false;
+
+      const ensureFreshRuntime = async () => {
+        if (disposed) return;
+        const reloading = await reloadIfVersionChanged();
+        if (!reloading && wasmLoading) {
+          await bootWasm();
+        }
+      };
+
+      const handleFocus = () => {
+        void reloadIfVersionChanged();
+      };
+
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          void reloadIfVersionChanged();
+        }
+      };
+
+      void ensureFreshRuntime();
+      window.addEventListener('focus', handleFocus);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
+      return () => {
+        disposed = true;
+        window.removeEventListener('focus', handleFocus);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    });
   }
 </script>
 
