@@ -69,6 +69,10 @@ func (a *AlternateTreeManager) RollAlternatePassiveAddition(rng *random.NumberGe
 func (a *AlternateTreeManager) ReplacePassiveSkill(rng *random.NumberGenerator) data.AlternatePassiveSkillInformation {
 	if a.PassiveSkill.IsKeystone {
 		alternatePassiveSkillKeyStone := data.GetAlternatePassiveSkillKeyStone(a.TimelessJewel)
+		if alternatePassiveSkillKeyStone == nil {
+			return data.AlternatePassiveSkillInformation{}
+		}
+
 		return data.AlternatePassiveSkillInformation{
 			AlternatePassiveSkill: alternatePassiveSkillKeyStone,
 			StatRolls: map[uint32]uint32{

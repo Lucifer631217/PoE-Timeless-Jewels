@@ -50,6 +50,7 @@ type AlternatePassiveSkill struct {
 	RandomMin                uint32             `json:"RandomMin"`
 	RandomMax                uint32             `json:"RandomMax"`
 	ConquerorVersion         uint32             `json:"Var24"`
+	EnabledWeight            uint32             `json:"Var25"`
 }
 
 func (a *AlternatePassiveSkill) GetStatMinMax(statMin bool, index uint32) uint32 {
@@ -84,14 +85,14 @@ func (a *AlternatePassiveSkill) UnmarshalJSON(data []byte) error {
 	type alias AlternatePassiveSkill
 	type signedAlias struct {
 		alias
-		Stat1Min int64 `json:"Stat1Min"`
-		Stat1Max int64 `json:"Stat1Max"`
-		Stat2Min int64 `json:"Stat2Min"`
-		Stat2Max int64 `json:"Stat2Max"`
-		Stat3Min int64 `json:"Var9"`
-		Stat3Max int64 `json:"Var10"`
-		Stat4Min int64 `json:"Var11"`
-		Stat4Max int64 `json:"Var12"`
+		Stat1Min  int64 `json:"Stat1Min"`
+		Stat1Max  int64 `json:"Stat1Max"`
+		Stat2Min  int64 `json:"Stat2Min"`
+		Stat2Max  int64 `json:"Stat2Max"`
+		Stat3Min  int64 `json:"Var9"`
+		Stat3Max  int64 `json:"Var10"`
+		Stat4Min  int64 `json:"Var11"`
+		Stat4Max  int64 `json:"Var12"`
 		RandomMin int64 `json:"RandomMin"`
 		RandomMax int64 `json:"RandomMax"`
 	}

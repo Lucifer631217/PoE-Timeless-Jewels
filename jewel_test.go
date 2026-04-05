@@ -79,15 +79,6 @@ func TestGloriousVanity(t *testing.T) {
 		},
 		{
 			jewel:     data.GloriousVanity,
-			conqueror: data.Zerphi,
-			passive:   2286, // Doomsday (hex_zone_keystone2800_)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveSkill: data.GetAlternatePassiveSkillByIndex(1),
-				StatRolls:             map[uint32]uint32{0: 1},
-			},
-		},
-		{
-			jewel:     data.GloriousVanity,
 			conqueror: data.Ahuana,
 			passive:   2286, // Doomsday (hex_zone_keystone2800_)
 			result: data.AlternatePassiveSkillInformation{
@@ -196,15 +187,6 @@ func TestLethalPride(t *testing.T) {
 		},
 		{
 			jewel:     data.LethalPride,
-			conqueror: data.Kiloava,
-			passive:   2286, // Doomsday (hex_zone_keystone2800_)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveSkill: data.GetAlternatePassiveSkillByIndex(80),
-				StatRolls:             map[uint32]uint32{0: 1},
-			},
-		},
-		{
-			jewel:     data.LethalPride,
 			conqueror: data.Akoya,
 			passive:   2286, // Doomsday (hex_zone_keystone2800_)
 			result: data.AlternatePassiveSkillInformation{
@@ -232,67 +214,6 @@ func TestBrutalRestraint(t *testing.T) {
 		passive   uint32
 		result    data.AlternatePassiveSkillInformation
 	}{
-		{
-			jewel:     data.BrutalRestraint,
-			conqueror: data.Deshret,
-			passive:   2286, // Doomsday (hex_zone_keystone2800_)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveSkill: data.GetAlternatePassiveSkillByIndex(82),
-				StatRolls:             map[uint32]uint32{0: 1},
-			},
-		},
-		{
-			jewel:     data.BrutalRestraint,
-			conqueror: data.Deshret,
-			passive:   411, // Instability (maximum_power_charges742)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveAdditionInformations: []data.AlternatePassiveAdditionInformation{
-					{
-						AlternatePassiveAddition: data.GetAlternatePassiveAdditionByIndex(70),
-						StatRolls:                map[uint32]uint32{0: 10},
-					},
-				},
-			},
-		},
-		{
-			jewel:     data.BrutalRestraint,
-			conqueror: data.Deshret,
-			passive:   519, // Intelligence (intelligence879)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveAdditionInformations: []data.AlternatePassiveAdditionInformation{
-					{
-						AlternatePassiveAddition: data.GetAlternatePassiveAdditionByIndex(66),
-						StatRolls:                map[uint32]uint32{0: 4},
-					},
-				},
-			},
-		},
-		{
-			jewel:     data.BrutalRestraint,
-			conqueror: data.Deshret,
-			passive:   1190, // Attack Damage and Attack Speed with Shield (damage_while_using_shield1913)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveAdditionInformations: []data.AlternatePassiveAdditionInformation{
-					{
-						AlternatePassiveAddition: data.GetAlternatePassiveAdditionByIndex(66),
-						StatRolls:                map[uint32]uint32{0: 4},
-					},
-				},
-			},
-		},
-		{
-			jewel:     data.BrutalRestraint,
-			conqueror: data.Deshret,
-			passive:   88, // Eagle Eye (eagle_eye199)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveAdditionInformations: []data.AlternatePassiveAdditionInformation{
-					{
-						AlternatePassiveAddition: data.GetAlternatePassiveAdditionByIndex(76),
-						StatRolls:                map[uint32]uint32{0: 20},
-					},
-				},
-			},
-		},
 		{
 			jewel:     data.BrutalRestraint,
 			conqueror: data.Balbala,
@@ -340,67 +261,6 @@ func TestMilitantFaith(t *testing.T) {
 		passive   uint32
 		result    data.AlternatePassiveSkillInformation
 	}{
-		{
-			jewel:     data.MilitantFaith,
-			conqueror: data.Venarius,
-			passive:   2286, // Doomsday (hex_zone_keystone2800_)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveSkill: data.GetAlternatePassiveSkillByIndex(86),
-				StatRolls:             map[uint32]uint32{0: 1},
-			},
-		},
-		{
-			jewel:     data.MilitantFaith,
-			conqueror: data.Venarius,
-			passive:   411, // Instability (maximum_power_charges742)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveAdditionInformations: []data.AlternatePassiveAdditionInformation{
-					{
-						AlternatePassiveAddition: data.GetAlternatePassiveAdditionByIndex(93),
-						StatRolls:                map[uint32]uint32{0: 5},
-					},
-				},
-			},
-		},
-		{
-			jewel:     data.MilitantFaith,
-			conqueror: data.Venarius,
-			passive:   519, // Intelligence (intelligence879)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveAdditionInformations: []data.AlternatePassiveAdditionInformation{
-					{
-						AlternatePassiveAddition: data.GetAlternatePassiveAdditionByIndex(92),
-						StatRolls:                map[uint32]uint32{0: 5},
-					},
-				},
-			},
-		},
-		{
-			jewel:     data.MilitantFaith,
-			conqueror: data.Venarius,
-			passive:   1190, // Attack Damage and Attack Speed with Shield (damage_while_using_shield1913)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveAdditionInformations: []data.AlternatePassiveAdditionInformation{
-					{
-						AlternatePassiveAddition: data.GetAlternatePassiveAdditionByIndex(92),
-						StatRolls:                map[uint32]uint32{0: 5},
-					},
-				},
-			},
-		},
-		{
-			jewel:     data.MilitantFaith,
-			conqueror: data.Venarius,
-			passive:   88, // Eagle Eye (eagle_eye199)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveAdditionInformations: []data.AlternatePassiveAdditionInformation{
-					{
-						AlternatePassiveAddition: data.GetAlternatePassiveAdditionByIndex(93),
-						StatRolls:                map[uint32]uint32{0: 5},
-					},
-				},
-			},
-		},
 		{
 			jewel:     data.MilitantFaith,
 			conqueror: data.Maxarius,
@@ -499,15 +359,6 @@ func TestElegantHubris(t *testing.T) {
 			passive:   2286, // Doomsday (hex_zone_keystone2800_)
 			result: data.AlternatePassiveSkillInformation{
 				AlternatePassiveSkill: data.GetAlternatePassiveSkillByIndex(106),
-				StatRolls:             map[uint32]uint32{0: 1},
-			},
-		},
-		{
-			jewel:     data.ElegantHubris,
-			conqueror: data.Chitus,
-			passive:   2286, // Doomsday (hex_zone_keystone2800_)
-			result: data.AlternatePassiveSkillInformation{
-				AlternatePassiveSkill: data.GetAlternatePassiveSkillByIndex(107),
 				StatRolls:             map[uint32]uint32{0: 1},
 			},
 		},

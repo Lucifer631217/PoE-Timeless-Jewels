@@ -19,6 +19,9 @@ func Calculate(passiveID uint32, seed uint32, timelessJewelType data.JewelType, 
 	alternateTreeVersion := data.GetAlternateTreeVersionIndex(uint32(timelessJewelType))
 
 	timelessJewelConqueror := data.TimelessJewelConquerors[timelessJewelType][conqueror]
+	if timelessJewelConqueror == nil {
+		return data.AlternatePassiveSkillInformation{}
+	}
 
 	timelessJewel := data.TimelessJewel{
 		Seed:                   seed,
@@ -53,6 +56,9 @@ func ReverseSearch(passiveIDs []uint32, statIDs []uint32, timelessJewelType data
 	alternateTreeVersion := data.GetAlternateTreeVersionIndex(uint32(timelessJewelType))
 
 	timelessJewelConqueror := data.TimelessJewelConquerors[timelessJewelType][conqueror]
+	if timelessJewelConqueror == nil {
+		return map[uint32]map[uint32]map[uint32]uint32{}
+	}
 
 	timelessJewel := data.TimelessJewel{
 		AlternateTreeVersion:   alternateTreeVersion,

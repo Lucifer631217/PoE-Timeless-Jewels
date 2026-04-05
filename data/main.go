@@ -98,6 +98,8 @@ func init() {
 		}
 	}
 
+	VisibleTimelessJewelConquerors = BuildVisibleTimelessJewelConquerors()
+
 	AlternateTreeVersions = unzipJSONTo[[]*AlternateTreeVersion](alternateTreeVersionsGz)
 
 	for _, alt := range AlternateTreeVersions {

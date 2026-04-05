@@ -24,7 +24,7 @@ func Expose() *crystalline.Exposer {
 		data.ElegantHubris:   data.ElegantHubris.String(),
 	}, "data", "TimelessJewels")
 
-	e.ExposeOrPanic(data.TimelessJewelConquerors, "data", "TimelessJewelConquerors")
+	e.ExposeOrPanic(data.VisibleTimelessJewelConquerors, "data", "TimelessJewelConquerors")
 	e.ExposeOrPanic(data.TimelessJewelSeedRanges, "data", "TimelessJewelSeedRanges")
 	e.ExposeOrPanic(data.GetApplicablePassives(), "data", "PassiveSkills")
 	e.ExposeOrPanic(string(data.SkillTreeJSON), "data", "SkillTree")
