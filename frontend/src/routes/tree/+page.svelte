@@ -61,7 +61,7 @@
 
   const anyConquerorOption: SelectOption<string> = {
     value: ANY_CONQUEROR,
-    label: '?券'
+    label: '全部'
   };
   const appVersion = APP_VERSION;
 
@@ -610,9 +610,9 @@
   };
 
   const sortResults = [
-    { label: '?箇甈⊥', value: 'count' },
-    { label: '閰韌摮?', value: 'alphabet' },
-    { label: '蝔?漲', value: 'rarity' },
+    { label: '數量排序', value: 'count' },
+    { label: '詞綴排序', value: 'alphabet' },
+    { label: '稀有度', value: 'rarity' },
     { label: '估值', value: 'value' }
   ] as const;
 
@@ -1025,8 +1025,8 @@
     removeFavoriteJewel(entry.id);
     favoriteFeedback =
       entry.entryType === 'group'
-        ? `撌脣?斗蝯??${entry.jewelLabel} / ??${entry.seeds.length} 蝑?Seed`
-        : `撌脣?斗??${entry.jewelLabel} / Seed ${entry.seed}`;
+        ? `已刪除整組收藏：${entry.jewelLabel} / 共 ${entry.seeds.length} 顆 Seed`
+        : `已刪除收藏：${entry.jewelLabel} / Seed ${entry.seed}`;
     if (favoriteDraft?.id === entry.id) {
       favoriteDraft = null;
     }
@@ -1089,16 +1089,16 @@
         <div class="panel-header">
           <div class="panel-title-row">
             <div class="panel-title-group">
-              <button class="burger-menu" aria-label="?嗉絲?Ｘ" title="?嗉絲?Ｘ" on:click={() => (collapsed = true)}>
+              <button class="burger-menu" aria-label="收合面板" title="收合面板" on:click={() => (collapsed = true)}>
                 <span class="burger-icon" aria-hidden="true">
                   <span></span>
                   <span></span>
                   <span></span>
                 </span>
-                <span class="menu-label">?嗉絲?Ｘ</span>
+                <span class="menu-label">收合面板</span>
               </button>
               <div>
-                <h3>{results ? '?蝯?' : '瘞豢??窄?亥岷'}</h3>
+                <h3>{results ? '反查結果' : '永恆珠寶查詢'}</h3>
                 <p>可依 Seed 或詞綴條件查詢，並快速開啟交易頁與收藏常用結果。</p>
               </div>
             </div>
@@ -1106,7 +1106,7 @@
               <button
                 class="secondary-toggle favorite-entry-toggle"
                 on:click={() => (favoriteDrawerOpen = !favoriteDrawerOpen)}>
-                {favoriteDrawerOpen ? '?嗅??嗉??窄' : `?嗉??窄 (${favoriteCount})`}
+                {favoriteDrawerOpen ? '收合收藏珠寶' : `收藏珠寶 (${favoriteCount})`}
               </button>
             </div>
           </div>
@@ -1114,18 +1114,18 @@
           {#if searchOutcome}
             <div class="trade-panel">
               <div class="trade-row compact-row">
-                <span class="trade-label">鈭斗?璇辣</span>
+                <span class="trade-label">交易條件</span>
                 <button
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'instant_buyout'}
                   on:click={() => (tradeCondition = 'instant_buyout')}>
-                  ?喳鞈潸眺
+                  即刻購買
                 </button>
                 <button
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'}
                   on:click={() => (tradeCondition = 'in_person_online_in_league')}>
-                  ?Ｗ??Ｖ漱???舐??函?嚗?
+                  面對面（聯盟上線）
                 </button>
                 <button
                   class="trade-toggle"
@@ -1159,12 +1159,12 @@
                       tradeOpenMode
                     )}
                   disabled={!searchOutcome || !league}>
-                  ???漱??
+                  國際服交易
                 </button>
               </div>
 
               <div class="trade-row">
-                <span class="trade-label">?唳??舐?</span>
+                <span class="trade-label">台服聯盟</span>
                 <div class="trade-select">
                   <Select
                     items={twLeagues}
@@ -1188,11 +1188,11 @@
                       tradeOpenMode
                     )}
                   disabled={!searchOutcome || !twLeague}>
-                  ?唳?鈭斗?
+                  台服交易
                 </button>
               </div>
               <div class="panel-note trade-hint">
-                ?渡?鈭斗??之???漱??賭?甈⊿????????交?銝???瘝???嚗??迂甇斤雯蝡?敶撘?蝒??撠???              </div>
+                若一次開啟多個交易分頁，請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。              </div>
               {#if $tradeOpenFeedback}
                 <div
                   class="trade-feedback"
@@ -1202,7 +1202,7 @@
                     <p>{$tradeOpenFeedback.message}</p>
                   </div>
                   <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>
-                    ??
+                    關閉
                   </button>
                 </div>
               {/if}
@@ -1219,16 +1219,16 @@
                 {groupResults ? '分組顯示中' : '已關閉分組'}
               </button>
               <button class="secondary-toggle" on:click={() => (results = !results)} disabled={!searchOutcome}>
-                {results ? '餈?璇辣閮剖?' : '?亦??蝯?'}
+                {results ? '隱藏反查結果' : '查看反查結果'}
               </button>
               {#if selectedConqueror && hasValidConquerorSelection && mode === 'stats'}
                 <div class="bulk-actions bulk-actions-inline compact-row-actions">
                   <button class="secondary-toggle" on:click={selectAll} disabled={searching || disabled.size === 0}
-                    >?券</button>
+                    >全選</button>
                   <button
                     class="secondary-toggle"
                     on:click={selectAllNotables}
-                    disabled={searching || disabled.size === 0}>?券撘瑕?憭抵釵</button>
+                    disabled={searching || disabled.size === 0}>全選強力天賦</button>
                   <button
                     class="secondary-toggle"
                     on:click={selectAllPassives}
@@ -1236,7 +1236,7 @@
                   <button
                     class="secondary-toggle"
                     on:click={deselectAll}
-                    disabled={searching || disabled.size >= affectedNodes.length}>?券?</button>
+                    disabled={searching || disabled.size >= affectedNodes.length}>全部排除</button>
                 </div>
               {/if}
             </div>
@@ -1248,25 +1248,25 @@
             <section class="control-section">
               <div class="inline-select-row" class:with-mode-toggle={selectedConqueror && hasValidConquerorSelection}>
                 <div class="field-stack field-stack-half">
-                  <h3>?窄</h3>
+                  <h3>珠寶</h3>
                   <Select
                     class="hero-select"
                     items={jewels}
                     bind:value={selectedJewel}
                     on:change={changeJewel}
-                    placeholder="?豢?瘞豢??窄"
+                    placeholder="選擇永恆珠寶"
                     floatingConfig={selectFloatingConfig} />
                 </div>
 
                 {#if selectedJewel}
                   <div class="field-stack field-stack-half">
-                    <h3>撠?</h3>
+                    <h3>將軍</h3>
                     <Select
                       class="hero-select"
                       items={conquerors}
                       bind:value={selectedConqueror}
                       on:change={updateUrl}
-                      placeholder="?豢?撠?"
+                      placeholder="選擇將軍"
                       floatingConfig={selectFloatingConfig} />
                   </div>
                 {/if}
@@ -1284,7 +1284,7 @@
                         class="selection-button"
                         class:selected={mode === 'stats'}
                         on:click={() => setMode('stats')}>
-                        靘?蝬游???
+                        依詞綴反查
                       </button>
                     </div>
                   </div>
@@ -1313,7 +1313,7 @@
                             class:selected={colored}
                             on:click={() => (colored = !colored)}>彩色顯示</button>
                           <button class="secondary-toggle" class:selected={split} on:click={() => (split = !split)}
-                            >??憿舐內</button>
+                            >分開顯示</button>
                         </div>
                       </div>
 
@@ -1376,13 +1376,13 @@
                     {/if}
                   {:else if mode === 'stats'}
                     <div class="field-stack field-stack-inline">
-                      <h3>?啣??格?閰韌</h3>
+                      <h3>選擇要反查的詞綴</h3>
                       <div class="stat-picker">
                         <Select
                           items={statItems}
                           on:change={selectStat}
                           bind:this={statSelector}
-                          placeholder="?豢?閬??亦?閰韌"
+                          placeholder="選擇要加入的詞綴"
                           floatingConfig={selectFloatingConfig}>
                           <svelte:fragment slot="item" let:item>
                             <span>{@html formatBilingualStatHtml(item.label)}</span>
@@ -1400,7 +1400,7 @@
                           <div class="selected-stat-card">
                             <div class="selected-stat-top">
                               <button class="remove-stat" on:click={() => removeStat(selectedStats[statId].id)}
-                                >蝘駁</button>
+                                >移除</button>
                               <span class="selected-stat-text"
                                 >{@html formatBilingualStatHtml(
                                   translateStatBilingual(selectedStats[statId].id)
@@ -1412,7 +1412,7 @@
                                 <input type="number" min="0" bind:value={selectedStats[statId].min} />
                               </label>
                               <label class="inline-label inline-label-compact">
-                                <span>甈?</span>
+                                <span>權重</span>
                                 <input type="number" min="0" bind:value={selectedStats[statId].weight} />
                               </label>
                             </div>
@@ -1422,14 +1422,14 @@
 
                       <div class="field-stack compact-field search-control-row">
                         <label class="inline-label inline-label-compact inline-label-total">
-                          <span>?雿蜇甈?</span>
+                          <span>最低總權重</span>
                           <input type="number" min="0" bind:value={minTotalWeight} />
                         </label>
                         <button class="primary-toggle search-button" on:click={search} disabled={searching}>
                           {#if searching && selectedJewel}
-                            ??銝?{currentSeed} / {maxSeed}
+                            搜尋中 {currentSeed} / {maxSeed}
                           {:else}
-                            ???
+                            開始反查
                           {/if}
                         </button>
                       </div>
@@ -1465,15 +1465,15 @@
   {:else}
     <button
       class="burger-menu collapsed-trigger"
-      aria-label="撅??Ｘ"
-      title="撅??Ｘ"
+      aria-label="展開面板"
+      title="展開面板"
       on:click={() => (collapsed = false)}>
       <span class="burger-icon" aria-hidden="true">
         <span></span>
         <span></span>
         <span></span>
       </span>
-      <span class="menu-label">撅??Ｘ</span>
+      <span class="menu-label">展開面板</span>
     </button>
   {/if}
 
@@ -1481,13 +1481,13 @@
     <section class="favorite-panel favorite-drawer">
       <div class="favorite-header">
         <div>
-          <h3>?嗉??窄</h3>
+          <h3>收藏珠寶</h3>
           <p>目前共有 {favoriteCount} 筆收藏，可匯出或匯入 JSON。</p>
         </div>
         <div class="favorite-actions">
-          <button class="secondary-toggle" on:click={exportFavorites} disabled={favoriteCount === 0}>?臬 JSON</button>
-          <button class="secondary-toggle" on:click={openImportDialog}>?臬 JSON</button>
-          <button class="secondary-toggle" on:click={() => (favoriteDrawerOpen = false)}>??</button>
+          <button class="secondary-toggle" on:click={exportFavorites} disabled={favoriteCount === 0}>匯出 JSON</button>
+          <button class="secondary-toggle" on:click={openImportDialog}>匯入 JSON</button>
+          <button class="secondary-toggle" on:click={() => (favoriteDrawerOpen = false)}>關閉</button>
           <input
             bind:this={favoriteImportInput}
             class="hidden-input"
@@ -1507,7 +1507,7 @@
             <strong>{$tradeOpenFeedback.title}</strong>
             <p>{$tradeOpenFeedback.message}</p>
           </div>
-          <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>??</button>
+          <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>關閉</button>
         </div>
       {/if}
 
@@ -1541,7 +1541,7 @@
   {/if}
 
   <div class="repo-link-wrap">
-    <span>? {appVersion}</span>
+    <span>版本 {appVersion}</span>
   </div>
 </SkillTree>
 
