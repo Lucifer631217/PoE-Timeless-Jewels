@@ -1,0 +1,18 @@
+{
+  "file": "SkillMineVariations",
+  "fields": [
+    {
+      "name": "SkillMinesKey",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "MiscObject",
+      "type": "longid",
+      "ref": "MiscObjects"
+    }
+  ]
+}

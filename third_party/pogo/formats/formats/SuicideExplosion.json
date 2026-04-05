@@ -1,0 +1,41 @@
+{
+  "file": "SuicideExplosion",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "i32"
+    },
+    {
+      "name": "Key1",
+      "type": "longid"
+    },
+    {
+      "name": "Key2",
+      "type": "longid"
+    },
+    {
+      "name": "Flag3",
+      "type": "bool"
+    },
+    {
+      "name": "Flag4",
+      "type": "bool"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    }
+  ]
+}

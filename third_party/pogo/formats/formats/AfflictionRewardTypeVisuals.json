@@ -1,0 +1,17 @@
+{
+  "file": "AfflictionRewardTypeVisuals",
+  "fields": [
+    {
+      "name": "AfflictionRewardTypes",
+      "type": "i32"
+    },
+    {
+      "name": "Id",
+      "type": "string"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    }
+  ]
+}

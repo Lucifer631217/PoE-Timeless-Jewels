@@ -1,0 +1,14 @@
+{
+  "file": "HeistNPCBlueprintTypes",
+  "fields": [
+    {
+      "name": "NPCsKey",
+      "type": "longid",
+      "ref": "NPCs"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    }
+  ]
+}

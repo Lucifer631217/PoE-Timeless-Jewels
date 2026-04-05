@@ -1,0 +1,90 @@
+{
+  "file": "GroundEffects",
+  "fields": [
+    {
+      "name": "GroundEffectTypesKey",
+      "type": "longid",
+      "ref": "GroundEffectTypes"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "Key3",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown4",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32[]"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    },
+    {
+      "name": "AOFile",
+      "type": "string[]"
+    },
+    {
+      "name": "Unknown8",
+      "type": "string[]"
+    },
+    {
+      "name": "EndEffect",
+      "type": "string"
+    },
+    {
+      "name": "Key10",
+      "type": "longid"
+    },
+    {
+      "name": "Key11",
+      "type": "longid"
+    },
+    {
+      "name": "Key12",
+      "type": "longid"
+    },
+    {
+      "name": "Key13",
+      "type": "longid"
+    },
+    {
+      "name": "Key14",
+      "type": "longid"
+    },
+    {
+      "name": "Flag15",
+      "type": "bool"
+    },
+    {
+      "name": "Flag16",
+      "type": "bool"
+    },
+    {
+      "name": "Flag17",
+      "type": "bool"
+    },
+    {
+      "name": "Key18",
+      "type": "longid"
+    },
+    {
+      "name": "Key19",
+      "type": "longid"
+    },
+    {
+      "name": "Flag20",
+      "type": "bool"
+    }
+  ]
+}

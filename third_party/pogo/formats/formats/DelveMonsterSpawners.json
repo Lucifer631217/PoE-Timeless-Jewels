@@ -1,0 +1,129 @@
+{
+  "file": "DelveMonsterSpawners",
+  "fields": [
+    {
+      "name": "BaseMetadata",
+      "type": "string"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Key2",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32"
+    },
+    {
+      "name": "Flag11",
+      "type": "bool"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool"
+    },
+    {
+      "name": "Flag13",
+      "type": "bool"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool"
+    },
+    {
+      "name": "Flag15",
+      "type": "bool"
+    },
+    {
+      "name": "Flag16",
+      "type": "bool"
+    },
+    {
+      "name": "Flag17",
+      "type": "bool"
+    },
+    {
+      "name": "Flag18",
+      "type": "bool"
+    },
+    {
+      "name": "Flag19",
+      "type": "bool"
+    },
+    {
+      "name": "Flag20",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown21",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown22",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown23",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown24",
+      "type": "i32"
+    },
+    {
+      "name": "Key25",
+      "type": "longid"
+    },
+    {
+      "name": "Flag26",
+      "type": "bool"
+    },
+    {
+      "name": "Flag27",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown28",
+      "type": "i32"
+    },
+    {
+      "name": "Script",
+      "type": "string"
+    },
+    {
+      "name": "Flag30",
+      "type": "bool"
+    }
+  ]
+}

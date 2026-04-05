@@ -1,0 +1,55 @@
+{
+  "file": "ItemisedVisualEffect",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "ItemVisualEffectKey",
+      "type": "longid",
+      "ref": "ItemVisualEffect"
+    },
+    {
+      "name": "ItemVisualIdentityKey1",
+      "type": "longid",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "ItemVisualIdentityKey2",
+      "type": "longid",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "Stats",
+      "type": "longid[]",
+      "ref": "Stats"
+    },
+    {
+      "name": "ItemClasses",
+      "type": "longid[]",
+      "ref": "ItemClasses"
+    },
+    {
+      "name": "Key6",
+      "type": "longid[]"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32[]"
+    },
+    {
+      "name": "Flag10",
+      "type": "bool"
+    }
+  ]
+}

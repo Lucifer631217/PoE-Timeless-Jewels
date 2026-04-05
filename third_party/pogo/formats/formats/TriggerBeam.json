@@ -1,0 +1,59 @@
+{
+  "file": "TriggerBeam",
+  "fields": [
+    {
+      "name": "Unknown0",
+      "type": "i32"
+    },
+    {
+      "name": "Key1",
+      "type": "longid[]",
+      "ref": "MiscBeams"
+    },
+    {
+      "name": "Key2",
+      "type": "longid[]",
+      "ref": "MiscBeams"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32[]"
+    },
+    {
+      "name": "Flag4",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "Flag9",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32[]"
+    },
+    {
+      "name": "Flag11",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32"
+    }
+  ]
+}

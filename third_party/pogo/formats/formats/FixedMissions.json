@@ -1,0 +1,33 @@
+{
+  "file": "FixedMissions",
+  "fields": [
+    {
+      "name": "Key0",
+      "type": "longid"
+    },
+    {
+      "name": "Key1",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "file": "NPCs",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "Metadata",
+      "type": "string"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "NPCMasterKey",
+      "type": "longid",
+      "ref": "NPCMaster"
+    },
+    {
+      "name": "ShortName",
+      "type": "string"
+    },
+    {
+      "name": "Act",
+      "type": "i32"
+    },
+    {
+      "name": "NPCShop",
+      "type": "longid",
+      "ref": "NPCShop"
+    },
+    {
+      "name": "Greetings",
+      "type": "longid[]",
+      "ref": "NPCAudio"
+    },
+    {
+      "name": "Farewells",
+      "type": "longid[]",
+      "ref": "NPCAudio"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32",
+      "since": "3.7"
+    },
+    {
+      "name": "Key11",
+      "type": "shortid",
+      "since": "3.11",
+      "ref": "NPCs"
+    },
+    {
+      "name": "PortraitFile",
+      "type": "string",
+      "since": "3.12",
+      "until": "3.14"
+    },
+    {
+      "name": "Portrait",
+      "type": "longid",
+      "since": "3.13",
+      "ref": "NPCPortraits"
+    },
+    {
+      "name": "DialogueStyle",
+      "type": "longid",
+      "since": "3.14",
+      "ref": "NPCDialogueStyles"
+    }
+  ]
+}

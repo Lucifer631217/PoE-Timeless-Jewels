@@ -1,0 +1,40 @@
+{
+  "file": "AchievementSetRewards",
+  "fields": [
+    {
+      "name": "SetId",
+      "type": "i32",
+      "ref": "AchievementSetsDisplay",
+      "ref-field": "Id"
+    },
+    {
+      "name": "AchievementsRequired",
+      "type": "i32"
+    },
+    {
+      "name": "Rewards",
+      "type": "longid[]",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "TotemPieceEveryNAchievements",
+      "type": "i32"
+    },
+    {
+      "name": "Message",
+      "type": "string"
+    },
+    {
+      "name": "NotificationIcon",
+      "type": "string"
+    },
+    {
+      "name": "HideoutName",
+      "type": "string"
+    },
+    {
+      "name": "Id",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "file": "FootstepAudio",
+  "fields": [
+    {
+      "name": "Unknown0",
+      "type": "i32",
+      "until": "3.13"
+    },
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown0",
+      "type": "i32",
+      "description": "yes, it literally just moved",
+      "since": "3.13"
+    }
+  ]
+}

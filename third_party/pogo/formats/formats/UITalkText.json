@@ -1,0 +1,31 @@
+{
+  "file": "UITalkText",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "UITalkCategoriesKey",
+      "type": "i32"
+    },
+    {
+      "name": "OGGFile",
+      "type": "string"
+    },
+    {
+      "name": "Text",
+      "type": "string"
+    },
+    {
+      "name": "Flag4",
+      "type": "bool"
+    },
+    {
+      "name": "NPCTextAudio",
+      "type": "longid",
+      "ref": "NPCTextAudio"
+    }
+  ]
+}

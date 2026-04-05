@@ -1,0 +1,65 @@
+{
+  "file": "MapDeviceRecipes",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "BaseItemTypesKeys",
+      "type": "longid[]",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "WorldAreasKey",
+      "type": "longid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "MicrotransactionPortalVariation",
+      "type": "longid",
+      "ref": "MicrotransactionPortalVariations"
+    },
+    {
+      "name": "AreaLevel",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32",
+      "since": "3.7"
+    },
+    {
+      "name": "IsLegionMap",
+      "type": "bool",
+      "since": "3.7"
+    },
+    {
+      "name": "IsShaperOrElderFight",
+      "type": "bool",
+      "since": "3.13"
+    },
+    {
+      "name": "IsMavenFight",
+      "type": "bool",
+      "since": "3.13",
+      "until": "3.17"
+    },
+    {
+      "name": "Flag10",
+      "type": "bool",
+      "since": "3.13"
+    },
+    {
+      "name": "Open_AchievementItems",
+      "type": "longid[]",
+      "since": "3.14",
+      "ref": "AchievementItems"
+    }
+  ]
+}

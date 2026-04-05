@@ -1,0 +1,29 @@
+{
+  "file": "HeistNPCDialogue",
+  "fields": [
+    {
+      "name": "DialogueEventKey",
+      "type": "longid",
+      "ref": "DialogueEvent"
+    },
+    {
+      "name": "HeistNPCsKey",
+      "type": "longid",
+      "ref": "HeistNPCs"
+    },
+    {
+      "name": "AudioNormal",
+      "type": "longid[]",
+      "ref": "NPCTextAudio"
+    },
+    {
+      "name": "AudioLoud",
+      "type": "longid[]",
+      "ref": "NPCTextAudio"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    }
+  ]
+}

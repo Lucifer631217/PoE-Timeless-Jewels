@@ -1,0 +1,36 @@
+{
+  "file": "MonsterProjectileSpell",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "i32",
+      "unique": true
+    },
+    {
+      "name": "Projectile",
+      "type": "longid",
+      "ref": "Projectiles"
+    },
+    {
+      "name": "Animation",
+      "type": "longid",
+      "ref": "Animation"
+    },
+    {
+      "name": "Flag3",
+      "type": "bool"
+    },
+    {
+      "name": "Flag4",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    }
+  ]
+}

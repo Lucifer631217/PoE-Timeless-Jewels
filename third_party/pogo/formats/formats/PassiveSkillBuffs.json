@@ -1,0 +1,36 @@
+{
+  "file": "PassiveSkillBuffs",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "BuffDefinitionsKey",
+      "type": "longid",
+      "ref": "BuffDefinitions"
+    },
+    {
+      "name": "Buff_StatValues",
+      "type": "i32[]"
+    },
+    {
+      "name": "Key1",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32[]",
+      "since": "3.10"
+    }
+  ]
+}

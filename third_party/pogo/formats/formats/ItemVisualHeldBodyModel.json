@@ -1,0 +1,66 @@
+{
+  "file": "ItemVisualHeldBodyModel",
+  "fields": [
+    {
+      "name": "ItemVisualIdentity",
+      "type": "longid",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "MarauderAnimatedObject",
+      "type": "string"
+    },
+    {
+      "name": "RangerAnimatedObject",
+      "type": "string"
+    },
+    {
+      "name": "WitchAnimatedObject",
+      "type": "string"
+    },
+    {
+      "name": "DuelistAnimatedObject",
+      "type": "string"
+    },
+    {
+      "name": "TemplarAnimatedObject",
+      "type": "string"
+    },
+    {
+      "name": "ShadowAnimatedObject",
+      "type": "string"
+    },
+    {
+      "name": "ScionAnimatedObject",
+      "type": "string"
+    },
+    {
+      "name": "MarauderBone",
+      "type": "string"
+    },
+    {
+      "name": "RangerBone",
+      "type": "string"
+    },
+    {
+      "name": "WitchBone",
+      "type": "string"
+    },
+    {
+      "name": "DuelistBone",
+      "type": "string"
+    },
+    {
+      "name": "TemplarBone",
+      "type": "string"
+    },
+    {
+      "name": "ShadowBone",
+      "type": "string"
+    },
+    {
+      "name": "ScionBone",
+      "type": "string"
+    }
+  ]
+}

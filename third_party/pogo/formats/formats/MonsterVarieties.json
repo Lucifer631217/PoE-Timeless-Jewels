@@ -1,0 +1,413 @@
+{
+  "file": "MonsterVarieties",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "MonsterTypesKey",
+      "type": "longid",
+      "ref": "MonsterTypes"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "ObjectSize",
+      "type": "i32"
+    },
+    {
+      "name": "MinimumAttackDistance",
+      "type": "i32"
+    },
+    {
+      "name": "MaximumAttackDistance",
+      "type": "i32"
+    },
+    {
+      "name": "ACTFiles",
+      "type": "string[]"
+    },
+    {
+      "name": "AOFiles",
+      "type": "string[]"
+    },
+    {
+      "name": "BaseMonsterTypeIndex",
+      "type": "string"
+    },
+    {
+      "name": "ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown11",
+      "type": "string"
+    },
+    {
+      "name": "Unknown12",
+      "type": "string"
+    },
+    {
+      "name": "ModelSizeMultiplier",
+      "type": "i32",
+      "description": "in percent"
+    },
+    {
+      "name": "Unknown14",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown15",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown16",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown17",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown18",
+      "type": "i32"
+    },
+    {
+      "name": "TagsKeys",
+      "type": "longid[]",
+      "ref": "Tags"
+    },
+    {
+      "name": "ExperienceMultiplier",
+      "type": "i32",
+      "description": "in percent"
+    },
+    {
+      "name": "Unknown21",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown22",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown23",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown24",
+      "type": "i32"
+    },
+    {
+      "name": "CriticalStrikeChance",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown26",
+      "type": "i32"
+    },
+    {
+      "name": "GrantedEffectsKeys",
+      "type": "longid[]",
+      "ref": "GrantedEffects"
+    },
+    {
+      "name": "AISFile",
+      "type": "string"
+    },
+    {
+      "name": "ModsKeys2",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "Stance",
+      "type": "string"
+    },
+    {
+      "name": "Key31",
+      "type": "longid"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "DamageMultiplier",
+      "type": "i32",
+      "description": "in percent"
+    },
+    {
+      "name": "LifeMultiplier",
+      "type": "i32",
+      "description": "in percent"
+    },
+    {
+      "name": "AttackSpeed",
+      "type": "i32",
+      "description": "in ms"
+    },
+    {
+      "name": "Weapon1_ItemVisualIdentityKeys",
+      "type": "longid[]",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "Weapon2_ItemVisualIdentityKeys",
+      "type": "longid[]",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "Back_ItemVisualIdentityKey",
+      "type": "longid",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "MainHand_ItemClassesKey",
+      "type": "longid",
+      "ref": "ItemClasses"
+    },
+    {
+      "name": "OffHand_ItemClassesKey",
+      "type": "longid",
+      "ref": "ItemClasses"
+    },
+    {
+      "name": "Helmet_ItemVisualIdentityKey",
+      "type": "longid",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "Unknown42",
+      "type": "i32"
+    },
+    {
+      "name": "KillSpecificMonsterCount_AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Special_ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "KillRare_AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Flag46",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown47",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown48",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown49",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown50",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown51",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown52",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown53",
+      "type": "i32"
+    },
+    {
+      "name": "Flag54",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown55",
+      "type": "string"
+    },
+    {
+      "name": "KillWhileOnslaughtIsActive_AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "MonsterSegmentsKey",
+      "type": "longid",
+      "ref": "MonsterSegments"
+    },
+    {
+      "name": "MonsterArmoursKey",
+      "type": "longid",
+      "ref": "MonsterArmours"
+    },
+    {
+      "name": "KillWhileTalismanIsActive_AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Part1_ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "Part2_ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "Endgame_ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "Key63",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown64",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown65",
+      "type": "i32"
+    },
+    {
+      "name": "Key66",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key67",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown68",
+      "type": "i32"
+    },
+    {
+      "name": "SinkAnimation_AOFile",
+      "type": "string"
+    },
+    {
+      "name": "Flag70",
+      "type": "bool"
+    },
+    {
+      "name": "Key71",
+      "type": "longid[]"
+    },
+    {
+      "name": "Flag72",
+      "type": "bool"
+    },
+    {
+      "name": "Flag73",
+      "type": "bool"
+    },
+    {
+      "name": "Flag74",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown75",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown76",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown77",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown78",
+      "type": "i32"
+    },
+    {
+      "name": "EPKFile",
+      "type": "string"
+    },
+    {
+      "name": "Unknown80",
+      "type": "i32"
+    },
+    {
+      "name": "MonsterConditionalEffectPacksKey",
+      "type": "longid",
+      "ref": "MonsterConditionalEffectPacks"
+    },
+    {
+      "name": "Flag82",
+      "type": "bool"
+    },
+    {
+      "name": "Flag83",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown84",
+      "type": "i32"
+    },
+    {
+      "name": "Flag85",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown86",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown87",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown88",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown89",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown90",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown91",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown92",
+      "type": "void[]"
+    },
+    {
+      "name": "Unknown93",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown94",
+      "type": "i32"
+    }
+  ]
+}

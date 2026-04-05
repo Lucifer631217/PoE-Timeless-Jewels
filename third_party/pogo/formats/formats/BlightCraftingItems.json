@@ -1,0 +1,24 @@
+{
+  "file": "BlightCraftingItems",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Tier",
+      "type": "i32"
+    },
+    {
+      "name": "AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "CanUseOnCorrupted",
+      "type": "bool"
+    }
+  ]
+}

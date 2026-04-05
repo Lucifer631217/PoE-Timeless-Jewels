@@ -1,0 +1,29 @@
+{
+  "file": "UniqueMapInfo",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Word",
+      "type": "longid",
+      "ref": "Words"
+    },
+    {
+      "name": "FlavourTextKey",
+      "type": "longid",
+      "ref": "FlavourText"
+    },
+    {
+      "name": "ItemVisualIdentityKey",
+      "type": "longid",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "Flag4",
+      "type": "bool"
+    }
+  ]
+}

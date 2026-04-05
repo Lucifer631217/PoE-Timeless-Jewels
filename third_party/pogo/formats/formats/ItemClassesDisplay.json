@@ -1,0 +1,18 @@
+{
+  "file": "ItemClassesDisplay",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "DisplayName",
+      "type": "string"
+    },
+    {
+      "name": "Unknown3",
+      "type": "shortid"
+    }
+  ]
+}

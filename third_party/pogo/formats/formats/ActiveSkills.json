@@ -1,0 +1,128 @@
+{
+  "file": "ActiveSkills",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "DisplayedName",
+      "type": "string"
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "Unknown3",
+      "type": "string"
+    },
+    {
+      "name": "Icon_DDSFile",
+      "type": "string"
+    },
+    {
+      "name": "ActiveSkillTargetTypes",
+      "type": "i32[]"
+    },
+    {
+      "name": "ActiveSkillTypes",
+      "type": "longid[]",
+      "ref": "ActiveSkillType"
+    },
+    {
+      "name": "WeaponRestriction_ItemClassesKeys",
+      "type": "longid[]",
+      "ref": "ItemClasses"
+    },
+    {
+      "name": "WebsiteDescription",
+      "type": "string"
+    },
+    {
+      "name": "WebsiteImage",
+      "type": "string"
+    },
+    {
+      "name": "Flag10",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown11",
+      "type": "string"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool"
+    },
+    {
+      "name": "SkillTotemId",
+      "type": "i32"
+    },
+    {
+      "name": "IsManuallyCasted",
+      "type": "bool"
+    },
+    {
+      "name": "Input_StatKeys",
+      "type": "longid[]",
+      "ref": "Stats"
+    },
+    {
+      "name": "Output_StatKeys",
+      "type": "longid[]",
+      "ref": "Stats"
+    },
+    {
+      "name": "MinionActiveSkillTypes",
+      "type": "longid[]",
+      "ref": "ActiveSkillType"
+    },
+    {
+      "name": "Flag18",
+      "type": "bool"
+    },
+    {
+      "name": "Flag19",
+      "type": "bool"
+    },
+    {
+      "name": "Key20",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown21",
+      "type": "i32"
+    },
+    {
+      "name": "AlternateSkillTargetingBehavioursKey",
+      "type": "longid",
+      "ref": "AlternateSkillTargetingBehaviours"
+    },
+    {
+      "name": "Flag23",
+      "type": "bool"
+    },
+    {
+      "name": "AIFile",
+      "type": "string"
+    },
+    {
+      "name": "Key25",
+      "type": "longid[]"
+    },
+    {
+      "name": "Flag26",
+      "type": "bool"
+    },
+    {
+      "name": "Flag27",
+      "type": "bool"
+    },
+    {
+      "name": "Flag28",
+      "type": "bool"
+    }
+  ]
+}

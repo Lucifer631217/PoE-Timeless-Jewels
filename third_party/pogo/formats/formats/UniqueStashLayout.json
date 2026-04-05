@@ -1,0 +1,58 @@
+{
+  "file": "UniqueStashLayout",
+  "fields": [
+    {
+      "name": "WordsKey",
+      "type": "longid",
+      "ref": "Words"
+    },
+    {
+      "name": "ItemVisualIdentityKey",
+      "type": "longid",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "UniqueStashTypesKey",
+      "type": "longid",
+      "ref": "UniqueStashTypes"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "ShowIfEmpty",
+      "type": "bool"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    },
+    {
+      "name": "RenamedVersion",
+      "type": "shortid",
+      "ref": "UniqueStashLayout"
+    },
+    {
+      "name": "BaseVersion",
+      "type": "shortid",
+      "ref": "UniqueStashLayout"
+    },
+    {
+      "name": "IsAlternateArt",
+      "type": "bool"
+    }
+  ]
+}

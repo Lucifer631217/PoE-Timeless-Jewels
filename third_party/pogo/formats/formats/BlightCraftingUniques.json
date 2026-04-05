@@ -1,0 +1,10 @@
+{
+  "file": "BlightCraftingUniques",
+  "fields": [
+    {
+      "name": "WordsKey",
+      "type": "longid",
+      "ref": "Words"
+    }
+  ]
+}

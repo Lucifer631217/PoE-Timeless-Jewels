@@ -1,0 +1,18 @@
+{
+  "file": "SkillTotemVariations",
+  "fields": [
+    {
+      "name": "SkillTotemsKey",
+      "type": "i32"
+    },
+    {
+      "name": "TotemSkinId",
+      "type": "i32"
+    },
+    {
+      "name": "MonsterVarietiesKey",
+      "type": "longid",
+      "ref": "MonsterVarieties"
+    }
+  ]
+}

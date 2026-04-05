@@ -1,0 +1,33 @@
+{
+  "file": "Commands",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Command",
+      "type": "string"
+    },
+    {
+      "name": "Flag2",
+      "type": "bool"
+    },
+    {
+      "name": "EnglishCommand",
+      "type": "string",
+      "since": "1.2"
+    },
+    {
+      "name": "Description",
+      "type": "string",
+      "since": "3.0"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool",
+      "since": "3.12"
+    }
+  ]
+}

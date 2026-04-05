@@ -1,0 +1,30 @@
+{
+  "file": "GroundEffectTypes",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown2",
+      "type": "f32"
+    },
+    {
+      "name": "Key3",
+      "type": "longid"
+    },
+    {
+      "name": "Key4",
+      "type": "longid"
+    },
+    {
+      "name": "Key5",
+      "type": "longid"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "file": "IncursionUniqueUpgradeComponents",
+  "fields": [
+    {
+      "name": "Key0",
+      "type": "longid"
+    },
+    {
+      "name": "BaseItemType",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    }
+  ]
+}

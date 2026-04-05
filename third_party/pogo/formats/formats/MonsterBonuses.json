@@ -1,0 +1,31 @@
+{
+  "file": "MonsterBonuses",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Key1",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key2",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32[]"
+    },
+    {
+      "name": "StatsKeys",
+      "type": "longid[]",
+      "ref": "Stats"
+    },
+    {
+      "name": "StatValues",
+      "type": "i32[]"
+    }
+  ]
+}

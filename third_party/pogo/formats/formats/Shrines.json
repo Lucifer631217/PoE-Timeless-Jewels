@@ -1,0 +1,88 @@
+{
+  "file": "Shrines",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "TimeoutInSeconds",
+      "type": "i32"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "ChargesShared",
+      "type": "bool"
+    },
+    {
+      "name": "Player_ShrineBuffsKey",
+      "type": "longid",
+      "ref": "ShrineBuffs"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "Monster_ShrineBuffsKey",
+      "type": "longid",
+      "ref": "ShrineBuffs"
+    },
+    {
+      "name": "SummonMonster_MonsterVarietiesKey",
+      "type": "longid",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "SummonPlayer_MonsterVarietiesKey",
+      "type": "longid",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "Unknown11",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32"
+    },
+    {
+      "name": "ShrineSoundsKey",
+      "type": "longid",
+      "ref": "ShrineSounds"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool"
+    },
+    {
+      "name": "AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "IsPVPOnly",
+      "type": "bool"
+    },
+    {
+      "name": "Flag17",
+      "type": "bool"
+    },
+    {
+      "name": "IsLesserShrine",
+      "type": "bool"
+    }
+  ]
+}

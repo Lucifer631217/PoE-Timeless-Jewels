@@ -1,0 +1,9 @@
+{
+  "file": "LabyrinthExclusionGroups",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string"
+    }
+  ]
+}

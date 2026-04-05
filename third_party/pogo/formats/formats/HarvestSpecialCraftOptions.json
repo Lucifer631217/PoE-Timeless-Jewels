@@ -1,0 +1,17 @@
+{
+  "file": "HarvestSpecialCraftOptions",
+  "fields": [
+    {
+      "name": "Key0",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Key2",
+      "type": "longid"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "file": "MiscEffectPacks",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "EPKFile",
+      "type": "string"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "PreloadGroups",
+      "type": "longid[]",
+      "ref": "PreloadGroups"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    },
+    {
+      "name": "PlayerOnly_EPKFile",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "file": "RunicCircles",
+  "fields": [
+    {
+      "name": "Unknown0",
+      "type": "string"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown2",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    }
+  ]
+}

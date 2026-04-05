@@ -1,0 +1,37 @@
+{
+  "file": "MeleeTrails",
+  "fields": [
+    {
+      "name": "EPKFile1",
+      "type": "string"
+    },
+    {
+      "name": "EPKFile2",
+      "type": "string"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "AOFile",
+      "type": "string"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    }
+  ]
+}

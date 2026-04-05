@@ -1,0 +1,27 @@
+{
+  "file": "MapStatConditions",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "StatsKey",
+      "type": "longid",
+      "ref": "Stats"
+    },
+    {
+      "name": "Flag2",
+      "type": "bool"
+    },
+    {
+      "name": "StatMin",
+      "type": "i32"
+    },
+    {
+      "name": "StatMax",
+      "type": "i32"
+    }
+  ]
+}

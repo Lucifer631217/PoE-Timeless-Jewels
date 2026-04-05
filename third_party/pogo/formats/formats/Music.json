@@ -1,0 +1,39 @@
+{
+  "file": "Music",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "SoundFile",
+      "type": "string"
+    },
+    {
+      "name": "BankFile",
+      "type": "string"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "IsAvailableInHideout",
+      "type": "bool"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "Unknown6",
+      "type": "string"
+    },
+    {
+      "name": "MusicCategories",
+      "type": "longid[]",
+      "ref": "MusicCategories"
+    }
+  ]
+}

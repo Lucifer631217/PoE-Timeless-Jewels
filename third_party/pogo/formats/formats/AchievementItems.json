@@ -1,0 +1,47 @@
+{
+  "file": "AchievementItems",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "CompletionsRequired",
+      "type": "i32"
+    },
+    {
+      "name": "AchievementsKey",
+      "type": "longid",
+      "ref": "Achievements"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    },
+    {
+      "name": "Flag9",
+      "type": "bool"
+    }
+  ]
+}

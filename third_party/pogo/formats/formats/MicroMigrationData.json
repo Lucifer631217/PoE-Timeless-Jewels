@@ -1,0 +1,22 @@
+{
+  "file": "MicroMigrationData",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Key2",
+      "type": "longid"
+    },
+    {
+      "name": "Key3",
+      "type": "longid"
+    }
+  ]
+}

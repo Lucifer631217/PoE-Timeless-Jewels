@@ -1,0 +1,57 @@
+{
+  "file": "BestiaryFamilies",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "Icon",
+      "type": "string"
+    },
+    {
+      "name": "IconSmall",
+      "type": "string"
+    },
+    {
+      "name": "Illustration",
+      "type": "string"
+    },
+    {
+      "name": "PageArt",
+      "type": "string"
+    },
+    {
+      "name": "FlavourText",
+      "type": "string"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "TagsKey",
+      "type": "longid",
+      "ref": "Tags"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32"
+    },
+    {
+      "name": "ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "CurrencyItemsKey",
+      "type": "longid",
+      "ref": "CurrencyItems"
+    }
+  ]
+}

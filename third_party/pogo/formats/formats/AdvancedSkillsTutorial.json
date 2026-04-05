@@ -1,0 +1,42 @@
+{
+  "file": "AdvancedSkillsTutorial",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "SkillGemInfoKey1",
+      "type": "longid[]",
+      "ref": "SkillGemInfo"
+    },
+    {
+      "name": "SkillGemInfoKey2",
+      "type": "longid[]",
+      "ref": "SkillGemInfo"
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "International_BK2File",
+      "type": "string"
+    },
+    {
+      "name": "SkillGemsKey",
+      "type": "longid",
+      "ref": "SkillGems"
+    },
+    {
+      "name": "China_BK2File",
+      "type": "string"
+    },
+    {
+      "name": "CharactersKey",
+      "type": "longid[]",
+      "ref": "Characters"
+    }
+  ]
+}

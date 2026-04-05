@@ -1,0 +1,23 @@
+{
+  "file": "CraftingItemClassCategories",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "ItemClasses",
+      "type": "longid[]",
+      "ref": "ItemClasses"
+    },
+    {
+      "name": "Unknown2",
+      "type": "string"
+    },
+    {
+      "name": "Text",
+      "type": "string"
+    }
+  ]
+}

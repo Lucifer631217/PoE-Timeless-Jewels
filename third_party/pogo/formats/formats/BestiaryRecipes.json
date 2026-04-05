@@ -1,0 +1,48 @@
+{
+  "file": "BestiaryRecipes",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "BestiaryRecipeComponentKeys",
+      "type": "longid[]",
+      "ref": "BestiaryRecipeComponent"
+    },
+    {
+      "name": "Notes",
+      "type": "string"
+    },
+    {
+      "name": "HintText",
+      "type": "string"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "RedBeastsRequired",
+      "type": "i32"
+    }
+  ]
+}

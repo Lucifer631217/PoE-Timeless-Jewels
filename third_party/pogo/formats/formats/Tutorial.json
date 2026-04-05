@@ -1,0 +1,53 @@
+{
+  "file": "Tutorial",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "UIFile",
+      "type": "string"
+    },
+    {
+      "name": "ClientString",
+      "type": "longid",
+      "ref": "ClientStrings"
+    },
+    {
+      "name": "IsEnabled",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32[]"
+    },
+    {
+      "name": "Flag9",
+      "type": "bool",
+      "since": "3.3"
+    },
+    {
+      "name": "Flag10",
+      "type": "bool",
+      "since": "3.4"
+    }
+  ]
+}

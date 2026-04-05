@@ -1,0 +1,15 @@
+{
+  "file": "TalismanMonsterMods",
+  "fields": [
+    {
+      "name": "ModTypeKey",
+      "type": "longid",
+      "ref": "ModType"
+    },
+    {
+      "name": "ModsKey",
+      "type": "longid",
+      "ref": "Mods"
+    }
+  ]
+}

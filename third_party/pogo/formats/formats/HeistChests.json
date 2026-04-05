@@ -1,0 +1,23 @@
+{
+  "file": "HeistChests",
+  "fields": [
+    {
+      "name": "ChestsKey",
+      "type": "longid",
+      "ref": "Chests"
+    },
+    {
+      "name": "Weight",
+      "type": "i32"
+    },
+    {
+      "name": "HeistAreasKey",
+      "type": "longid[]",
+      "ref": "HeistAreas"
+    },
+    {
+      "name": "HeistChestTypesKey",
+      "type": "i32"
+    }
+  ]
+}

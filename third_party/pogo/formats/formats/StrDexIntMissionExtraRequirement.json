@@ -1,0 +1,86 @@
+{
+  "file": "StrDexIntMissionExtraRequirement",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "SpawnWeight",
+      "type": "i32"
+    },
+    {
+      "name": "MinLevel",
+      "type": "i32"
+    },
+    {
+      "name": "MaxLevel",
+      "type": "i32"
+    },
+    {
+      "name": "TimeLimit",
+      "type": "i32",
+      "description": "in milliseconds"
+    },
+    {
+      "name": "HasTimeBonusPerKill",
+      "type": "bool"
+    },
+    {
+      "name": "HasTimeBonusPerObjectTagged",
+      "type": "bool"
+    },
+    {
+      "name": "HasLimitedPortals",
+      "type": "bool"
+    },
+    {
+      "name": "NPCTalkKey",
+      "type": "longid",
+      "ref": "NPCTalk"
+    },
+    {
+      "name": "TimeLimitBonusFromObjective",
+      "type": "i32",
+      "description": "in milliseconds"
+    },
+    {
+      "name": "ObjectCount",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown11",
+      "type": "i32[]",
+      "since": "3.2"
+    },
+    {
+      "name": "Unknown11_1",
+      "type": "i32",
+      "since": "3.2",
+      "until": "3.7"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool",
+      "since": "3.2"
+    },
+    {
+      "name": "Key13",
+      "type": "longid[]",
+      "since": "3.4"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool",
+      "since": "3.7",
+      "until": "3.9"
+    },
+    {
+      "name": "Flag15",
+      "type": "bool",
+      "since": "3.7",
+      "until": "3.9"
+    }
+  ]
+}

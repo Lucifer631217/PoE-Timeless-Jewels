@@ -1,0 +1,36 @@
+{
+  "file": "CloneShot",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "until": "3.16"
+    },
+    {
+      "name": "Id",
+      "type": "i32",
+      "since": "3.16",
+      "unique": true
+    },
+    {
+      "name": "MonsterVarietiesKey",
+      "type": "longid",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "MiscAnimated1",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "MiscAnimated2",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "MiscAnimated3",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    }
+  ]
+}

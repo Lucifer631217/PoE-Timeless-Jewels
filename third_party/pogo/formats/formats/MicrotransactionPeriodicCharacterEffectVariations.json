@@ -1,0 +1,19 @@
+{
+  "file": "MicrotransactionPeriodicCharacterEffectVariations",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "AOFile",
+      "type": "string"
+    },
+    {
+      "name": "MiscObject",
+      "type": "longid",
+      "ref": "MiscObjects"
+    }
+  ]
+}

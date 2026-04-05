@@ -1,0 +1,19 @@
+{
+  "file": "IndexableSupportGems",
+  "fields": [
+    {
+      "name": "Index",
+      "type": "i32",
+      "unique": true
+    },
+    {
+      "name": "SupportGem",
+      "type": "longid",
+      "ref": "SkillGems"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    }
+  ]
+}

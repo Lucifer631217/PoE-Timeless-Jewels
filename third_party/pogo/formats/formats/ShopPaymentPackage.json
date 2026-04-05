@@ -1,0 +1,80 @@
+{
+  "file": "ShopPaymentPackage",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Text",
+      "type": "string"
+    },
+    {
+      "name": "Coins",
+      "type": "i32"
+    },
+    {
+      "name": "AvailableFlag",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    },
+    {
+      "name": "ContainsBetaKey",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32[]"
+    },
+    {
+      "name": "Key9",
+      "type": "longid"
+    },
+    {
+      "name": "BackgroundImage",
+      "type": "string"
+    },
+    {
+      "name": "Unknown11",
+      "type": "string"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool"
+    },
+    {
+      "name": "Upgrade_ShopPaymentPackageKey",
+      "type": "shortid",
+      "ref": "ShopPaymentPackage"
+    },
+    {
+      "name": "PhysicalItemPoints",
+      "type": "i32",
+      "description": "Number of points the user gets back if they opt-out of physical items"
+    },
+    {
+      "name": "Unknown15",
+      "type": "i32"
+    },
+    {
+      "name": "ShopPackagePlatformKeys",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown17",
+      "type": "string"
+    }
+  ]
+}

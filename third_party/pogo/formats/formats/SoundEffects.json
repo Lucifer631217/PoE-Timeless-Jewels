@@ -1,0 +1,22 @@
+{
+  "file": "SoundEffects",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "SoundFile",
+      "type": "string"
+    },
+    {
+      "name": "SoundFile_2D",
+      "type": "string"
+    },
+    {
+      "name": "Flag3",
+      "type": "bool"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "file": "Grandmasters",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string"
+    },
+    {
+      "name": "GMFile",
+      "type": "string"
+    },
+    {
+      "name": "AISFile",
+      "type": "string"
+    },
+    {
+      "name": "ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "CharacterLevel",
+      "type": "i32"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    }
+  ]
+}

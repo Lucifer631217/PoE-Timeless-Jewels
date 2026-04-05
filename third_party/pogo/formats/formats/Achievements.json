@@ -1,0 +1,73 @@
+{
+  "file": "Achievements",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "SetId",
+      "type": "i32",
+      "ref": "AchievementSetsDisplay",
+      "ref-field": "Id"
+    },
+    {
+      "name": "Objective",
+      "type": "string"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32",
+      "unique": true
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "HideAchievementItems",
+      "type": "bool"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "MinCompletedItems",
+      "type": "i32"
+    },
+    {
+      "name": "TwoColumnLayout",
+      "type": "bool"
+    },
+    {
+      "name": "ShowItemCompletionsAsOne",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown11",
+      "type": "string"
+    },
+    {
+      "name": "SoftcoreOnly",
+      "type": "bool"
+    },
+    {
+      "name": "HardcoreOnly",
+      "type": "bool"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown15",
+      "type": "string"
+    }
+  ]
+}

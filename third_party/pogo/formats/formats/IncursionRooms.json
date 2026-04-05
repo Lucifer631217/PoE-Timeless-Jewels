@@ -1,0 +1,96 @@
+{
+  "file": "IncursionRooms",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "Tier",
+      "type": "i32"
+    },
+    {
+      "name": "MinLevel",
+      "type": "i32"
+    },
+    {
+      "name": "RoomUpgrade_IncursionRoomsKey",
+      "type": "shortid",
+      "ref": "IncursionRooms"
+    },
+    {
+      "name": "ModsKey",
+      "type": "longid",
+      "until": "3.10",
+      "ref": "Mods"
+    },
+    {
+      "name": "Mods",
+      "type": "longid[]",
+      "since": "3.10",
+      "ref": "Mods"
+    },
+    {
+      "name": "PresentARMFile",
+      "type": "string"
+    },
+    {
+      "name": "HASH16",
+      "type": "i32",
+      "unique": true
+    },
+    {
+      "name": "IncursionArchitectKey",
+      "type": "longid",
+      "ref": "IncursionArchitect"
+    },
+    {
+      "name": "PastARMFile",
+      "type": "string"
+    },
+    {
+      "name": "TSIFile",
+      "type": "string"
+    },
+    {
+      "name": "UIIcon",
+      "type": "string"
+    },
+    {
+      "name": "FlavourText",
+      "type": "string"
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Unknown15",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown16",
+      "type": "i32"
+    },
+    {
+      "name": "RoomUpgradeFrom_IncursionRoomsKey",
+      "type": "shortid",
+      "ref": "IncursionRooms"
+    },
+    {
+      "name": "Key18",
+      "type": "longid",
+      "since": "3.14"
+    }
+  ]
+}

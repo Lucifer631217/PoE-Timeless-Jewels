@@ -1,0 +1,96 @@
+{
+  "file": "HeistBalancePerLevel",
+  "fields": [
+    {
+      "name": "Level",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown1",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown2",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "f32"
+    },
+    {
+      "name": "HeistValueScalingKey1",
+      "type": "longid",
+      "ref": "HeistValueScaling"
+    },
+    {
+      "name": "HeistValueScalingKey2",
+      "type": "longid",
+      "ref": "HeistValueScaling"
+    },
+    {
+      "name": "HeistValueScalingKey3",
+      "type": "longid",
+      "ref": "HeistValueScaling"
+    },
+    {
+      "name": "HeistValueScalingKey4",
+      "type": "longid",
+      "ref": "HeistValueScaling"
+    },
+    {
+      "name": "HeistValueScalingKey5",
+      "type": "longid",
+      "ref": "HeistValueScaling"
+    },
+    {
+      "name": "Unknown12",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown13",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown14",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown15",
+      "type": "f32"
+    },
+    {
+      "name": "HeistValueScalingKey6",
+      "type": "longid",
+      "ref": "HeistValueScaling"
+    },
+    {
+      "name": "HeistValueScalingKey7",
+      "type": "longid",
+      "ref": "HeistValueScaling"
+    },
+    {
+      "name": "Unknown18",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown19",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown20",
+      "type": "i32"
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "file": "ExecuteGEAL",
+  "fields": [
+    {
+      "name": "Unknown0",
+      "type": "i32"
+    },
+    {
+      "name": "MiscAnimated",
+      "type": "longid[]",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "Flag9",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32"
+    },
+    {
+      "name": "Flag11",
+      "type": "bool"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown13",
+      "type": "void[]"
+    },
+    {
+      "name": "Unknown14",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown15",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown16",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown17",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown18",
+      "type": "i32"
+    },
+    {
+      "name": "Flag19",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown20",
+      "type": "string"
+    },
+    {
+      "name": "Flag21",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown22",
+      "type": "i32"
+    },
+    {
+      "name": "Flag23",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown24",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown25",
+      "type": "i32"
+    },
+    {
+      "name": "Flag26",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown27",
+      "type": "i32"
+    },
+    {
+      "name": "MetadataIDs",
+      "type": "string[]"
+    },
+    {
+      "name": "ScriptCommand",
+      "type": "string"
+    },
+    {
+      "name": "Unknown30",
+      "type": "string"
+    },
+    {
+      "name": "Unknown31",
+      "type": "string"
+    },
+    {
+      "name": "Unknown32",
+      "type": "string"
+    },
+    {
+      "name": "Unknown33",
+      "type": "string"
+    },
+    {
+      "name": "Unknown34",
+      "type": "i32"
+    },
+    {
+      "name": "Flag35",
+      "type": "bool"
+    },
+    {
+      "name": "Flag36",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown37",
+      "type": "void[]"
+    },
+    {
+      "name": "Unknown38",
+      "type": "i32"
+    }
+  ]
+}

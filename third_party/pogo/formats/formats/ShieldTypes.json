@@ -1,0 +1,15 @@
+{
+  "file": "ShieldTypes",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Block",
+      "type": "i32"
+    }
+  ]
+}

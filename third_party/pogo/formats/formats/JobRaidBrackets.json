@@ -1,0 +1,34 @@
+{
+  "file": "JobRaidBrackets",
+  "fields": [
+    {
+      "name": "MinLevel",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "WorldArea",
+      "type": "longid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    }
+  ]
+}

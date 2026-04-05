@@ -1,0 +1,21 @@
+{
+  "file": "ModSets",
+  "fields": [
+    {
+      "name": "Unknown0",
+      "type": "string"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Key2",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    }
+  ]
+}

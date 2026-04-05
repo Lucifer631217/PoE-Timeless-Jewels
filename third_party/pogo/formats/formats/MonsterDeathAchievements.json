@@ -1,0 +1,100 @@
+{
+  "file": "MonsterDeathAchievements",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "MonsterVarietiesKeys",
+      "type": "longid[]",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Flag3",
+      "type": "bool"
+    },
+    {
+      "name": "PlayerConditionsKeys",
+      "type": "longid[]",
+      "ref": "PlayerConditions"
+    },
+    {
+      "name": "MonsterDeathConditionsKeys",
+      "type": "longid[]",
+      "ref": "MonsterDeathConditions"
+    },
+    {
+      "name": "Key6",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "Flag9",
+      "type": "bool"
+    },
+    {
+      "name": "Flag10",
+      "type": "bool"
+    },
+    {
+      "name": "Key11",
+      "type": "longid"
+    },
+    {
+      "name": "Key12",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key13",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key14",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key15",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown16",
+      "type": "i32"
+    },
+    {
+      "name": "NearbyMonsterConditionsKeys",
+      "type": "longid[]",
+      "ref": "NearbyMonsterConditions"
+    },
+    {
+      "name": "Flag18",
+      "type": "bool"
+    },
+    {
+      "name": "MultiPartAchievementConditionsKeys",
+      "type": "longid[]",
+      "ref": "MultiPartAchievementConditions"
+    },
+    {
+      "name": "Unknown20",
+      "type": "i32"
+    },
+    {
+      "name": "Flag21",
+      "type": "bool"
+    }
+  ]
+}

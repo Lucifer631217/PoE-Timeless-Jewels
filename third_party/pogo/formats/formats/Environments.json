@@ -1,0 +1,41 @@
+{
+  "file": "Environments",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Base_ENVFile",
+      "type": "string"
+    },
+    {
+      "name": "Corrupted_ENVFile",
+      "type": "string"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "void[]"
+    },
+    {
+      "name": "EnvironmentTransitionsKey",
+      "type": "longid",
+      "ref": "EnvironmentTransitions"
+    },
+    {
+      "name": "PreloadGroup",
+      "type": "longid",
+      "since": "3.7",
+      "ref": "PreloadGroups"
+    }
+  ]
+}

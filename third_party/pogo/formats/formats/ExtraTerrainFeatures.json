@@ -1,0 +1,48 @@
+{
+  "file": "ExtraTerrainFeatures",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "ArmFiles",
+      "type": "string[]"
+    },
+    {
+      "name": "TdtFiles",
+      "type": "string[]"
+    },
+    {
+      "name": "Flag3",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown4",
+      "type": "string[]"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32[]"
+    },
+    {
+      "name": "Key6",
+      "type": "shortid",
+      "ref": "ExtraTerrainFeatures"
+    },
+    {
+      "name": "WorldAreasKey",
+      "type": "longid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32"
+    }
+  ]
+}

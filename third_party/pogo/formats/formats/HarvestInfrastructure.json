@@ -1,0 +1,18 @@
+{
+  "file": "HarvestInfrastructure",
+  "fields": [
+    {
+      "name": "Object",
+      "type": "string"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "ClientStringsKey",
+      "type": "longid",
+      "ref": "ClientStrings"
+    }
+  ]
+}

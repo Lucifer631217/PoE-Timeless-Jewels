@@ -1,0 +1,78 @@
+{
+  "file": "LegionMonsterVarieties",
+  "fields": [
+    {
+      "name": "MonsterVarietiesKey",
+      "type": "longid",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "LegionFactionsKey",
+      "type": "longid",
+      "ref": "LegionFactions"
+    },
+    {
+      "name": "LegionRanksKey",
+      "type": "longid",
+      "ref": "LegionRanks"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "MiscAnimatedKey",
+      "type": "longid[]",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown11",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown14",
+      "type": "i32"
+    },
+    {
+      "name": "Key15",
+      "type": "longid[]"
+    },
+    {
+      "name": "MonsterVarietiesKey2",
+      "type": "longid",
+      "ref": "MonsterVarieties"
+    }
+  ]
+}

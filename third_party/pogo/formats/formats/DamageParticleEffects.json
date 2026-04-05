@@ -1,0 +1,31 @@
+{
+  "file": "DamageParticleEffects",
+  "fields": [
+    {
+      "name": "DamageParticleEffectTypes",
+      "type": "i32"
+    },
+    {
+      "name": "Variation",
+      "type": "i32"
+    },
+    {
+      "name": "PETFile",
+      "type": "string"
+    },
+    {
+      "name": "ImpactSoundData1",
+      "type": "longid",
+      "ref": "ImpactSoundData"
+    },
+    {
+      "name": "ImpactSoundData2",
+      "type": "longid",
+      "ref": "ImpactSoundData"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    }
+  ]
+}

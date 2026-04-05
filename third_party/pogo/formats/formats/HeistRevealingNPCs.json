@@ -1,0 +1,23 @@
+{
+  "file": "HeistRevealingNPCs",
+  "fields": [
+    {
+      "name": "NPCsKey",
+      "type": "longid",
+      "ref": "NPCs"
+    },
+    {
+      "name": "PortraitFile",
+      "type": "string"
+    },
+    {
+      "name": "NPCAudioKey",
+      "type": "longid[]",
+      "ref": "NPCAudio"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    }
+  ]
+}

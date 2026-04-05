@@ -1,0 +1,18 @@
+{
+  "file": "AfflictionFixedMods",
+  "fields": [
+    {
+      "name": "Rarity",
+      "type": "i32"
+    },
+    {
+      "name": "Mod",
+      "type": "longid",
+      "ref": "Mods"
+    },
+    {
+      "name": "Key2",
+      "type": "longid"
+    }
+  ]
+}

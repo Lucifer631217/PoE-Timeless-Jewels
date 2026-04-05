@@ -1,0 +1,121 @@
+{
+  "file": "EffectDrivenSkill",
+  "fields": [
+    {
+      "name": "Unknown0",
+      "type": "i32"
+    },
+    {
+      "name": "Key1",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown2",
+      "type": "void[]"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown8",
+      "type": "void[]"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown11",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown15",
+      "type": "i32"
+    },
+    {
+      "name": "Flag16",
+      "type": "bool"
+    },
+    {
+      "name": "Flag17",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown18",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown19",
+      "type": "i32"
+    },
+    {
+      "name": "Flag20",
+      "type": "bool"
+    },
+    {
+      "name": "Flag21",
+      "type": "bool"
+    },
+    {
+      "name": "Flag22",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown23",
+      "type": "i32"
+    },
+    {
+      "name": "Flag24",
+      "type": "bool"
+    },
+    {
+      "name": "Flag25",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown26",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown27",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown28",
+      "type": "i32"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "file": "CurrencyItems",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Stacks",
+      "type": "i32"
+    },
+    {
+      "name": "CurrencyUseType",
+      "type": "i32"
+    },
+    {
+      "name": "Action",
+      "type": "string"
+    },
+    {
+      "name": "Directions",
+      "type": "string"
+    },
+    {
+      "name": "FullStack_BaseItemTypesKey",
+      "type": "longid",
+      "description": "Full stack transforms into this item",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "Usage_AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    },
+    {
+      "name": "CosmeticTypeName",
+      "type": "string"
+    },
+    {
+      "name": "Possession_AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Key11",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32[]"
+    },
+    {
+      "name": "CurrencyTab_StackSize",
+      "type": "i32"
+    },
+    {
+      "name": "XBoxDirections",
+      "type": "string"
+    },
+    {
+      "name": "Unknown15",
+      "type": "i32"
+    },
+    {
+      "name": "Key16",
+      "type": "longid"
+    },
+    {
+      "name": "Key17",
+      "type": "longid"
+    },
+    {
+      "name": "AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Key19",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key20",
+      "type": "longid"
+    }
+  ]
+}

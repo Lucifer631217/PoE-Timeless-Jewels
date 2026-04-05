@@ -1,0 +1,159 @@
+{
+  "file": "Chests",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Flag1",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "AOFiles",
+      "type": "string[]"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    },
+    {
+      "name": "Flag9",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32"
+    },
+    {
+      "name": "Key11",
+      "type": "longid[]"
+    },
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Flag13",
+      "type": "bool"
+    },
+    {
+      "name": "ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "TagsKeys",
+      "type": "longid[]",
+      "ref": "Tags"
+    },
+    {
+      "name": "ChestEffectsKey",
+      "type": "longid",
+      "ref": "ChestEffects"
+    },
+    {
+      "name": "MinLevel",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown18",
+      "type": "string"
+    },
+    {
+      "name": "MaxLevel",
+      "type": "i32"
+    },
+    {
+      "name": "Corrupt_AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "CurrencyUse_AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Encounter_AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Key23",
+      "type": "longid"
+    },
+    {
+      "name": "InheritsFrom",
+      "type": "string"
+    },
+    {
+      "name": "Flag25",
+      "type": "bool"
+    },
+    {
+      "name": "Key26",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown27",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown28",
+      "type": "string"
+    },
+    {
+      "name": "Unknown29",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown30",
+      "type": "i32"
+    },
+    {
+      "name": "Flag31",
+      "type": "bool"
+    },
+    {
+      "name": "Key32",
+      "type": "longid"
+    },
+    {
+      "name": "Key33",
+      "type": "longid"
+    },
+    {
+      "name": "Flag26",
+      "type": "bool",
+      "since": "3.17"
+    },
+    {
+      "name": "Flag27",
+      "type": "bool",
+      "since": "3.17"
+    }
+  ]
+}

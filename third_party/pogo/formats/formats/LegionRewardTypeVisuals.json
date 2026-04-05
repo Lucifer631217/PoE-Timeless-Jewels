@@ -1,0 +1,32 @@
+{
+  "file": "LegionRewardTypeVisuals",
+  "fields": [
+    {
+      "name": "IntId",
+      "type": "i32",
+      "unique": true
+    },
+    {
+      "name": "MinimapIconsKey",
+      "type": "longid",
+      "ref": "MinimapIcons"
+    },
+    {
+      "name": "Unknown2",
+      "type": "string"
+    },
+    {
+      "name": "MiscAnimatedKey",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "Unknown4",
+      "type": "f32"
+    },
+    {
+      "name": "Id",
+      "type": "string"
+    }
+  ]
+}

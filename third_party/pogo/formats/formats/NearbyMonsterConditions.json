@@ -1,0 +1,43 @@
+{
+  "file": "NearbyMonsterConditions",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "MonsterVarietiesKeys",
+      "type": "longid[]",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "MonsterAmount",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "IsNegated",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "ObjectId",
+      "type": "string[]"
+    },
+    {
+      "name": "IsLessThan",
+      "type": "bool"
+    },
+    {
+      "name": "MinimumHealthPercentage",
+      "type": "i32"
+    }
+  ]
+}

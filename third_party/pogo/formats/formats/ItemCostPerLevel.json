@@ -1,0 +1,23 @@
+{
+  "file": "ItemCostPerLevel",
+  "fields": [
+    {
+      "name": "Contract_BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Level",
+      "type": "i32"
+    },
+    {
+      "name": "Cost",
+      "type": "longid",
+      "ref": "ItemCosts"
+    },
+    {
+      "name": "Key3",
+      "type": "longid"
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "file": "BaseItemTypes",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "ItemClassesKey",
+      "type": "longid",
+      "ref": "ItemClasses"
+    },
+    {
+      "name": "Width",
+      "type": "i32"
+    },
+    {
+      "name": "Height",
+      "type": "i32"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "InheritsFrom",
+      "type": "string"
+    },
+    {
+      "name": "DropLevel",
+      "type": "i32"
+    },
+    {
+      "name": "FlavourTextKey",
+      "type": "longid",
+      "ref": "FlavourText"
+    },
+    {
+      "name": "Implicit_ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "SizeOnGround",
+      "type": "i32"
+    },
+    {
+      "name": "SoundEffectsKey",
+      "type": "longid",
+      "ref": "SoundEffects"
+    },
+    {
+      "name": "TagsKeys",
+      "type": "longid[]",
+      "ref": "Tags"
+    },
+    {
+      "name": "ModDomainsKey",
+      "type": "i32"
+    },
+    {
+      "name": "IsDropDisabled",
+      "type": "bool",
+      "until": "3.18"
+    },
+    {
+      "name": "SiteVisibility",
+      "type": "i32",
+      "since": "3.18"
+    },
+    {
+      "name": "ItemVisualIdentityKey",
+      "type": "longid",
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "HASH",
+      "type": "i32",
+      "unique": true
+    },
+    {
+      "name": "VendorRecipe_AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Inflection",
+      "type": "string",
+      "description": "the inflection identifier used for i18n in related fields"
+    },
+    {
+      "name": "Equip_AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "IsCorrupted",
+      "type": "bool"
+    },
+    {
+      "name": "Identify_AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "ItemThemesKey",
+      "type": "longid",
+      "until": "3.17",
+      "ref": "ItemThemes"
+    },
+    {
+      "name": "IdentifyMagic_AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "FragmentBaseItemTypesKey",
+      "type": "shortid",
+      "description": "the item which represents this item in the fragment stash tab",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Flag24",
+      "type": "bool"
+    },
+    {
+      "name": "ItemShopType",
+      "type": "longid",
+      "until": "3.17",
+      "ref": "ItemShopType"
+    },
+    {
+      "name": "Key26",
+      "type": "longid"
+    },
+    {
+      "name": "Key27",
+      "type": "longid"
+    },
+    {
+      "name": "Flag28",
+      "type": "bool"
+    },
+    {
+      "name": "Key317",
+      "type": "longid",
+      "since": "3.17"
+    }
+  ]
+}

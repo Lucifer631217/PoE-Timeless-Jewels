@@ -1,0 +1,59 @@
+{
+  "file": "SkillSurgeEffects",
+  "fields": [
+    {
+      "name": "GrantedEffectsKey",
+      "type": "longid",
+      "ref": "GrantedEffects"
+    },
+    {
+      "name": "Unknown1",
+      "type": "string"
+    },
+    {
+      "name": "Flag2",
+      "type": "bool"
+    },
+    {
+      "name": "Flag3",
+      "type": "bool"
+    },
+    {
+      "name": "Flag4",
+      "type": "bool"
+    },
+    {
+      "name": "MiscAnimated",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "Flag9",
+      "type": "bool"
+    },
+    {
+      "name": "Flag10",
+      "type": "bool"
+    },
+    {
+      "name": "Flag11",
+      "type": "bool"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool"
+    }
+  ]
+}

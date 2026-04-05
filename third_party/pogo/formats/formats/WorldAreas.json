@@ -1,0 +1,561 @@
+{
+  "file": "WorldAreas",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "Act",
+      "type": "i32"
+    },
+    {
+      "name": "IsTown",
+      "type": "bool"
+    },
+    {
+      "name": "HasWaypoint",
+      "type": "bool"
+    },
+    {
+      "name": "Connections_WorldAreasKeys",
+      "type": "shortid[]",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "AreaLevel",
+      "type": "i32"
+    },
+    {
+      "name": "HASH16",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32"
+    },
+    {
+      "name": "LoadingScreen_DDSFile",
+      "type": "string"
+    },
+    {
+      "name": "Unknown11",
+      "type": "i32",
+      "until": "3.19"
+    },
+    {
+      "name": "Unknown11",
+      "type": "longid",
+      "since": "3.19"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32[]",
+      "until": "3.19"
+    },
+    {
+      "name": "Unknown12",
+      "type": "longid[]",
+      "since": "3.19"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32"
+    },
+    {
+      "name": "TopologiesKeys",
+      "type": "longid[]",
+      "ref": "Topologies"
+    },
+    {
+      "name": "ParentTown_WorldAreasKey",
+      "type": "shortid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "Unknown16",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown17",
+      "type": "i32",
+      "until": "3.19"
+    },
+    {
+      "name": "Unknown17",
+      "type": "longid",
+      "since": "3.19"
+    },
+    {
+      "name": "Unknown18",
+      "type": "i32",
+      "until": "3.19"
+    },
+    {
+      "name": "Unknown18",
+      "type": "longid",
+      "since": "3.19"
+    },
+    {
+      "name": "Bosses_MonsterVarietiesKeys",
+      "type": "longid[]",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "Monsters_MonsterVarietiesKeys",
+      "type": "longid[]",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "SpawnWeight_TagsKeys",
+      "type": "longid[]",
+      "ref": "Tags"
+    },
+    {
+      "name": "SpawnWeight_Values",
+      "type": "i32[]"
+    },
+    {
+      "name": "IsMapArea",
+      "type": "bool"
+    },
+    {
+      "name": "FullClear_AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Unknown24",
+      "type": "i32",
+      "until": "3.15"
+    },
+    {
+      "name": "Key25",
+      "type": "longid",
+      "since": "3.15"
+    },
+    {
+      "name": "UnknownRemovedField1",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "Unknown28",
+      "type": "i32"
+    },
+    {
+      "name": "UnknownRemovedField2",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "VaalArea_WorldAreasKeys",
+      "type": "shortid[]",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "VaalArea_SpawnChance",
+      "type": "i32"
+    },
+    {
+      "name": "Strongbox_SpawnChance",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "Strongbox_MaxCount",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "Strongbox_RarityWeight",
+      "type": "i32[]",
+      "description": "Normal/Magic/Rare/Unique spawn distribution",
+      "until": "3.16"
+    },
+    {
+      "name": "Flag31",
+      "type": "bool"
+    },
+    {
+      "name": "UnknownRemovedField3",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "MaxLevel",
+      "type": "i32"
+    },
+    {
+      "name": "AreaType_TagsKeys",
+      "type": "longid[]",
+      "ref": "Tags"
+    },
+    {
+      "name": "Unknown34",
+      "type": "i32"
+    },
+    {
+      "name": "UnknownRemovedField4",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "IsHideout",
+      "type": "bool"
+    },
+    {
+      "name": "UnknownRemovedField5",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField6",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField7",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField8",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "Inflection",
+      "type": "string"
+    },
+    {
+      "name": "Unknown37",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown38",
+      "type": "i32"
+    },
+    {
+      "name": "UnknownRemovedField9",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "TagsKeys",
+      "type": "longid[]",
+      "ref": "Tags"
+    },
+    {
+      "name": "IsVaalArea",
+      "type": "bool"
+    },
+    {
+      "name": "UnknownRemovedField10",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField11",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField12",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "IsLabyrinthAirlock",
+      "type": "bool"
+    },
+    {
+      "name": "IsLabyrinthArea",
+      "type": "bool"
+    },
+    {
+      "name": "TwinnedFullClear_AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Enter_AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "UnknownRemovedField13",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField14",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField15",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "TSIFile",
+      "type": "string"
+    },
+    {
+      "name": "Key46",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown47",
+      "type": "i32"
+    },
+    {
+      "name": "UnknownRemovedField16",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField17",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "WaypointActivation_AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "IsUniqueMapArea",
+      "type": "bool"
+    },
+    {
+      "name": "IsLabyrinthBossArea",
+      "type": "bool"
+    },
+    {
+      "name": "UnknownRemovedField18",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField19",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "FirstEntry_NPCTextAudioKey",
+      "type": "longid",
+      "ref": "NPCTextAudio"
+    },
+    {
+      "name": "FirstEntry_SoundEffectsKey",
+      "type": "longid",
+      "ref": "SoundEffects"
+    },
+    {
+      "name": "FirstEntry_NPCsKey",
+      "type": "string",
+      "ref": "NPCs",
+      "ref-field": "Id"
+    },
+    {
+      "name": "UnknownRemovedField20",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField21",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField22",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField23",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "Unknown54",
+      "type": "i32"
+    },
+    {
+      "name": "UnknownRemovedField24",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "EnvironmentsKey",
+      "type": "longid",
+      "ref": "Environments"
+    },
+    {
+      "name": "UnknownRemovedField25",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField26",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField27",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField28",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "Unknown56",
+      "type": "i32"
+    },
+    {
+      "name": "Key57",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown58",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown59",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown60",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown61",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown62",
+      "type": "i32"
+    },
+    {
+      "name": "Flag63",
+      "type": "bool"
+    },
+    {
+      "name": "UnknownRemovedField29",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "Flag64",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown65",
+      "type": "i32"
+    },
+    {
+      "name": "UnknownRemovedField30",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "UnknownRemovedField31",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "Unknown66",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown67",
+      "type": "i32"
+    },
+    {
+      "name": "UnknownRemovedField32",
+      "type": "i32",
+      "until": "3.16"
+    },
+    {
+      "name": "MetamorphChance",
+      "type": "i32",
+      "since": "3.9",
+      "until": "3.16"
+    },
+    {
+      "name": "DeliriumChance",
+      "type": "i32",
+      "since": "3.10",
+      "until": "3.16"
+    },
+    {
+      "name": "HarvestChance",
+      "type": "i32",
+      "since": "3.11",
+      "until": "3.16"
+    },
+    {
+      "name": "HeistChance",
+      "type": "i32",
+      "since": "3.12",
+      "until": "3.16"
+    },
+    {
+      "name": "RitualChance",
+      "type": "i32",
+      "since": "3.13",
+      "until": "3.16"
+    },
+    {
+      "name": "Unknown68",
+      "type": "void[]",
+      "since": "3.13"
+    },
+    {
+      "name": "UltimatumChance",
+      "type": "i32",
+      "since": "3.14",
+      "until": "3.16"
+    },
+    {
+      "name": "ExpeditionChance",
+      "type": "i32",
+      "since": "3.15",
+      "until": "3.16"
+    },
+    {
+      "name": "Unknown69",
+      "type": "longid",
+      "since": "3.18"
+    },
+    {
+      "name": "Unknown70",
+      "type": "i32",
+      "since": "3.18"
+    }
+  ]
+}

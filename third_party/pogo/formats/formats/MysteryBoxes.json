@@ -1,0 +1,22 @@
+{
+  "file": "MysteryBoxes",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "BK2File",
+      "type": "string"
+    },
+    {
+      "name": "BoxId",
+      "type": "string"
+    },
+    {
+      "name": "BundleId",
+      "type": "string"
+    }
+  ]
+}

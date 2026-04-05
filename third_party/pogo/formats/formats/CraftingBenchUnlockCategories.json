@@ -1,0 +1,31 @@
+{
+  "file": "CraftingBenchUnlockCategories",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32[]"
+    },
+    {
+      "name": "UnlockType",
+      "type": "string"
+    },
+    {
+      "name": "CraftingItemClassCategories",
+      "type": "longid[]",
+      "ref": "CraftingItemClassCategories"
+    },
+    {
+      "name": "ObtainingDescription",
+      "type": "string"
+    }
+  ]
+}

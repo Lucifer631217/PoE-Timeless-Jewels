@@ -1,0 +1,162 @@
+{
+  "file": "HeistQuestContracts",
+  "fields": [
+    {
+      "name": "HeistContractsKey",
+      "type": "longid",
+      "ref": "HeistContracts"
+    },
+    {
+      "name": "HeistObjectivesKey",
+      "type": "longid",
+      "ref": "HeistObjectives"
+    },
+    {
+      "name": "HeistNPCsKey",
+      "type": "longid[]",
+      "ref": "HeistNPCs"
+    },
+    {
+      "name": "HeistJobsKey",
+      "type": "longid",
+      "ref": "HeistJobs"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "HeistRoomsKey1",
+      "type": "longid",
+      "ref": "HeistRooms"
+    },
+    {
+      "name": "WorldAreasKey",
+      "type": "longid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "Flag10",
+      "type": "bool"
+    },
+    {
+      "name": "Flag11",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool"
+    },
+    {
+      "name": "Flag15",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown16",
+      "type": "i32",
+      "until": "3.19"
+    },
+    {
+      "name": "Unknown16",
+      "type": "longid",
+      "since": "3.19"
+    },
+    {
+      "name": "Flag17",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown18",
+      "type": "i32",
+      "until": "3.19"
+    },
+    {
+      "name": "Unknown18",
+      "type": "longid",
+      "since": "3.19"
+    },
+    {
+      "name": "Unknown19",
+      "type": "i32",
+      "until": "3.19"
+    },
+    {
+      "name": "Unknown19",
+      "type": "longid",
+      "since": "3.19"
+    },
+    {
+      "name": "Unknown20",
+      "type": "i32",
+      "until": "3.19"
+    },
+    {
+      "name": "Unknown20",
+      "type": "longid",
+      "since": "3.19"
+    },
+    {
+      "name": "Flag21",
+      "type": "bool"
+    },
+    {
+      "name": "Flag22",
+      "type": "bool"
+    },
+    {
+      "name": "Objective",
+      "type": "string"
+    },
+    {
+      "name": "Flag24",
+      "type": "bool"
+    },
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Flag26",
+      "type": "bool"
+    },
+    {
+      "name": "HeistIntroAreasKey",
+      "type": "longid",
+      "ref": "HeistIntroAreas"
+    },
+    {
+      "name": "Unknown28",
+      "type": "i32"
+    },
+    {
+      "name": "HeistRoomsKey2",
+      "type": "longid",
+      "ref": "HeistRooms"
+    },
+    {
+      "name": "Unknown30",
+      "type": "string"
+    }
+  ]
+}

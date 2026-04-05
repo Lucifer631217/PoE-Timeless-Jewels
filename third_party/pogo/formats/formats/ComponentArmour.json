@@ -1,0 +1,29 @@
+{
+  "file": "ComponentArmour",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "string",
+      "unique": true,
+      "ref": "BaseItemTypes",
+      "ref-field": "Id"
+    },
+    {
+      "name": "Armour",
+      "type": "i32"
+    },
+    {
+      "name": "Evasion",
+      "type": "i32"
+    },
+    {
+      "name": "EnergyShield",
+      "type": "i32"
+    },
+    {
+      "name": "IncreasedMovementSpeed",
+      "type": "i32",
+      "since": "3.6"
+    }
+  ]
+}

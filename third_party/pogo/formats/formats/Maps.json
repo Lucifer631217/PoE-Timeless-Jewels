@@ -1,0 +1,92 @@
+{
+  "file": "Maps",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Regular_WorldAreasKey",
+      "type": "longid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "Unique_WorldAreasKey",
+      "type": "longid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "MapUpgrade_BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "MonsterPacksKeys",
+      "type": "longid[]",
+      "ref": "MonsterPacks"
+    },
+    {
+      "name": "AchievementItem",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Regular_GuildCharacter",
+      "type": "string"
+    },
+    {
+      "name": "Unique_GuildCharacter",
+      "type": "string"
+    },
+    {
+      "name": "Tier",
+      "type": "i32"
+    },
+    {
+      "name": "Shaped_Base_MapsKey",
+      "type": "shortid",
+      "ref": "Maps"
+    },
+    {
+      "name": "Shaped_AreaLevel",
+      "type": "i32"
+    },
+    {
+      "name": "UpgradedFrom_MapsKey",
+      "type": "shortid",
+      "ref": "Maps"
+    },
+    {
+      "name": "MapsKey2",
+      "type": "shortid",
+      "ref": "Maps"
+    },
+    {
+      "name": "MapsKey3",
+      "type": "shortid",
+      "ref": "Maps"
+    },
+    {
+      "name": "MapSeriesKey",
+      "type": "i32",
+      "description": "References MapSeries as an enum: i32, 1-based indexing"
+    },
+    {
+      "name": "Flag15",
+      "type": "bool",
+      "since": "3.7"
+    },
+    {
+      "name": "Flag16",
+      "type": "bool",
+      "since": "3.9"
+    },
+    {
+      "name": "Flag17",
+      "type": "bool",
+      "since": "3.16"
+    }
+  ]
+}

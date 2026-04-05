@@ -1,0 +1,189 @@
+{
+  "file": "GeometryAttack",
+  "fields": [
+    {
+      "name": "Unknown0",
+      "type": "i32"
+    },
+    {
+      "name": "Key1",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key2",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown11",
+      "type": "i32"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool"
+    },
+    {
+      "name": "Flag13",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown14",
+      "type": "void[]"
+    },
+    {
+      "name": "Unknown15",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown16",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown17",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown18",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown19",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown20",
+      "type": "i32"
+    },
+    {
+      "name": "Flag21",
+      "type": "bool"
+    },
+    {
+      "name": "Flag22",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown23",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown24",
+      "type": "i32"
+    },
+    {
+      "name": "Flag25",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown26",
+      "type": "i32"
+    },
+    {
+      "name": "Flag27",
+      "type": "bool"
+    },
+    {
+      "name": "Key28",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown29",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown30",
+      "type": "i32"
+    },
+    {
+      "name": "Flag31",
+      "type": "bool"
+    },
+    {
+      "name": "Flag32",
+      "type": "bool"
+    },
+    {
+      "name": "Key33",
+      "type": "longid"
+    },
+    {
+      "name": "Flag34",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown35",
+      "type": "i32[]"
+    },
+    {
+      "name": "Flag36",
+      "type": "bool"
+    },
+    {
+      "name": "Flag37",
+      "type": "bool"
+    },
+    {
+      "name": "Key38",
+      "type": "longid"
+    },
+    {
+      "name": "Flag39",
+      "type": "bool"
+    },
+    {
+      "name": "Flag40",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown41",
+      "type": "void[]"
+    },
+    {
+      "name": "Flag42",
+      "type": "bool"
+    },
+    {
+      "name": "Flag43",
+      "type": "bool"
+    },
+    {
+      "name": "Flag44",
+      "type": "bool"
+    },
+    {
+      "name": "Flag45",
+      "type": "bool"
+    }
+  ]
+}

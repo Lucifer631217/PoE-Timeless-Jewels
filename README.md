@@ -22,6 +22,28 @@
 
 ## 更新紀錄
 
+### 2026-04-05 3.28 本機抽取相容性修正與資料同步
+
+- 新增 `go-pob-data-main/cmd/dat_probe`，可直接探測指定 `.datc64` 的 rowCount、boundary、前段位元組與 bundle lookup 結果，方便定位 3.28 抽取失敗點。
+- `dat_probe` 現在可切換 `--old-hash` / `--new-hash`，並列出多組 hash 候選對應到的實際 bundle entry，方便驗證 3.28 `Bundles2` 檔案查找規則。
+- 修正 `go-pob-data-main/extractor/schema.go` 的版本選擇邏輯，不再固定吃到最舊 `validFor`；同時加入本專案實際需要的 `Stats` / `PassiveSkills` 欄位裁切，避開 3.28 尾端欄位不相容問題。
+- `go-pob-data-main` 改以 `replace github.com/oriath-net/gooz => github.com/oriath-net/goodle v1.1.0` 接上本機 Oodle DLL（透過 `OODLE_DLL`），已解決 `Bundles2` 的 pathrep 解壓失敗。
+- `third_party/pogo` 保留 pathrep 失敗時的 hash-only fallback 與偵錯資訊輸出，方便後續追查不同 client 差異。
+- 已用本機 Steam `Bundles2` client 成功抽出 `3.28` 的 `raw`、`tree`、`stat_translations`，並同步更新根目錄 `data/*.json.gz`。
+- `data/types.go` 現在可正確吃入 3.28 永恆珠寶資料中的負數詞綴範圍，不再因 `uint32` JSON 反序列化失敗而 panic。
+- `jewel_test.go` 與 `reverse_test.go` 的基準已更新到 3.28；目前 `go test ./...` 與 `go build ./...` 均已通過。
+
+### 2026-04-05 本機資料抽取探測腳本
+
+- 新增 `probe_local_extract_v2.ps1`，可自動判斷本機 PoE 安裝是 `Bundles2` 還是 `Content.ggpk`。
+- 若偵測到 `Bundles2/_.index.bin`，表示可直接走現有 `go-pob-data-main` 抽取流程。
+- 若僅偵測到 `Content.ggpk`，腳本會進一步用 `pogo` 探測並輸出具體 blocker，避免誤以為 repo 已能直接抽取此格式。
+
+### 2026-04-05 調整本機抽取依賴
+
+- 移除 `go-pob-data-main` 內 raw 抽取流程對 `imagick` 與 `pngquant` 的編譯期依賴。
+- 目前先專注產出本專案需要的 `raw`、`tree`、`stat_translations`，不再阻塞於少數圖片資產轉檔。
+
 ### 2026-04-05 交易分頁邏輯清理與收藏輸入樣式調整（v1.2.0）
 
 - 整組交易自動開啟多個交易分頁，每個分頁上限為180個珠寶。

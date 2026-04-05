@@ -1,0 +1,25 @@
+{
+  "file": "TerrainPlugins",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32",
+      "unique": true
+    },
+    {
+      "name": "Flag2",
+      "type": "bool",
+      "since": "3.13"
+    },
+    {
+      "name": "Flag3",
+      "type": "bool",
+      "since": "3.14"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "file": "Realms",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "Server",
+      "type": "string[]"
+    },
+    {
+      "name": "IsEnabled",
+      "type": "bool"
+    },
+    {
+      "name": "Server2",
+      "type": "string[]"
+    },
+    {
+      "name": "ShortName",
+      "type": "string"
+    },
+    {
+      "name": "Key6",
+      "type": "shortid[]",
+      "ref": "Realms"
+    },
+    {
+      "name": "Key7",
+      "type": "shortid",
+      "ref": "Realms"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "IsGammaRealm",
+      "type": "bool"
+    },
+    {
+      "name": "SpeedtestUrl",
+      "type": "string[]"
+    }
+  ]
+}

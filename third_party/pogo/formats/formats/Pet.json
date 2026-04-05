@@ -1,0 +1,44 @@
+{
+  "file": "Pet",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "HASH16",
+      "type": "i32",
+      "since": "2.1"
+    },
+    {
+      "name": "HASH32",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32",
+      "since": "2.1"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool",
+      "since": "3.8"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool",
+      "since": "3.8"
+    },
+    {
+      "name": "Unknown7",
+      "type": "longid[]",
+      "since": "3.16"
+    }
+  ]
+}

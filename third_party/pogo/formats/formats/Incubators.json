@@ -1,0 +1,28 @@
+{
+  "file": "Incubators",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "Hash",
+      "type": "i32"
+    },
+    {
+      "name": "AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    }
+  ]
+}

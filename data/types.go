@@ -1,5 +1,7 @@
 package data
 
+import "encoding/json"
+
 type Stat struct {
 	Index    uint32  `json:"_key"`
 	ID       string  `json:"Id"`
@@ -78,6 +80,42 @@ func (a *AlternatePassiveSkill) GetStatMinMax(statMin bool, index uint32) uint32
 	return 0
 }
 
+func (a *AlternatePassiveSkill) UnmarshalJSON(data []byte) error {
+	type alias AlternatePassiveSkill
+	type signedAlias struct {
+		alias
+		Stat1Min int64 `json:"Stat1Min"`
+		Stat1Max int64 `json:"Stat1Max"`
+		Stat2Min int64 `json:"Stat2Min"`
+		Stat2Max int64 `json:"Stat2Max"`
+		Stat3Min int64 `json:"Var9"`
+		Stat3Max int64 `json:"Var10"`
+		Stat4Min int64 `json:"Var11"`
+		Stat4Max int64 `json:"Var12"`
+		RandomMin int64 `json:"RandomMin"`
+		RandomMax int64 `json:"RandomMax"`
+	}
+
+	var decoded signedAlias
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		return err
+	}
+
+	*a = AlternatePassiveSkill(decoded.alias)
+	a.Stat1Min = uint32(int32(decoded.Stat1Min))
+	a.Stat1Max = uint32(int32(decoded.Stat1Max))
+	a.Stat2Min = uint32(int32(decoded.Stat2Min))
+	a.Stat2Max = uint32(int32(decoded.Stat2Max))
+	a.Stat3Min = uint32(int32(decoded.Stat3Min))
+	a.Stat3Max = uint32(int32(decoded.Stat3Max))
+	a.Stat4Min = uint32(int32(decoded.Stat4Min))
+	a.Stat4Max = uint32(int32(decoded.Stat4Max))
+	a.RandomMin = uint32(int32(decoded.RandomMin))
+	a.RandomMax = uint32(int32(decoded.RandomMax))
+
+	return nil
+}
+
 type AlternatePassiveAddition struct {
 	Index                    uint32             `json:"_key"`
 	ID                       string             `json:"Id"`
@@ -109,4 +147,28 @@ func (a *AlternatePassiveAddition) GetStatMinMax(statMin bool, index uint32) uin
 		}
 	}
 	return 0
+}
+
+func (a *AlternatePassiveAddition) UnmarshalJSON(data []byte) error {
+	type alias AlternatePassiveAddition
+	type signedAlias struct {
+		alias
+		Stat1Min int64 `json:"Stat1Min"`
+		Stat1Max int64 `json:"Stat1Max"`
+		Stat2Min int64 `json:"Var6"`
+		Stat2Max int64 `json:"Var7"`
+	}
+
+	var decoded signedAlias
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		return err
+	}
+
+	*a = AlternatePassiveAddition(decoded.alias)
+	a.Stat1Min = uint32(int32(decoded.Stat1Min))
+	a.Stat1Max = uint32(int32(decoded.Stat1Max))
+	a.Stat2Min = uint32(int32(decoded.Stat2Min))
+	a.Stat2Max = uint32(int32(decoded.Stat2Max))
+
+	return nil
 }

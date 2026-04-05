@@ -1,0 +1,15 @@
+{
+  "file": "Rulesets",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown1",
+      "type": "shortid[]",
+      "since": "3.15"
+    }
+  ]
+}

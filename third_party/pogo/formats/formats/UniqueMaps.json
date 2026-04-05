@@ -1,0 +1,42 @@
+{
+  "file": "UniqueMaps",
+  "fields": [
+    {
+      "name": "ItemVisualIdentityKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "ItemVisualIdentity"
+    },
+    {
+      "name": "WorldAreasKey",
+      "type": "longid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "WordsKey",
+      "type": "longid",
+      "ref": "Words"
+    },
+    {
+      "name": "FlavourTextKey",
+      "type": "longid",
+      "ref": "FlavourText"
+    },
+    {
+      "name": "HasGuildCharacter",
+      "type": "bool"
+    },
+    {
+      "name": "GuildCharacter",
+      "type": "string"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "IsDropDisabled",
+      "type": "bool"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "file": "DelveCatchupDepths",
+  "fields": [
+    {
+      "name": "Level",
+      "type": "i32"
+    },
+    {
+      "name": "Depth",
+      "type": "i32"
+    }
+  ]
+}

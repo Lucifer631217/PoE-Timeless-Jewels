@@ -1,0 +1,77 @@
+{
+  "file": "QuestStates",
+  "fields": [
+    {
+      "name": "QuestKey",
+      "type": "longid",
+      "ref": "Quest"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "QuestStates",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32[]"
+    },
+    {
+      "name": "Text",
+      "type": "string"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "Message",
+      "type": "string"
+    },
+    {
+      "name": "MapPinsKeys1",
+      "type": "longid[]",
+      "ref": "MapPins"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "MapPinsTexts",
+      "type": "string[]"
+    },
+    {
+      "name": "MapPinsKeys2",
+      "type": "longid[]",
+      "ref": "MapPins"
+    },
+    {
+      "name": "Key11",
+      "type": "longid[]"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32[]"
+    },
+    {
+      "name": "QuestStateCalcuationKey",
+      "type": "shortid[]",
+      "ref": "QuestStates"
+    },
+    {
+      "name": "Unknown15",
+      "type": "i32"
+    },
+    {
+      "name": "Key16",
+      "type": "longid"
+    }
+  ]
+}

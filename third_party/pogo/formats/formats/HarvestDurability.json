@@ -1,0 +1,15 @@
+{
+  "file": "HarvestDurability",
+  "fields": [
+    {
+      "name": "HarvestObjectsKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "HarvestObjects"
+    },
+    {
+      "name": "Durability",
+      "type": "i32"
+    }
+  ]
+}

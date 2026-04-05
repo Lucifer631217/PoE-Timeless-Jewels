@@ -1,0 +1,20 @@
+{
+  "file": "TalkingPetNPCAudio",
+  "fields": [
+    {
+      "name": "Event",
+      "type": "longid",
+      "ref": "TalkingPetAudioEvents"
+    },
+    {
+      "name": "TalkingPet",
+      "type": "longid",
+      "ref": "TalkingPets"
+    },
+    {
+      "name": "Audio",
+      "type": "longid[]",
+      "ref": "NPCTextAudio"
+    }
+  ]
+}

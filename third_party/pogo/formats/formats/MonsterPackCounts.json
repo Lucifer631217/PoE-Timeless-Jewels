@@ -1,0 +1,25 @@
+{
+  "file": "MonsterPackCounts",
+  "fields": [
+    {
+      "name": "Key0",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Key2",
+      "type": "longid[]"
+    },
+    {
+      "name": "Flag3",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32[]"
+    }
+  ]
+}

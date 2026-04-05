@@ -1,0 +1,42 @@
+{
+  "file": "MapSeries",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "BaseIcon_DDSFile",
+      "type": "string"
+    },
+    {
+      "name": "Infected_DDSFile",
+      "type": "string"
+    },
+    {
+      "name": "Shaper_DDSFile",
+      "type": "string"
+    },
+    {
+      "name": "Elder_DDSFile",
+      "type": "string"
+    },
+    {
+      "name": "Drawn_DDSFile",
+      "type": "string"
+    },
+    {
+      "name": "Delirious_DDSFile",
+      "type": "string"
+    },
+    {
+      "name": "UberBlight_DDSFile",
+      "type": "string"
+    }
+  ]
+}

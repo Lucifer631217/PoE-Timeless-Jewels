@@ -1,0 +1,23 @@
+{
+  "file": "BreachElement",
+  "fields": [
+    {
+      "name": "Element",
+      "type": "string"
+    },
+    {
+      "name": "Key1",
+      "type": "longid"
+    },
+    {
+      "name": "BaseBreachstone",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "BossMapMod",
+      "type": "longid",
+      "ref": "Stats"
+    }
+  ]
+}

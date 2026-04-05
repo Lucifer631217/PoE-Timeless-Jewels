@@ -1,0 +1,34 @@
+{
+  "file": "GemTags",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Tag",
+      "type": "string"
+    },
+    {
+      "name": "Stat1",
+      "type": "longid",
+      "ref": "Stats"
+    },
+    {
+      "name": "Stat2",
+      "type": "longid",
+      "ref": "Stats"
+    },
+    {
+      "name": "Stat3",
+      "type": "longid",
+      "ref": "Stats"
+    },
+    {
+      "name": "Stat4",
+      "type": "longid",
+      "ref": "Stats"
+    }
+  ]
+}

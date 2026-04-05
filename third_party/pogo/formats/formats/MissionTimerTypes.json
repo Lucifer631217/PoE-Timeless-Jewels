@@ -1,0 +1,33 @@
+{
+  "file": "MissionTimerTypes",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string"
+    },
+    {
+      "name": "Image",
+      "type": "string"
+    },
+    {
+      "name": "BackgroundImage",
+      "type": "string"
+    },
+    {
+      "name": "Key3",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown4",
+      "type": "f32[]"
+    },
+    {
+      "name": "Key5",
+      "type": "longid"
+    },
+    {
+      "name": "Key6",
+      "type": "longid"
+    }
+  ]
+}

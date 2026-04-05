@@ -1,0 +1,24 @@
+{
+  "file": "ComponentAttributeRequirements",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "string",
+      "unique": true,
+      "ref": "BaseItemTypes",
+      "ref-field": "Id"
+    },
+    {
+      "name": "ReqStr",
+      "type": "i32"
+    },
+    {
+      "name": "ReqDex",
+      "type": "i32"
+    },
+    {
+      "name": "ReqInt",
+      "type": "i32"
+    }
+  ]
+}

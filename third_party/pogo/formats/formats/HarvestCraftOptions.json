@@ -1,0 +1,98 @@
+{
+  "file": "HarvestCraftOptions",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "FormattedDescription",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "HarvestCraftTiersKey",
+      "type": "longid"
+    },
+    {
+      "name": "Command",
+      "type": "string"
+    },
+    {
+      "name": "Parameters",
+      "type": "string"
+    },
+    {
+      "name": "AchievementItems",
+      "type": "longid[]",
+      "ref": "AchievementItems",
+      "until": "3.19"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool",
+      "until": "3.19"
+    },
+    {
+      "name": "Unknown9",
+      "type": "void[]",
+      "since": "3.19"
+    },
+    {
+      "name": "HASH16",
+      "type": "i32"
+    },
+    {
+      "name": "HarvestCraftOptionIconsKeys",
+      "type": "longid[]",
+      "ref": "HarvestCraftOptionIcons",
+      "until": "3.19"
+    },
+    {
+      "name": "PlainDescription",
+      "type": "string"
+    },
+    {
+      "name": "DDSFile",
+      "type": "string",
+      "until": "3.19"
+    },
+    {
+      "name": "ResultsAreDropped",
+      "type": "bool",
+      "until": "3.19"
+    },
+    {
+      "name": "IsEnchant",
+      "type": "bool",
+      "since": "3.15"
+    },
+    {
+      "name": "LifeforceType",
+      "type": "i32",
+      "since": "3.19"
+    },
+    {
+      "name": "LifeforceCost",
+      "type": "i32",
+      "since": "3.19"
+    },
+    {
+      "name": "SacredCost",
+      "type": "i32",
+      "since": "3.19"
+    },
+    {
+      "name": "CostScalesWithStackSize",
+      "type": "bool",
+      "since": "3.19"
+    },
+    {
+      "name": "AchievementItems",
+      "type": "longid[]",
+      "ref": "AchievementItems",
+      "since": "3.19"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "file": "HideoutDoodads",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Variation_AOFiles",
+      "type": "string[]"
+    },
+    {
+      "name": "IsNonMasterDoodad",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "InheritsFrom",
+      "type": "string"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "IsCraftingBench",
+      "type": "bool"
+    },
+    {
+      "name": "Key9",
+      "type": "longid[]"
+    },
+    {
+      "name": "Flag10",
+      "type": "bool"
+    },
+    {
+      "name": "Key11",
+      "type": "longid"
+    },
+    {
+      "name": "HideoutDoodadCategory",
+      "type": "longid",
+      "since": "3.17",
+      "ref": "HideoutDoodadCategory"
+    }
+  ]
+}

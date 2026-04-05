@@ -1,0 +1,14 @@
+{
+  "file": "HeistNPCAuras",
+  "fields": [
+    {
+      "name": "StatsKey",
+      "type": "longid",
+      "ref": "Stats"
+    },
+    {
+      "name": "Key1",
+      "type": "longid"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "file": "HeistContracts",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "HeistAreasKey",
+      "type": "longid",
+      "ref": "HeistAreas"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    }
+  ]
+}

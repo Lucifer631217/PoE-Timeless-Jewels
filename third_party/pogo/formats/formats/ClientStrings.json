@@ -1,0 +1,30 @@
+{
+  "file": "ClientStrings",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Text",
+      "type": "string"
+    },
+    {
+      "name": "XBoxText",
+      "type": "string"
+    },
+    {
+      "name": "XBoxText2",
+      "type": "string"
+    },
+    {
+      "name": "HASH32",
+      "type": "i32"
+    },
+    {
+      "name": "PlaystationText",
+      "type": "string"
+    }
+  ]
+}

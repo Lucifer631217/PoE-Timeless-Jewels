@@ -1,0 +1,19 @@
+{
+  "file": "DelveRooms",
+  "fields": [
+    {
+      "name": "DelveBiomesKey",
+      "type": "longid",
+      "ref": "DelveBiomes"
+    },
+    {
+      "name": "DelveFeaturesKey",
+      "type": "longid",
+      "ref": "DelveFeatures"
+    },
+    {
+      "name": "ARMFile",
+      "type": "string"
+    }
+  ]
+}

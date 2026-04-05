@@ -1,0 +1,67 @@
+{
+  "file": "NPCMaster",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string"
+    },
+    {
+      "name": "Flag1",
+      "type": "bool"
+    },
+    {
+      "name": "Flag2",
+      "type": "bool"
+    },
+    {
+      "name": "Signature_ModsKey",
+      "type": "longid",
+      "ref": "Mods"
+    },
+    {
+      "name": "Flag4",
+      "type": "bool"
+    },
+    {
+      "name": "SpawnWeight_TagsKeys",
+      "type": "longid[]",
+      "ref": "Tags"
+    },
+    {
+      "name": "SpawnWeight_Values",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32[]"
+    },
+    {
+      "name": "Key9",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32"
+    },
+    {
+      "name": "AreaDescription",
+      "type": "string"
+    },
+    {
+      "name": "Key12",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32"
+    },
+    {
+      "name": "Key14",
+      "type": "longid"
+    }
+  ]
+}

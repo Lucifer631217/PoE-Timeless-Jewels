@@ -1,0 +1,84 @@
+{
+  "file": "LegionFactions",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "LegionBalancePerLevelKey",
+      "type": "longid",
+      "ref": "LegionBalancePerLevel"
+    },
+    {
+      "name": "Unknown3",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "f32"
+    },
+    {
+      "name": "BuffVisualsKey",
+      "type": "longid",
+      "ref": "BuffVisuals"
+    },
+    {
+      "name": "MiscAnimatedKey1",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "MiscAnimatedKey2",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "MiscAnimatedKey3",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "AchievementItemsKeys1",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "MiscAnimatedKey4",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "MiscAnimatedKey5",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "Unknown12",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown13",
+      "type": "f32"
+    },
+    {
+      "name": "AchievementItemsKeys2",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "StatsKey",
+      "type": "longid",
+      "ref": "Stats"
+    },
+    {
+      "name": "Shard",
+      "type": "string"
+    }
+  ]
+}

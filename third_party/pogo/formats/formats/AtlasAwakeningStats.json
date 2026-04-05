@@ -1,0 +1,18 @@
+{
+  "file": "AtlasAwakeningStats",
+  "fields": [
+    {
+      "name": "AwakeningLevel",
+      "type": "i32"
+    },
+    {
+      "name": "Stats",
+      "type": "longid[]",
+      "ref": "Stats"
+    },
+    {
+      "name": "Values",
+      "type": "i32[]"
+    }
+  ]
+}

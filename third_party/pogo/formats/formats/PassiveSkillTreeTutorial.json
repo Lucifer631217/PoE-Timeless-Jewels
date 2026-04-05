@@ -1,0 +1,46 @@
+{
+  "file": "PassiveSkillTreeTutorial",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string"
+    },
+    {
+      "name": "CharactersKey",
+      "type": "longid",
+      "ref": "Characters"
+    },
+    {
+      "name": "Key2",
+      "type": "longid"
+    },
+    {
+      "name": "ChoiceA_Description",
+      "type": "string"
+    },
+    {
+      "name": "ChoiceB_Description",
+      "type": "string"
+    },
+    {
+      "name": "Key5",
+      "type": "longid"
+    },
+    {
+      "name": "ChoiceA_PassiveTreeURL",
+      "type": "string"
+    },
+    {
+      "name": "ChoiceB_PassiveTreeURL",
+      "type": "string"
+    },
+    {
+      "name": "Key8",
+      "type": "longid"
+    },
+    {
+      "name": "Key9",
+      "type": "longid"
+    }
+  ]
+}

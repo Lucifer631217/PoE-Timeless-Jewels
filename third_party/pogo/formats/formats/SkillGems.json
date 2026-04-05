@@ -1,0 +1,83 @@
+{
+  "file": "SkillGems",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "GrantedEffectsKey",
+      "type": "longid",
+      "ref": "GrantedEffects"
+    },
+    {
+      "name": "Str",
+      "type": "i32"
+    },
+    {
+      "name": "Dex",
+      "type": "i32"
+    },
+    {
+      "name": "Int",
+      "type": "i32"
+    },
+    {
+      "name": "GemTagsKeys",
+      "type": "longid[]",
+      "ref": "GemTags"
+    },
+    {
+      "name": "VaalVariant_BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "IsVaalVariant",
+      "type": "bool"
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "Consumed_ModsKey",
+      "type": "longid",
+      "ref": "Mods"
+    },
+    {
+      "name": "GrantedEffectsKey2",
+      "type": "longid",
+      "ref": "GrantedEffects"
+    },
+    {
+      "name": "MinionGlobalSkillLevelStat",
+      "type": "longid",
+      "ref": "Stats"
+    },
+    {
+      "name": "SupportSkillName",
+      "type": "string"
+    },
+    {
+      "name": "Flag13",
+      "type": "bool"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool"
+    },
+    {
+      "name": "AwakenedVariant",
+      "type": "shortid",
+      "ref": "SkillGems"
+    },
+    {
+      "name": "RegularVariant",
+      "type": "shortid",
+      "ref": "SkillGems"
+    }
+  ]
+}

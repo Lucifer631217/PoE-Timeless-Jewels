@@ -1,0 +1,66 @@
+{
+  "file": "TreasureHunterMissions",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Key1",
+      "type": "longid"
+    },
+    {
+      "name": "Key2",
+      "type": "longid"
+    },
+    {
+      "name": "Key3",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key4",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key5",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown9",
+      "type": "string"
+    },
+    {
+      "name": "Unknown10",
+      "type": "string"
+    },
+    {
+      "name": "OTFile",
+      "type": "string"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown14",
+      "type": "i32"
+    }
+  ]
+}

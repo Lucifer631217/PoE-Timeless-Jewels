@@ -1,0 +1,20 @@
+{
+  "file": "KillstreakThresholds",
+  "fields": [
+    {
+      "name": "Kills",
+      "type": "i32"
+    },
+    {
+      "name": "MonsterVarietiesKey",
+      "type": "longid",
+      "description": "Monster that plays the effect, i.e. the 'nova' etc.",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    }
+  ]
+}

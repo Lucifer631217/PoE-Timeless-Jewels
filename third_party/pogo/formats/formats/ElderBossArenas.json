@@ -1,0 +1,20 @@
+{
+  "file": "ElderBossArenas",
+  "fields": [
+    {
+      "name": "WorldAreasKey",
+      "type": "longid",
+      "unique": true,
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    }
+  ]
+}

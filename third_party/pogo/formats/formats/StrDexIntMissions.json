@@ -1,0 +1,99 @@
+{
+  "file": "StrDexIntMissions",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "SpawnWeight",
+      "type": "i32"
+    },
+    {
+      "name": "Key4",
+      "type": "longid"
+    },
+    {
+      "name": "Key5",
+      "type": "longid"
+    },
+    {
+      "name": "Extra_ModsKeys",
+      "type": "longid[]",
+      "ref": "Mods"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    },
+    {
+      "name": "Flag9",
+      "type": "bool"
+    },
+    {
+      "name": "Key10",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown11",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown14",
+      "type": "i32"
+    },
+    {
+      "name": "Key15",
+      "type": "longid"
+    },
+    {
+      "name": "Key16",
+      "type": "longid"
+    },
+    {
+      "name": "Key17",
+      "type": "longid"
+    },
+    {
+      "name": "Flag18",
+      "type": "bool",
+      "since": "3.6"
+    },
+    {
+      "name": "Key19",
+      "type": "longid",
+      "since": "3.9"
+    },
+    {
+      "name": "Flag20",
+      "type": "bool",
+      "since": "3.9"
+    },
+    {
+      "name": "Key21",
+      "type": "longid",
+      "since": "3.13"
+    }
+  ]
+}

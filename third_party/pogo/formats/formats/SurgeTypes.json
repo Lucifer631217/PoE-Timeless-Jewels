@@ -1,0 +1,19 @@
+{
+  "file": "SurgeTypes",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "SurgeEffects",
+      "type": "longid[]",
+      "ref": "SurgeEffects"
+    },
+    {
+      "name": "IntId",
+      "type": "i32"
+    }
+  ]
+}

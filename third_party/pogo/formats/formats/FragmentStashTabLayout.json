@@ -1,0 +1,47 @@
+{
+  "file": "FragmentStashTabLayout",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "PosX",
+      "type": "i32"
+    },
+    {
+      "name": "PosY",
+      "type": "i32"
+    },
+    {
+      "name": "Order",
+      "type": "i32"
+    },
+    {
+      "name": "SizeX",
+      "type": "i32"
+    },
+    {
+      "name": "SizeY",
+      "type": "i32"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32"
+    }
+  ]
+}

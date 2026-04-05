@@ -1,0 +1,79 @@
+{
+  "file": "BuffVisuals",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "BuffDDSFile",
+      "type": "string"
+    },
+    {
+      "name": "EPKFiles1",
+      "type": "string[]"
+    },
+    {
+      "name": "EPKFiles2",
+      "type": "string[]"
+    },
+    {
+      "name": "PreloadGroups",
+      "type": "longid[]",
+      "ref": "PreloadGroups"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "BuffName",
+      "type": "string"
+    },
+    {
+      "name": "MiscAnimated1",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "MiscAnimated2",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "BuffDescription",
+      "type": "string"
+    },
+    {
+      "name": "EPKFile",
+      "type": "string"
+    },
+    {
+      "name": "HasExtraArt",
+      "type": "bool"
+    },
+    {
+      "name": "ExtraArt",
+      "type": "string"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32[]"
+    },
+    {
+      "name": "EPKFiles",
+      "type": "string[]"
+    },
+    {
+      "name": "BuffVisualOrbs",
+      "type": "longid[]",
+      "ref": "BuffVisualOrbs"
+    },
+    {
+      "name": "MiscAnimated3",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    }
+  ]
+}

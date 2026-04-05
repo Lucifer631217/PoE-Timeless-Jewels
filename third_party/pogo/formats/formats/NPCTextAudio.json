@@ -1,0 +1,68 @@
+{
+  "file": "NPCTextAudio",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "CharactersKey",
+      "type": "longid",
+      "ref": "Characters"
+    },
+    {
+      "name": "Text",
+      "type": "string"
+    },
+    {
+      "name": "Mono_AudioFile",
+      "type": "string"
+    },
+    {
+      "name": "Stereo_AudioFile",
+      "type": "string",
+      "since": "2.1"
+    },
+    {
+      "name": "HasStereo",
+      "type": "bool",
+      "since": "2.1"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool",
+      "since": "2.1"
+    },
+    {
+      "name": "Video",
+      "type": "string",
+      "since": "3.0"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32",
+      "since": "3.12"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32",
+      "since": "3.12"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32",
+      "since": "3.12"
+    },
+    {
+      "name": "NPCs",
+      "type": "longid[]",
+      "since": "3.13"
+    },
+    {
+      "name": "Key12",
+      "type": "longid",
+      "since": "3.14"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "file": "PassiveJewelSlots",
+  "fields": [
+    {
+      "name": "PassiveSkillsKey",
+      "type": "longid",
+      "ref": "PassiveSkills"
+    },
+    {
+      "name": "PassiveTreeExpansionJewelSize",
+      "type": "longid",
+      "ref": "PassiveTreeExpansionJewelSizes"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "PassiveJewelSlotsKey",
+      "type": "shortid",
+      "ref": "PassiveJewelSlots"
+    },
+    {
+      "name": "Key4",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32[]"
+    }
+  ]
+}

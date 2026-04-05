@@ -1,0 +1,35 @@
+{
+  "file": "MicrotransactionCombineFormula",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string"
+    },
+    {
+      "name": "Result_BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Ingredients_BaseItemTypesKeys",
+      "type": "longid[]",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "BK2File",
+      "type": "string"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "file": "IncursionRoomBossFightEvents",
+  "fields": [
+    {
+      "name": "Room",
+      "type": "longid",
+      "ref": "IncursionRooms"
+    },
+    {
+      "name": "Unknown1",
+      "type": "string"
+    },
+    {
+      "name": "Unknown2",
+      "type": "string"
+    },
+    {
+      "name": "Unknown3",
+      "type": "string"
+    },
+    {
+      "name": "Unknown4",
+      "type": "string"
+    },
+    {
+      "name": "Unknown5",
+      "type": "string"
+    },
+    {
+      "name": "Key6",
+      "type": "longid"
+    }
+  ]
+}

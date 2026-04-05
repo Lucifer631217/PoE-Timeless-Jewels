@@ -1,0 +1,19 @@
+{
+  "file": "HeistObjectives",
+  "fields": [
+    {
+      "name": "BaseItemType",
+      "type": "longid",
+      "unique": true,
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Scaling",
+      "type": "f32"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    }
+  ]
+}

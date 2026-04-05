@@ -1,0 +1,19 @@
+{
+  "file": "MapPurchaseCosts",
+  "fields": [
+    {
+      "name": "Tier",
+      "type": "i32",
+      "unique": true
+    },
+    {
+      "name": "Cost",
+      "type": "longid",
+      "ref": "ItemCosts"
+    },
+    {
+      "name": "Key2",
+      "type": "longid"
+    }
+  ]
+}

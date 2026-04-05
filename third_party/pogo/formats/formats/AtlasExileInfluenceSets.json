@@ -1,0 +1,15 @@
+{
+  "file": "AtlasExileInfluenceSets",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "InfluencePacks",
+      "type": "longid[]",
+      "ref": "AtlasExileInfluenceOutcomes"
+    }
+  ]
+}

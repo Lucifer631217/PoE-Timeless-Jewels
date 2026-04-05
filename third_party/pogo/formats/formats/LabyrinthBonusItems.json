@@ -1,0 +1,18 @@
+{
+  "file": "LabyrinthBonusItems",
+  "fields": [
+    {
+      "name": "BaseItemType",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "AreaLevel",
+      "type": "i32"
+    },
+    {
+      "name": "LabyrinthName",
+      "type": "string"
+    }
+  ]
+}

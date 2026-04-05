@@ -1,0 +1,19 @@
+{
+  "file": "SalvageBoxes",
+  "fields": [
+    {
+      "name": "BaseItemType",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown2",
+      "type": "string"
+    }
+  ]
+}

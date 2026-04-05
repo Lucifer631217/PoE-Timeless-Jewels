@@ -1,0 +1,18 @@
+{
+  "file": "Footprints",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Active_AOFiles",
+      "type": "string[]"
+    },
+    {
+      "name": "Idle_AOFiles",
+      "type": "string[]"
+    }
+  ]
+}

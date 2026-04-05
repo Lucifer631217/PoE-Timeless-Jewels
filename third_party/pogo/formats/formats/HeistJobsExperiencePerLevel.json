@@ -1,0 +1,27 @@
+{
+  "file": "HeistJobsExperiencePerLevel",
+  "fields": [
+    {
+      "name": "HeistJobsKey",
+      "type": "longid",
+      "ref": "HeistJobs"
+    },
+    {
+      "name": "Tier",
+      "type": "i32"
+    },
+    {
+      "name": "Experience",
+      "type": "i32"
+    },
+    {
+      "name": "MinLevel",
+      "type": "i32"
+    },
+    {
+      "name": "AchievementItemsKey",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    }
+  ]
+}

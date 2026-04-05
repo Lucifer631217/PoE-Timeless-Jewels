@@ -1,0 +1,15 @@
+{
+  "file": "ModType",
+  "fields": [
+    {
+      "name": "Name",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "ModSellPriceTypesKeys",
+      "type": "longid[]",
+      "ref": "ModSellPriceTypes"
+    }
+  ]
+}

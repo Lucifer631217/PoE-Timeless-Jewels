@@ -1,0 +1,15 @@
+{
+  "file": "TalkingPets",
+  "fields": [
+    {
+      "name": "NPC",
+      "type": "longid",
+      "ref": "NPCs"
+    },
+    {
+      "name": "Pets",
+      "type": "longid[]",
+      "ref": "Pet"
+    }
+  ]
+}

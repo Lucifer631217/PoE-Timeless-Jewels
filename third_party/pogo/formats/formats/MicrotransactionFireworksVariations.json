@@ -1,0 +1,18 @@
+{
+  "file": "MicrotransactionFireworksVariations",
+  "fields": [
+    {
+      "name": "BaseItemTypesKey",
+      "type": "longid",
+      "ref": "BaseItemTypes"
+    },
+    {
+      "name": "AOFile",
+      "type": "string"
+    },
+    {
+      "name": "Flag2",
+      "type": "bool"
+    }
+  ]
+}

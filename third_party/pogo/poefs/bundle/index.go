@@ -1,0 +1,223 @@
+package bundle
+
+import (
+	"bytes"
+	"encoding/binary"
+	"fmt"
+	"hash/fnv"
+	"io"
+	"log/slog"
+	"sort"
+	"strings"
+
+	"github.com/nfisher/gstream/hash/murmur2"
+)
+
+type bundleIndex struct {
+	bundles    []string
+	files      []bundleFileInfo
+	fileByHash map[uint64]bundleFileInfo
+	hashFunc   func(string) uint64
+	seed       uint64
+}
+
+type bundleFileInfo struct {
+	path     string
+	bundleId uint32
+	offset   uint32
+	size     uint32
+}
+
+type bundlePathrep struct {
+	offset        uint32
+	size          uint32
+	recursiveSize uint32
+}
+
+func loadBundleIndex(indexFile io.ReaderAt, newHashFunc bool) (bundleIndex, error) {
+	indexBundle, err := openBundle(indexFile)
+	if err != nil {
+		return bundleIndex{}, fmt.Errorf("unable to load index bundle: %w", err)
+	}
+
+	indexData := make([]byte, indexBundle.Size())
+	if _, err := indexBundle.ReadAt(indexData, 0); err != nil {
+		return bundleIndex{}, fmt.Errorf("unable to read index bundle: %w", err)
+	}
+
+	p := 0
+
+	bundleCount := binary.LittleEndian.Uint32(indexData[p:])
+	p += 4
+
+	bundles := make([]string, bundleCount)
+	for i := range bundles {
+		nameLen := int(binary.LittleEndian.Uint32(indexData[p:]))
+		p += 4
+
+		name := string(indexData[p : p+nameLen])
+		p += nameLen
+
+		// skip uncompressed size -- available elsewhere
+		p += 4
+
+		bundles[i] = name
+	}
+
+	fileCount := binary.LittleEndian.Uint32(indexData[p:])
+	p += 4
+
+	files := make([]bundleFileInfo, fileCount)
+	filemap := make(map[uint64]int, fileCount)
+	for i := 0; i < int(fileCount); i++ {
+		hash := binary.LittleEndian.Uint64(indexData[p+0:])
+		files[i] = bundleFileInfo{
+			bundleId: binary.LittleEndian.Uint32(indexData[p+8:]),
+			offset:   binary.LittleEndian.Uint32(indexData[p+12:]),
+			size:     binary.LittleEndian.Uint32(indexData[p+16:]),
+		}
+		p += 20
+		if _, exists := filemap[hash]; exists {
+			panic("duplicate filemap hash")
+		}
+		filemap[hash] = i
+	}
+
+	pathrepCount := binary.LittleEndian.Uint32(indexData[p:])
+	p += 4
+
+	slog.Info(
+		"bundle index counts",
+		slog.Uint64("bundle_count", uint64(bundleCount)),
+		slog.Uint64("file_count", uint64(fileCount)),
+		slog.Uint64("pathrep_count", uint64(pathrepCount)),
+		slog.Int("pathrep_offset", p),
+		slog.Int("index_data_len", len(indexData)),
+	)
+
+	var seed uint64
+	pathmap := make(map[uint64]bundlePathrep, pathrepCount)
+	for i := uint32(0); i < pathrepCount; i++ {
+		hash := binary.LittleEndian.Uint64(indexData[p+0:])
+		if i == 0 {
+			a := (hash ^ (hash >> 47)) * 0x5F7A0EA7E59B19BD
+			seed = a ^ (a >> 47)
+		}
+		pr := bundlePathrep{
+			offset:        binary.LittleEndian.Uint32(indexData[p+8:]),
+			size:          binary.LittleEndian.Uint32(indexData[p+12:]),
+			recursiveSize: binary.LittleEndian.Uint32(indexData[p+16:]),
+		}
+		p += 20
+		if _, exists := pathmap[hash]; exists {
+			panic("duplicate pathmap hash")
+		}
+		pathmap[hash] = pr
+	}
+
+	hashFuncOld := func(path string) uint64 {
+		h := fnv.New64a()
+		h.Write([]byte(strings.ToLower(path) + "++"))
+		return h.Sum64()
+	}
+
+	hashFuncNew := func(path string) uint64 {
+		return murmur2.Hash([]byte(strings.ToLower(path)), 0x1337b33f)
+	}
+
+	hashFunc := hashFuncOld
+	if newHashFunc {
+		hashFunc = hashFuncNew
+	}
+
+	if p < len(indexData) {
+		pathrepBundle, err := openBundle(bytes.NewReader(indexData[p:]))
+		if err != nil {
+			slog.Warn("unable to load pathrep bundle, falling back to hash-only index", slog.Any("err", err))
+		} else {
+			pathrepData := make([]byte, pathrepBundle.Size())
+			if _, err := pathrepBundle.ReadAt(pathrepData, 0); err != nil {
+				slog.Warn("unable to read pathrep bundle, falling back to hash-only index", slog.Any("err", err))
+			} else {
+				for _, pr := range pathmap {
+					end := int(pr.offset + pr.size)
+					if end > len(pathrepData) {
+						continue
+					}
+
+					for _, filePath := range readPathspec(pathrepData[pr.offset:end]) {
+						hash := hashFunc(filePath)
+						idx, ok := filemap[hash]
+						if !ok {
+							continue
+						}
+
+						files[idx].path = filePath
+					}
+				}
+			}
+		}
+	}
+
+	sort.Slice(files, func(i, j int) bool {
+		if files[i].path == files[j].path {
+			if files[i].bundleId == files[j].bundleId {
+				return files[i].offset < files[j].offset
+			}
+			return files[i].bundleId < files[j].bundleId
+		}
+
+		return files[i].path < files[j].path
+	})
+
+	fileByHash := make(map[uint64]bundleFileInfo, len(filemap))
+	for hash, idx := range filemap {
+		fileByHash[hash] = files[idx]
+	}
+
+	return bundleIndex{
+		bundles:    bundles,
+		files:      files,
+		fileByHash: fileByHash,
+		hashFunc:   hashFunc,
+		seed:       seed,
+	}, nil
+}
+
+func readPathspec(data []byte) []string {
+	p := int(0)
+	phase := 1
+	names := make([]string, 0, 128)
+	output := make([]string, 0, 128)
+
+	for p < len(data) {
+		n := int(binary.LittleEndian.Uint32(data[p:]))
+		p += 4
+		if n == 0 {
+			phase = 1 - phase
+			continue
+		}
+
+		str := readPathspecString(data, &p)
+		if n-1 < len(names) {
+			str = names[n-1] + str
+		}
+		if phase == 0 {
+			names = append(names, str)
+		} else {
+			output = append(output, str)
+		}
+	}
+
+	return output
+}
+
+func readPathspecString(data []byte, offset *int) string {
+	p := *offset
+	for p < len(data) && data[p] != 0 {
+		p++
+	}
+	s := string(data[*offset:p])
+	*offset = p + 1
+	return s
+}

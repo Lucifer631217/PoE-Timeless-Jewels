@@ -1,0 +1,53 @@
+{
+  "file": "BlightTopologyNodes",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "ChildNodes",
+      "type": "shortid[]",
+      "ref": "BlightTopologyNodes"
+    },
+    {
+      "name": "Size",
+      "type": "i32"
+    },
+    {
+      "name": "Angle",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown8",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i64[]",
+      "description": "this contains suspicious values like 0x0000000300000002 but I can't find any other way to parse this file"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32",
+      "since": "3.13"
+    }
+  ]
+}

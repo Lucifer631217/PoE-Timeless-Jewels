@@ -1,0 +1,28 @@
+{
+  "file": "QuestAchievements",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "QuestStates",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32[]"
+    },
+    {
+      "name": "AchievementItems",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "NPCs",
+      "type": "longid[]",
+      "ref": "NPCs"
+    }
+  ]
+}

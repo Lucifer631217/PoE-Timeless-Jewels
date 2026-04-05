@@ -1,0 +1,50 @@
+{
+  "file": "AegisVariations",
+  "fields": [
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "DefendsAgainstPhysical",
+      "type": "bool"
+    },
+    {
+      "name": "DefendsAgainstFire",
+      "type": "bool"
+    },
+    {
+      "name": "DefendsAgainstCold",
+      "type": "bool"
+    },
+    {
+      "name": "DefendsAgainstLightning",
+      "type": "bool"
+    },
+    {
+      "name": "DefendsAgainstChaos",
+      "type": "bool"
+    },
+    {
+      "name": "Key6",
+      "type": "longid"
+    },
+    {
+      "name": "Key7",
+      "type": "longid"
+    },
+    {
+      "name": "Key8",
+      "type": "longid"
+    },
+    {
+      "name": "Key9",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown10",
+      "type": "longid[]",
+      "since": "3.19"
+    }
+  ]
+}

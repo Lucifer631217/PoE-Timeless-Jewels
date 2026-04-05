@@ -1,0 +1,36 @@
+{
+  "file": "MonsterHeightBrackets",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "BuffVisuals1",
+      "type": "longid",
+      "ref": "BuffVisuals"
+    },
+    {
+      "name": "BuffVisuals2",
+      "type": "longid",
+      "ref": "BuffVisuals"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    }
+  ]
+}

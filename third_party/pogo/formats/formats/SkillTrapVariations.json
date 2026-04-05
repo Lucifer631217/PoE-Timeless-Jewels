@@ -1,0 +1,18 @@
+{
+  "file": "SkillTrapVariations",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "i32"
+    },
+    {
+      "name": "Metadata",
+      "type": "string"
+    },
+    {
+      "name": "MiscAnimated",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    }
+  ]
+}

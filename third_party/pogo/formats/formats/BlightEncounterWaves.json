@@ -1,0 +1,30 @@
+{
+  "file": "BlightEncounterWaves",
+  "fields": [
+    {
+      "name": "MonsterSpawnerId",
+      "type": "string"
+    },
+    {
+      "name": "EncounterType",
+      "type": "longid",
+      "ref": "BlightEncounterTypes"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Wave",
+      "type": "i32"
+    }
+  ]
+}

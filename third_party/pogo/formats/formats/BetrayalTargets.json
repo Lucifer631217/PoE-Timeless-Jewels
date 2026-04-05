@@ -1,0 +1,88 @@
+{
+  "file": "BetrayalTargets",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string"
+    },
+    {
+      "name": "BetrayalRanksKey",
+      "type": "longid",
+      "ref": "BetrayalRanks"
+    },
+    {
+      "name": "MonsterVarietiesKey",
+      "type": "longid",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "BetrayalJobsKey",
+      "type": "longid",
+      "ref": "BetrayalJobs"
+    },
+    {
+      "name": "Art",
+      "type": "string"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "ItemClasses",
+      "type": "longid",
+      "ref": "ItemClasses"
+    },
+    {
+      "name": "FullName",
+      "type": "string"
+    },
+    {
+      "name": "Safehouse_ARMFile",
+      "type": "string"
+    },
+    {
+      "name": "ShortName",
+      "type": "string"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32"
+    },
+    {
+      "name": "SafehouseLeader_AcheivementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Level3_AchievementItemsKey",
+      "type": "longid",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Unknown13",
+      "type": "i32",
+      "since": "3.6"
+    },
+    {
+      "name": "Unknown14",
+      "type": "i32",
+      "since": "3.6"
+    },
+    {
+      "name": "Unknown15",
+      "type": "i32",
+      "since": "3.6"
+    },
+    {
+      "name": "Key16",
+      "type": "longid",
+      "since": "3.14"
+    },
+    {
+      "name": "VeiledRareName",
+      "type": "string",
+      "since": "3.17"
+    }
+  ]
+}

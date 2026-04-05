@@ -1,0 +1,60 @@
+{
+  "file": "DelveFeatures",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "SpawnWeight",
+      "type": "i32[]"
+    },
+    {
+      "name": "WorldAreasKey",
+      "type": "longid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "Image",
+      "type": "string"
+    },
+    {
+      "name": "AchievementItemsKeys",
+      "type": "longid[]",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32[]"
+    },
+    {
+      "name": "MinDepth",
+      "type": "i32[]"
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "Unknown9",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown11",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32[]"
+    }
+  ]
+}

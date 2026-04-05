@@ -1,0 +1,39 @@
+{
+  "file": "ExpandingPulse",
+  "fields": [
+    {
+      "name": "IntId",
+      "type": "i32",
+      "unique": true
+    },
+    {
+      "name": "StringId",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32[]"
+    },
+    {
+      "name": "Unknown3",
+      "type": "f32[]"
+    },
+    {
+      "name": "Key4",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "file": "OnKillAchievements",
+  "fields": [
+    {
+      "name": "MonsterVarietiesKey",
+      "type": "longid",
+      "ref": "MonsterVarieties"
+    },
+    {
+      "name": "GameStat",
+      "type": "longid",
+      "ref": "GameStats"
+    }
+  ]
+}

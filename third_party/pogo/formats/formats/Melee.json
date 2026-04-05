@@ -1,0 +1,70 @@
+{
+  "file": "Melee",
+  "fields": [
+    {
+      "name": "ActiveSkill",
+      "type": "longid",
+      "ref": "ActiveSkills"
+    },
+    {
+      "name": "Unknown1",
+      "type": "i32"
+    },
+    {
+      "name": "MiscAnimated",
+      "type": "longid",
+      "ref": "MiscAnimated"
+    },
+    {
+      "name": "MeleeTrailsKey1",
+      "type": "longid",
+      "ref": "MeleeTrails"
+    },
+    {
+      "name": "MeleeTrailsKey2",
+      "type": "longid",
+      "ref": "MeleeTrails"
+    },
+    {
+      "name": "MeleeTrailsKey3",
+      "type": "longid",
+      "ref": "MeleeTrails"
+    },
+    {
+      "name": "MeleeTrailsKey4",
+      "type": "longid",
+      "ref": "MeleeTrails"
+    },
+    {
+      "name": "MeleeTrailsKey5",
+      "type": "longid",
+      "ref": "MeleeTrails"
+    },
+    {
+      "name": "MeleeTrailsKey6",
+      "type": "longid",
+      "ref": "MeleeTrails"
+    },
+    {
+      "name": "MeleeTrailsKey7",
+      "type": "longid",
+      "ref": "MeleeTrails"
+    },
+    {
+      "name": "Flag10",
+      "type": "bool"
+    },
+    {
+      "name": "SurgeEffect_EPKFile",
+      "type": "string"
+    },
+    {
+      "name": "Unknown12",
+      "type": "string"
+    },
+    {
+      "name": "Unknown13",
+      "type": "string"
+    }
+  ]
+}

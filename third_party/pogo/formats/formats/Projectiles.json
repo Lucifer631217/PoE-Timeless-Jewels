@@ -1,0 +1,130 @@
+{
+  "file": "Projectiles",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "AOFiles",
+      "type": "string[]"
+    },
+    {
+      "name": "LoopAnimationIds",
+      "type": "string[]"
+    },
+    {
+      "name": "ImpactAnimationIds",
+      "type": "string[]"
+    },
+    {
+      "name": "ProjectileSpeed",
+      "type": "i32"
+    },
+    {
+      "name": "Flag5",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown6",
+      "type": "i32"
+    },
+    {
+      "name": "Flag7",
+      "type": "bool"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    },
+    {
+      "name": "InheritsFrom",
+      "type": "string"
+    },
+    {
+      "name": "Unknown10",
+      "type": "i32"
+    },
+    {
+      "name": "Key11",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32"
+    },
+    {
+      "name": "Flag13",
+      "type": "bool"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool"
+    },
+    {
+      "name": "Stuck_AOFile",
+      "type": "string[]"
+    },
+    {
+      "name": "Bounce_AOFile",
+      "type": "string"
+    },
+    {
+      "name": "Unknown17",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown18",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown19",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown20",
+      "type": "i32"
+    },
+    {
+      "name": "Key21",
+      "type": "longid"
+    },
+    {
+      "name": "Key22",
+      "type": "longid"
+    },
+    {
+      "name": "Unknown23",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown24",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown25",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown26",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown27",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown28",
+      "type": "string[]"
+    },
+    {
+      "name": "Flag29",
+      "type": "bool"
+    },
+    {
+      "name": "Key30",
+      "type": "longid"
+    }
+  ]
+}

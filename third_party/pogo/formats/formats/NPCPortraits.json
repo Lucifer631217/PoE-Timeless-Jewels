@@ -1,0 +1,22 @@
+{
+  "file": "NPCPortraits",
+  "fields": [
+    {
+      "name": "Name",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "PortraitFile",
+      "type": "string"
+    },
+    {
+      "name": "Unknown2",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown3",
+      "type": "i32"
+    }
+  ]
+}

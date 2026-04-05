@@ -1,0 +1,70 @@
+{
+  "file": "Archetypes",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string"
+    },
+    {
+      "name": "CharactersKey",
+      "type": "longid",
+      "ref": "Characters"
+    },
+    {
+      "name": "PassiveSkillTreeURL",
+      "type": "string"
+    },
+    {
+      "name": "AscendancyClassName",
+      "type": "string"
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "UIImageFile",
+      "type": "string"
+    },
+    {
+      "name": "TutorialVideo_BKFile",
+      "type": "string"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown8",
+      "type": "f32"
+    },
+    {
+      "name": "Unknown9",
+      "type": "f32"
+    },
+    {
+      "name": "BackgroundImageFile",
+      "type": "string"
+    },
+    {
+      "name": "IsTemporary",
+      "type": "bool"
+    },
+    {
+      "name": "Flag12",
+      "type": "bool"
+    },
+    {
+      "name": "ArchetypeImage",
+      "type": "string"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool"
+    },
+    {
+      "name": "Flag15",
+      "type": "bool"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "file": "ShrineSounds",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "StereoSoundFile",
+      "type": "string"
+    },
+    {
+      "name": "MonoSoundFile",
+      "type": "string"
+    }
+  ]
+}

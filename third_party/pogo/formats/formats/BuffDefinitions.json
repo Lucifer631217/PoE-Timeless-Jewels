@@ -1,0 +1,190 @@
+{
+  "file": "BuffDefinitions",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string",
+      "unique": true
+    },
+    {
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "name": "Invisible",
+      "type": "bool"
+    },
+    {
+      "name": "Removable",
+      "type": "bool"
+    },
+    {
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "name": "StatsKeys",
+      "type": "longid[]",
+      "ref": "Stats"
+    },
+    {
+      "name": "Flag6",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown7",
+      "type": "i32"
+    },
+    {
+      "name": "Flag8",
+      "type": "bool"
+    },
+    {
+      "name": "Maximum_StatsKey",
+      "type": "longid",
+      "ref": "Stats"
+    },
+    {
+      "name": "Current_StatsKey",
+      "type": "longid",
+      "ref": "Stats"
+    },
+    {
+      "name": "Flag11",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown12",
+      "type": "i32"
+    },
+    {
+      "name": "BuffVisualsKey",
+      "type": "longid",
+      "ref": "BuffVisuals"
+    },
+    {
+      "name": "Flag14",
+      "type": "bool"
+    },
+    {
+      "name": "Flag15",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown16",
+      "type": "i32"
+    },
+    {
+      "name": "Flag17",
+      "type": "bool"
+    },
+    {
+      "name": "Flag18",
+      "type": "bool"
+    },
+    {
+      "name": "Flag19",
+      "type": "bool"
+    },
+    {
+      "name": "Flag20",
+      "type": "bool"
+    },
+    {
+      "name": "BuffLimit",
+      "type": "i32"
+    },
+    {
+      "name": "Flag22",
+      "type": "bool"
+    },
+    {
+      "name": "Id2",
+      "type": "string"
+    },
+    {
+      "name": "IsRecovery",
+      "type": "bool"
+    },
+    {
+      "name": "Flag25",
+      "type": "bool"
+    },
+    {
+      "name": "Flag26",
+      "type": "bool"
+    },
+    {
+      "name": "Key27",
+      "type": "longid"
+    },
+    {
+      "name": "Flag28",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown29",
+      "type": "i32"
+    },
+    {
+      "name": "Flag30",
+      "type": "bool"
+    },
+    {
+      "name": "Flag31",
+      "type": "bool"
+    },
+    {
+      "name": "Unknown32",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown33",
+      "type": "i32[]"
+    },
+    {
+      "name": "Flag34",
+      "type": "bool"
+    },
+    {
+      "name": "Flag35",
+      "type": "bool"
+    },
+    {
+      "name": "Key36",
+      "type": "longid"
+    },
+    {
+      "name": "Flag37",
+      "type": "bool"
+    },
+    {
+      "name": "Key38",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key39",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key40",
+      "type": "longid[]"
+    },
+    {
+      "name": "Key41",
+      "type": "longid[]"
+    },
+    {
+      "name": "Unknown42",
+      "type": "i32"
+    },
+    {
+      "name": "Flag43",
+      "type": "bool"
+    },
+    {
+      "name": "Key44",
+      "type": "longid"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "file": "BetrayalJobs",
+  "fields": [
+    {
+      "name": "Id",
+      "type": "string"
+    },
+    {
+      "name": "Text",
+      "type": "string"
+    },
+    {
+      "name": "ExtraTerrainFeaturesKey",
+      "type": "longid",
+      "ref": "ExtraTerrainFeatures"
+    },
+    {
+      "name": "Art",
+      "type": "string"
+    },
+    {
+      "name": "Unknown4",
+      "type": "i32"
+    },
+    {
+      "name": "Unknown5",
+      "type": "i32"
+    },
+    {
+      "name": "WorldAreasKey",
+      "type": "longid",
+      "ref": "WorldAreas"
+    },
+    {
+      "name": "Completion_AchievementItemsKey",
+      "type": "longid",
+      "until": "3.12",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "OpenChests_AchievementItemsKey",
+      "type": "longid",
+      "until": "3.12",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "MissionCompletion_AcheivementItemsKey",
+      "type": "longid",
+      "until": "3.12",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "Completion_AchievementItems",
+      "type": "longid[]",
+      "since": "3.12",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "OpenChests_AchievementItems",
+      "type": "longid[]",
+      "since": "3.12",
+      "ref": "AchievementItems"
+    },
+    {
+      "name": "MissionCompletion_AchievementItems",
+      "type": "longid[]",
+      "since": "3.12",
+      "ref": "AchievementItems"
+    }
+  ]
+}
