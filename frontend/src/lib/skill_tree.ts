@@ -612,6 +612,11 @@ const tradeStatNames: { [key: number]: { [key: string]: string } } = {
     Victario: 'explicit.pseudo_timeless_jewel_victario',
     Chitus: 'explicit.pseudo_timeless_jewel_chitus',
     Caspiro: 'explicit.pseudo_timeless_jewel_caspiro'
+  },
+  6: {
+    Vorana: 'explicit.pseudo_timeless_jewel_vorana',
+    Uhtred: 'explicit.pseudo_timeless_jewel_uhtred',
+    Medved: 'explicit.pseudo_timeless_jewel_medved'
   }
 };
 
