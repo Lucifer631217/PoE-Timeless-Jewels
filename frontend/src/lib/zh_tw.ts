@@ -613,7 +613,8 @@ export const alternateAdditionNames: Record<string, string> = {
 
 /** 把英文特殊天賦名稱翻譯為繁體中文（同時支援 Addition ID） */
 export const translateAlternateSkillName = (englishName: string): string => {
-  return alternateSkillNames[englishName] ?? alternateAdditionNames[englishName] ?? englishName;
+  const normalized = englishName.trim();
+  return alternateSkillNames[normalized] ?? alternateAdditionNames[normalized] ?? alternateSkillNames[englishName] ?? alternateAdditionNames[englishName] ?? englishName;
 };
 
 /** 把英文珠寶名稱翻譯為繁體中文 */
@@ -680,6 +681,12 @@ export const englishFallbackTranslations: Record<string, string> = {
   '#% chance to Intimidate Enemies for 4 seconds on Hit': '擊中時有 #% 機率威嚇敵人 4 秒',
   'Gain #% of Physical Damage as Extra Cold Damage': '獲得等同 #% 物理傷害的額外冰冷傷害',
   '#% increased Elemental Damage': '增加 #% 元素傷害',
+  '#% increased Endurance Charge Duration': '增加 #% 耐力球持續時間',
+  '#% increased Power Charge Duration': '增加 #% 暴擊球持續時間',
+  '#% increased Frenzy Charge Duration': '增加 #% 狂怒球持續時間',
+  '#% faster start of Energy Shield Recharge': '能量護盾充能開始速度加快 #%',
+  '#% Chance to Block Attack Damage': '增加 #% 攻擊傷害格擋率',
+  'self_damaging_ailment_duration_+%': '你身上的傷害異常狀態持續時間 #%',
   '#% increased Ward': '增加 #% 保護',
   '#% faster Restoration of Ward': '#% 更快恢復保護',
   '#% increased Ward during any Flask Effect': '在任何藥劑效果期間增加 #% 保護',
@@ -704,6 +711,9 @@ export const englishFallbackTranslations: Record<string, string> = {
   'Iron Flasks gain # charges when your Ward Breaks': '保護破損時，鐵製藥劑獲得 # 個充能',
   'Remove a random Damaging Ailment when Ward is Restored': '保護恢復時，移除一個隨機的傷害異常狀態',
   '#% increased Ward from Equipped Armour Items': '增加 #% 來自裝備護甲物品的保護',
+  'Black Scythe Training': '黑鐮之訓',
+  'Celestial Mathematics': '星界計算',
+  'The Unbreaking Circle': '不滅之環',
   'Removes all Energy Shield\nChance to Evade Hits is based off of 200% of your Ward instead of your Evasion Rating\nPhysical Damage Reduction from Hits is based off of 200% of your Ward instead of your Armour':
     '移除所有能量護盾\n擊中閃避率改以你保護值的 200% 計算，而非閃避值\n擊中物理傷害減免改以你保護值的 200% 計算，而非護甲',
   'While you have Unbroken Ward, your next non-channelling Attack you Use yourself breaks your Ward to gain Added Cold Damage equal to 25% of Ward':
