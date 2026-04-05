@@ -1,0 +1,8 @@
+./internal_types.go
+./jewels.go
+./jewels_active.go
+./main.go
+./manager.go
+./skill_tree_types.go
+./types.go
+./jewels_active_test.go

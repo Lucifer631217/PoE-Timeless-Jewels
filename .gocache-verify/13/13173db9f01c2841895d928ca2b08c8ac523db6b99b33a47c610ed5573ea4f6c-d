@@ -1,0 +1,12 @@
+./assert.go
+./capture.go
+./configuration.go
+./constraints.go
+./fuzz-bools.go
+./fuzz-floats64.go
+./fuzz-ints.go
+./fuzz-strings.go
+./fuzz-utils.go
+./snapshot.go
+./testza.go
+./utils.go

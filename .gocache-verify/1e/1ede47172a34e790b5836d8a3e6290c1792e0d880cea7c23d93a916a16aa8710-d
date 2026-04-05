@@ -1,0 +1,10 @@
+./byte_array.go
+./error.go
+./exposer.go
+./funcs.go
+./mapper.go
+./namespace.go
+./structs.go
+./typescript.go
+./utils.go
+./weak_cache.go

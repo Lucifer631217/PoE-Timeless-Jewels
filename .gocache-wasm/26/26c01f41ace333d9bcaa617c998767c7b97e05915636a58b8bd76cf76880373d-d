@@ -1,0 +1,11 @@
+./byte_array_js.go
+./common_js.go
+./error_js.go
+./exposer.go
+./funcs_js.go
+./mapper.go
+./namespace_js.go
+./structs_js.go
+./typescript.go
+./utils.go
+./weak_cache.go
