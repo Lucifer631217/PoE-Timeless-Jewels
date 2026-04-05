@@ -29,6 +29,7 @@
 - 修正 3.28 永恆珠寶資料中負數詞綴範圍的 JSON 載入相容性，避免執行期 panic。
 - 更新永恆珠寶單點測試與反查測試基準到 3.28，`go test ./...` 與 `go build ./...` 已通過。
 - 補上本機抽取探測腳本與 `third_party/pogo` 相容修正，讓 3.28 `Bundles2` 抽取流程可重現。
+- 修正 `calculator.wasm` / `wasm_exec.js` 舊快取問題：前端載入改附帶版本 query，Firebase Hosting 也加上 `no-cache` header，避免一般模式長時間沿用舊版天賦樹。
 
 ### 2026-04-05 3.28 本機抽取相容性修正與資料同步
 

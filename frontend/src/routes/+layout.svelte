@@ -5,6 +5,7 @@
   import { loadSkillTree } from '../lib/skill_tree';
   import { syncWrap } from '../lib/worker';
   import { initializeCrystalline } from '../lib/types';
+  import { APP_VERSION } from '../lib/version';
 
   let wasmLoading = true;
 
@@ -14,7 +15,7 @@
   if (browser) {
     // @ts-ignore
     go = new globalThis.Go();
-    fetch(assets + '/calculator.wasm')
+    fetch(`${assets}/calculator.wasm?v=${APP_VERSION}`)
       .then((data) => data.arrayBuffer())
       .then((data) => {
         WebAssembly.instantiate(data, go.importObject).then((result) => {
