@@ -43,7 +43,12 @@ export const conquerorNames: Record<string, string> = {
   Cadiro: '卡迪羅',
   Victario: '維多里奧',
   Chitus: '切特斯',
-  Caspiro: '卡斯皮羅'
+  Caspiro: '卡斯皮羅',
+
+  // Heroic Tragedy (6)
+  Vorana: '沃拉娜',
+  Uhtred: '烏特雷',
+  Medved: '梅德偉'
 };
 
 const exactLeagueNames: Record<string, string> = {
@@ -666,15 +671,44 @@ export const englishFallbackTranslations: Record<string, string> = {
   '#% of Fire Damage Leeched as Life': '#% 火焰傷害轉為生命偷取',
   '#% of Cold Damage Leeched as Life': '#% 冰冷傷害轉為生命偷取',
   '#% of Lightning Damage Leeched as Life': '#% 閃電傷害轉為生命偷取',
-  '#% chance to deal Double Damage': '#% 機率造成雙倍傷害',
+  '#% chance to deal Double Damage': '#% 機率造成 2 倍傷害',
   '#% of Spell Damage Leeched as Energy Shield': '#% 法術傷害轉為能量護盾偷取',
   '#% chance to inflict Withered for 2 seconds on Hit': '擊中時有 #% 機率造成凋零狀態，持續 2 秒',
   '+#% chance to Suppress Spell Damage': '+#% 壓抑法術傷害機率',
   '#% increased Burning Damage': '增加 #% 燃燒傷害',
   'Gain #% of Physical Damage as Extra Fire Damage': '獲得等同 #% 物理傷害的額外火焰傷害',
-  '#% chance to Intimidate Enemies for 4 seconds on Hit': '擊中時有 #% 機率恐嚇敵人，持續 4 秒',
+  '#% chance to Intimidate Enemies for 4 seconds on Hit': '擊中時有 #% 機率威嚇敵人 4 秒',
   'Gain #% of Physical Damage as Extra Cold Damage': '獲得等同 #% 物理傷害的額外冰冷傷害',
   '#% increased Elemental Damage': '增加 #% 元素傷害',
+  '#% increased Ward': '增加 #% 保護',
+  '#% faster Restoration of Ward': '#% 更快恢復保護',
+  '#% increased Ward during any Flask Effect': '在任何藥劑效果期間增加 #% 保護',
+  '#% chance for Ward to be Restored when you Use a Flask': '你使用藥劑時有 #% 機率恢復保護',
+  'Gain # Endurance Charge when Ward Breaks': '保護破損時獲得 # 個耐力球',
+  'Gain # Endurance Charges when Ward Breaks': '保護破損時獲得 # 個耐力球',
+  'Gain # Power Charge when Ward Breaks': '保護破損時獲得 # 個暴擊球',
+  'Gain # Power Charges when Ward Breaks': '保護破損時獲得 # 個暴擊球',
+  'Gain # Frenzy Charge when Ward Breaks': '保護破損時獲得 # 個狂怒球',
+  'Gain # Frenzy Charges when Ward Breaks': '保護破損時獲得 # 個狂怒球',
+  '#% increased Armour while you have Unbroken Ward': '當你擁有未破損的保護時，增加 #% 護甲',
+  '#% increased Evasion Rating while you have Unbroken Ward': '當你擁有未破損的保護時，增加 #% 閃避值',
+  '+# to Ward per 10 Armour on Equipped Helmet': '裝備頭盔上的每 10 點護甲提供 +# 保護',
+  '+# to Ward per 10 Evasion Rating on Equipped Gloves': '裝備手套上的每 10 點閃避值提供 +# 保護',
+  '+# to Ward per 10 Energy Shield on Equipped Boots': '裝備鞋子上的每 10 點能量護盾提供 +# 保護',
+  '#% increased Damage while you have Unbroken Ward': '當你擁有未破損的保護時，增加 #% 傷害',
+  'Damage Penetrates #% Elemental Resistances while your Ward is Broken': '當你的保護破損時，傷害穿透 #% 元素抗性',
+  '#% increased effect of Non-Curse Auras from your skills while your Ward is Broken':
+    '當你的保護破損時，增加 #% 你技能的非詛咒光環效果',
+  '#% chance to Restore Ward when you Block': '你格擋時有 #% 機率恢復保護',
+  'Iron Flasks gain # charge when your Ward Breaks': '保護破損時，鐵製藥劑獲得 # 個充能',
+  'Iron Flasks gain # charges when your Ward Breaks': '保護破損時，鐵製藥劑獲得 # 個充能',
+  'Remove a random Damaging Ailment when Ward is Restored': '保護恢復時，移除一個隨機的傷害異常狀態',
+  '#% increased Ward from Equipped Armour Items': '增加 #% 來自裝備護甲物品的保護',
+  'Removes all Energy Shield\nChance to Evade Hits is based off of 200% of your Ward instead of your Evasion Rating\nPhysical Damage Reduction from Hits is based off of 200% of your Ward instead of your Armour':
+    '移除所有能量護盾\n擊中閃避率改以你保護值的 200% 計算，而非閃避值\n擊中物理傷害減免改以你保護值的 200% 計算，而非護甲',
+  'While you have Unbroken Ward, your next non-channelling Attack you Use yourself breaks your Ward to gain Added Cold Damage equal to 25% of Ward':
+    '當你擁有未破損的保護時，你下一個由自己施放的非引導攻擊會打破你的保護，並獲得等同於保護 25% 的附加冰冷傷害',
+  '40% less Ward\nWard has a 60% chance to not Break': '保護降低 40%\n保護有 60% 機率不會破損',
   'You gain Onslaught for # seconds on Kill': '擊殺時獲得 # 秒猛攻',
   '#% of Physical Damage Converted to Fire Damage while you have at least 150 Devotion':
     '若你至少有 150 個奉獻，將 #% 物理傷害轉換為火焰傷害',

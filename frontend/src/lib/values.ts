@@ -33,6 +33,7 @@ export const statValues = {
   3110: 4, // #% of Cold Damage Leeched as Life
   3111: 4, // #% of Lightning Damage Leeched as Life
   5815: 4, // #% chance to deal Double Damage
+  5914: 4, // #% chance to deal Double Damage
   8835: 1, // #% of Spell Damage Leeched as Energy Shield
   9091: 1, // Bleeding you inflict deals Damage #% faster
   9772: 1, // #% chance to inflict Withered for 2 seconds on Hit
@@ -44,6 +45,7 @@ export const statValues = {
   1361: 1, // #% increased Melee Damage
   2031: 5, // #% increased Strength
   8177: 2, // #% chance to Intimidate Enemies for 4 seconds on Hit
+  8301: 2, // #% chance to Intimidate Enemies for 4 seconds on Hit
   448: 2, // Gain #% of Physical Damage as Extra Cold Damage
   486: 1, // #% increased Elemental Damage
   579: 2, // +# to Dexterity
