@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import Select from 'svelte-select';
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
@@ -18,6 +18,7 @@
     removeFavoriteJewel,
     serializeFavoriteJewels,
     upsertFavoriteJewel,
+    type FavoriteTradeTarget,
     type FavoriteSnapshotSkill,
     type SavedJewelDraft,
     type SavedJewelEntry
@@ -25,17 +26,20 @@
   import { isSoloSelfFoundLeague, pickCurrentLeagueValue, type LeagueLike } from '../../lib/leagues';
   import {
     ANY_CONQUEROR,
+    clearTradeOpenFeedback,
     formatBilingualStatHtml,
     getAffectedNodes,
     openTrade,
     skillTree,
     splitBilingualStatText,
+    tradeOpenFeedback,
     translateStatBilingual,
     type ReverseSearchConfig,
     type SearchResults as SearchResultsType,
     type SearchWithSeed,
     type StatConfig,
-    type TradeCondition
+    type TradeCondition,
+    type TradeOpenMode
   } from '../../lib/skill_tree';
   import type { Node } from '../../lib/skill_tree_types';
   import { data, calculator } from '../../lib/types';
@@ -57,7 +61,7 @@
 
   const anyConquerorOption: SelectOption<string> = {
     value: ANY_CONQUEROR,
-    label: '全部'
+    label: '?券'
   };
   const appVersion = APP_VERSION;
 
@@ -75,8 +79,12 @@
       return fallback;
     }
 
-    const raw = localStorage.getItem(key);
-    return raw === null ? fallback : raw === 'true';
+    try {
+      const raw = localStorage.getItem(key);
+      return raw === null ? fallback : raw === 'true';
+    } catch {
+      return fallback;
+    }
   };
 
   const readStringPreference = (key: string, fallback: string): string => {
@@ -84,7 +92,23 @@
       return fallback;
     }
 
-    return localStorage.getItem(key) || fallback;
+    try {
+      return localStorage.getItem(key) || fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const writePreference = (key: string, value: string) => {
+    if (!browser) {
+      return;
+    }
+
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Ignore storage write failures so the page doesn't crash.
+    }
   };
 
   const uniqueStrings = (values: string[]): string[] => Array.from(new Set(values));
@@ -396,9 +420,15 @@
   };
 
   let highlighted: number[] = [];
-  const highlight = (newSeed: number, passives: number[]) => {
+  const highlight = (newSeed: number, passives: number[], conquerorValue?: string) => {
     seed = newSeed;
-    highlighted = passives;
+    highlighted = [...new Set(passives)];
+    if (conquerorValue) {
+      const matchedConqueror = conquerors.find((option) => option.value === conquerorValue);
+      if (matchedConqueror) {
+        selectedConqueror = matchedConqueror;
+      }
+    }
     updateUrl();
   };
 
@@ -437,7 +467,7 @@
   };
 
   let groupResults = readBooleanPreference('groupResults', true);
-  $: if (browser) localStorage.setItem('groupResults', groupResults ? 'true' : 'false');
+  $: writePreference('groupResults', groupResults ? 'true' : 'false');
 
   type CombinedResult = {
     id: string;
@@ -580,21 +610,21 @@
   };
 
   const sortResults = [
-    { label: '出現次數', value: 'count' },
-    { label: '詞綴字母', value: 'alphabet' },
-    { label: '稀有度', value: 'rarity' },
+    { label: '?箇甈⊥', value: 'count' },
+    { label: '閰韌摮?', value: 'alphabet' },
+    { label: '蝔?漲', value: 'rarity' },
     { label: '估值', value: 'value' }
   ] as const;
 
   let sortOrder =
     sortResults.find((item) => item.value === readStringPreference('sortOrder', 'count')) || sortResults[0];
-  $: if (browser && sortOrder) localStorage.setItem('sortOrder', sortOrder.value);
+  $: if (sortOrder) writePreference('sortOrder', sortOrder.value);
 
   let colored = readBooleanPreference('colored', true);
-  $: if (browser) localStorage.setItem('colored', colored ? 'true' : 'false');
+  $: writePreference('colored', colored ? 'true' : 'false');
 
   let split = readBooleanPreference('split', true);
-  $: if (browser) localStorage.setItem('split', split ? 'true' : 'false');
+  $: writePreference('split', split ? 'true' : 'false');
 
   const onPaste = (event: ClipboardEvent) => {
     const paste = event.clipboardData?.getData('text') || '';
@@ -711,6 +741,10 @@
   };
 
   let tradeCondition: TradeCondition = 'instant_buyout';
+  let singleTabTradeMode = readBooleanPreference('singleTabTradeMode', false);
+  $: writePreference('singleTabTradeMode', singleTabTradeMode ? 'true' : 'false');
+  let tradeOpenMode: TradeOpenMode = 'multi-tab';
+  $: tradeOpenMode = singleTabTradeMode ? 'single-tab' : 'multi-tab';
   const extractTranslatedStats = (result: data.AlternatePassiveSkillInformation): string[] => {
     const translatedStats: string[] = [];
 
@@ -809,12 +843,14 @@
 
   const createFavoriteDraft = ({
     seeds,
+    tradeTargets,
     snapshot,
     entryType,
     conquerorOverride,
     seedTotal
   }: {
     seeds: number[];
+    tradeTargets?: FavoriteTradeTarget[];
     snapshot: FavoriteSnapshotSkill[];
     entryType?: 'single' | 'group';
     conquerorOverride?: string;
@@ -834,6 +870,18 @@
     const conquerorLabel =
       conquerorValue === ANY_CONQUEROR ? anyConquerorOption.label : translateConquerorName(conquerorValue);
     const primarySeed = normalizedSeeds[0];
+    const normalizedTradeTargets =
+      tradeTargets && tradeTargets.length > 0
+        ? tradeTargets
+            .filter((target) => Number.isFinite(target.seed))
+            .map((target) => ({
+              seed: Math.trunc(target.seed),
+              conqueror: target.conqueror || undefined
+            }))
+        : normalizedSeeds.map((targetSeed) => ({
+            seed: targetSeed,
+            conqueror: conquerorValue || undefined
+          }));
     const id =
       resolvedEntryType === 'group'
         ? buildSavedJewelGroupId(selectedJewel.value, conquerorValue, normalizedSeeds)
@@ -848,6 +896,7 @@
       entryType: resolvedEntryType,
       seed: primarySeed,
       seeds: normalizedSeeds,
+      tradeTargets: normalizedTradeTargets,
       seedTotal:
         resolvedEntryType === 'group'
           ? Math.max(normalizedSeeds.length, Math.trunc(seedTotal ?? normalizedSeeds.length))
@@ -878,6 +927,7 @@
       .filter((entry): entry is FavoriteSnapshotSkill => !!entry);
     const draft = createFavoriteDraft({
       seeds: [seed],
+      tradeTargets: [{ seed, conqueror: selectedConquerorValue === ANY_CONQUEROR ? undefined : selectedConquerorValue }],
       snapshot,
       entryType: 'single'
     });
@@ -893,6 +943,7 @@
   const openFavoriteForSearchResult = (set: SearchWithSeed) => {
     const draft = createFavoriteDraft({
       seeds: [set.seed],
+      tradeTargets: [{ seed: set.seed, conqueror: set.conqueror }],
       snapshot: buildSnapshotFromSearchResult(set),
       entryType: 'single',
       conquerorOverride: set.conqueror
@@ -924,6 +975,10 @@
     const snapshot = mergeSnapshotSkills(sets.map((set) => buildSnapshotFromSearchResult(set)));
     const draft = createFavoriteDraft({
       seeds,
+      tradeTargets: sets.map((set) => ({
+        seed: set.seed,
+        conqueror: set.conqueror
+      })),
       snapshot,
       entryType: 'group',
       conquerorOverride,
@@ -950,10 +1005,10 @@
     favoriteFeedback = replaced
       ? draft.entryType === 'group'
         ? '已更新整組收藏。'
-        : '已更新收藏珠寶。'
+        : '已更新收藏項目。'
       : draft.entryType === 'group'
-      ? '已加入整組收藏。'
-      : '已加入收藏珠寶。';
+      ? '已新增整組收藏。'
+      : '已新增收藏項目。';
     favoriteDraft = null;
   };
 
@@ -970,8 +1025,8 @@
     removeFavoriteJewel(entry.id);
     favoriteFeedback =
       entry.entryType === 'group'
-        ? `已刪除整組收藏：${entry.jewelLabel} / 共 ${entry.seeds.length} 筆 Seed`
-        : `已刪除收藏：${entry.jewelLabel} / Seed ${entry.seed}`;
+        ? `撌脣?斗蝯??${entry.jewelLabel} / ??${entry.seeds.length} 蝑?Seed`
+        : `撌脣?斗??${entry.jewelLabel} / Seed ${entry.seed}`;
     if (favoriteDraft?.id === entry.id) {
       favoriteDraft = null;
     }
@@ -1034,24 +1089,24 @@
         <div class="panel-header">
           <div class="panel-title-row">
             <div class="panel-title-group">
-              <button class="burger-menu" aria-label="收起面板" title="收起面板" on:click={() => (collapsed = true)}>
+              <button class="burger-menu" aria-label="?嗉絲?Ｘ" title="?嗉絲?Ｘ" on:click={() => (collapsed = true)}>
                 <span class="burger-icon" aria-hidden="true">
                   <span></span>
                   <span></span>
                   <span></span>
                 </span>
-                <span class="menu-label">收起面板</span>
+                <span class="menu-label">?嗉絲?Ｘ</span>
               </button>
               <div>
-                <h3>{results ? '反查結果' : '永恆珠寶查詢'}</h3>
-                <p>可在 Seed 與反查結果之間切換，並將重要珠寶加入收藏清單。</p>
+                <h3>{results ? '?蝯?' : '瘞豢??窄?亥岷'}</h3>
+                <p>可依 Seed 或詞綴條件查詢，並快速開啟交易頁與收藏常用結果。</p>
               </div>
             </div>
             <div class="panel-title-actions">
               <button
                 class="secondary-toggle favorite-entry-toggle"
                 on:click={() => (favoriteDrawerOpen = !favoriteDrawerOpen)}>
-                {favoriteDrawerOpen ? '收合收藏珠寶' : `收藏珠寶 (${favoriteCount})`}
+                {favoriteDrawerOpen ? '?嗅??嗉??窄' : `?嗉??窄 (${favoriteCount})`}
               </button>
             </div>
           </div>
@@ -1059,18 +1114,27 @@
           {#if searchOutcome}
             <div class="trade-panel">
               <div class="trade-row compact-row">
-                <span class="trade-label">交易條件</span>
+                <span class="trade-label">鈭斗?璇辣</span>
                 <button
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'instant_buyout'}
                   on:click={() => (tradeCondition = 'instant_buyout')}>
-                  即刻購買
+                  ?喳鞈潸眺
                 </button>
                 <button
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'}
                   on:click={() => (tradeCondition = 'in_person_online_in_league')}>
-                  面對面交易（聯盟在線）
+                  ?Ｗ??Ｖ漱???舐??函?嚗?
+                </button>
+                <button
+                  class="trade-toggle"
+                  class:trade-toggle-active={singleTabTradeMode}
+                  on:click={() => {
+                    singleTabTradeMode = !singleTabTradeMode;
+                    clearTradeOpenFeedback();
+                  }}>
+                  {singleTabTradeMode ? '單分頁模式' : '多分頁模式'}
                 </button>
               </div>
 
@@ -1091,15 +1155,16 @@
                       platform.value,
                       league.value,
                       'international',
-                      tradeCondition
+                      tradeCondition,
+                      tradeOpenMode
                     )}
                   disabled={!searchOutcome || !league}>
-                  國際服交易
+                  ???漱??
                 </button>
               </div>
 
               <div class="trade-row">
-                <span class="trade-label">台服聯盟</span>
+                <span class="trade-label">?唳??舐?</span>
                 <div class="trade-select">
                   <Select
                     items={twLeagues}
@@ -1119,12 +1184,28 @@
                       'PC',
                       twLeague.value,
                       'tw',
-                      tradeCondition
+                      tradeCondition,
+                      tradeOpenMode
                     )}
                   disabled={!searchOutcome || !twLeague}>
-                  台服交易
+                  ?唳?鈭斗?
                 </button>
               </div>
+              <div class="panel-note trade-hint">
+                ?渡?鈭斗??之???漱??賭?甈⊿????????交?銝???瘝???嚗??迂甇斤雯蝡?敶撘?蝒??撠???              </div>
+              {#if $tradeOpenFeedback}
+                <div
+                  class="trade-feedback"
+                  class:trade-feedback-warning={$tradeOpenFeedback.level === 'warning'}>
+                  <div class="trade-feedback-copy">
+                    <strong>{$tradeOpenFeedback.title}</strong>
+                    <p>{$tradeOpenFeedback.message}</p>
+                  </div>
+                  <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>
+                    ??
+                  </button>
+                </div>
+              {/if}
             </div>
           {/if}
 
@@ -1138,24 +1219,24 @@
                 {groupResults ? '分組顯示中' : '已關閉分組'}
               </button>
               <button class="secondary-toggle" on:click={() => (results = !results)} disabled={!searchOutcome}>
-                {results ? '返回條件設定' : '查看反查結果'}
+                {results ? '餈?璇辣閮剖?' : '?亦??蝯?'}
               </button>
               {#if selectedConqueror && hasValidConquerorSelection && mode === 'stats'}
                 <div class="bulk-actions bulk-actions-inline compact-row-actions">
                   <button class="secondary-toggle" on:click={selectAll} disabled={searching || disabled.size === 0}
-                    >全選</button>
+                    >?券</button>
                   <button
                     class="secondary-toggle"
                     on:click={selectAllNotables}
-                    disabled={searching || disabled.size === 0}>全選強力天賦</button>
+                    disabled={searching || disabled.size === 0}>?券撘瑕?憭抵釵</button>
                   <button
                     class="secondary-toggle"
                     on:click={selectAllPassives}
-                    disabled={searching || disabled.size === 0}>全選小天賦</button>
+                    disabled={searching || disabled.size === 0}>全選周圍天賦</button>
                   <button
                     class="secondary-toggle"
                     on:click={deselectAll}
-                    disabled={searching || disabled.size >= affectedNodes.length}>全部排除</button>
+                    disabled={searching || disabled.size >= affectedNodes.length}>?券?</button>
                 </div>
               {/if}
             </div>
@@ -1167,25 +1248,25 @@
             <section class="control-section">
               <div class="inline-select-row" class:with-mode-toggle={selectedConqueror && hasValidConquerorSelection}>
                 <div class="field-stack field-stack-half">
-                  <h3>珠寶</h3>
+                  <h3>?窄</h3>
                   <Select
                     class="hero-select"
                     items={jewels}
                     bind:value={selectedJewel}
                     on:change={changeJewel}
-                    placeholder="選擇永恆珠寶"
+                    placeholder="?豢?瘞豢??窄"
                     floatingConfig={selectFloatingConfig} />
                 </div>
 
                 {#if selectedJewel}
                   <div class="field-stack field-stack-half">
-                    <h3>將軍</h3>
+                    <h3>撠?</h3>
                     <Select
                       class="hero-select"
                       items={conquerors}
                       bind:value={selectedConqueror}
                       on:change={updateUrl}
-                      placeholder="選擇將軍"
+                      placeholder="?豢?撠?"
                       floatingConfig={selectFloatingConfig} />
                   </div>
                 {/if}
@@ -1197,13 +1278,13 @@
                         class="selection-button"
                         class:selected={mode === 'seed'}
                         on:click={() => setMode('seed')}>
-                        依 Seed
+                        靘?Seed
                       </button>
                       <button
                         class="selection-button"
                         class:selected={mode === 'stats'}
                         on:click={() => setMode('stats')}>
-                        依詞綴反查
+                        靘?蝬游???
                       </button>
                     </div>
                   </div>
@@ -1230,9 +1311,9 @@
                           <button
                             class="secondary-toggle"
                             class:selected={colored}
-                            on:click={() => (colored = !colored)}>關鍵字上色</button>
+                            on:click={() => (colored = !colored)}>彩色顯示</button>
                           <button class="secondary-toggle" class:selected={split} on:click={() => (split = !split)}
-                            >分開顯示</button>
+                            >??憿舐內</button>
                         </div>
                       </div>
 
@@ -1255,7 +1336,7 @@
                       {:else}
                         <div class="combined-results split-results">
                           <div>
-                            <h3>強力天賦</h3>
+                            <h3>撘瑕?憭抵釵</h3>
                             <div class:rainbow={colored}>
                               {#each sortCombined(combineResults(seedResults, colored, 'notables'), sortOrder.value) as result}
                                 <div
@@ -1273,7 +1354,7 @@
                             </div>
                           </div>
                           <div>
-                            <h3>小天賦</h3>
+                            <h3>周圍天賦</h3>
                             <div class:rainbow={colored}>
                               {#each sortCombined(combineResults(seedResults, colored, 'passives'), sortOrder.value) as result}
                                 <div
@@ -1295,13 +1376,13 @@
                     {/if}
                   {:else if mode === 'stats'}
                     <div class="field-stack field-stack-inline">
-                      <h3>新增目標詞綴</h3>
+                      <h3>?啣??格?閰韌</h3>
                       <div class="stat-picker">
                         <Select
                           items={statItems}
                           on:change={selectStat}
                           bind:this={statSelector}
-                          placeholder="選擇要反查的詞綴"
+                          placeholder="?豢?閬??亦?閰韌"
                           floatingConfig={selectFloatingConfig}>
                           <svelte:fragment slot="item" let:item>
                             <span>{@html formatBilingualStatHtml(item.label)}</span>
@@ -1319,7 +1400,7 @@
                           <div class="selected-stat-card">
                             <div class="selected-stat-top">
                               <button class="remove-stat" on:click={() => removeStat(selectedStats[statId].id)}
-                                >移除</button>
+                                >蝘駁</button>
                               <span class="selected-stat-text"
                                 >{@html formatBilingualStatHtml(
                                   translateStatBilingual(selectedStats[statId].id)
@@ -1327,11 +1408,11 @@
                             </div>
                             <div class="selected-stat-inputs">
                               <label class="inline-label inline-label-compact">
-                                <span>最低數量</span>
+                                <span>最小值</span>
                                 <input type="number" min="0" bind:value={selectedStats[statId].min} />
                               </label>
                               <label class="inline-label inline-label-compact">
-                                <span>權重</span>
+                                <span>甈?</span>
                                 <input type="number" min="0" bind:value={selectedStats[statId].weight} />
                               </label>
                             </div>
@@ -1341,14 +1422,14 @@
 
                       <div class="field-stack compact-field search-control-row">
                         <label class="inline-label inline-label-compact inline-label-total">
-                          <span>最低總權重</span>
+                          <span>?雿蜇甈?</span>
                           <input type="number" min="0" bind:value={minTotalWeight} />
                         </label>
                         <button class="primary-toggle search-button" on:click={search} disabled={searching}>
                           {#if searching && selectedJewel}
-                            搜尋中 {currentSeed} / {maxSeed}
+                            ??銝?{currentSeed} / {maxSeed}
                           {:else}
-                            開始反查
+                            ???
                           {/if}
                         </button>
                       </div>
@@ -1375,7 +1456,8 @@
               platform={platform.value}
               league={league.value}
               twLeague={twLeague.value}
-              {tradeCondition} />
+              {tradeCondition}
+              {tradeOpenMode} />
           {/if}
         </div>
       </div>
@@ -1383,15 +1465,15 @@
   {:else}
     <button
       class="burger-menu collapsed-trigger"
-      aria-label="展開面板"
-      title="展開面板"
+      aria-label="撅??Ｘ"
+      title="撅??Ｘ"
       on:click={() => (collapsed = false)}>
       <span class="burger-icon" aria-hidden="true">
         <span></span>
         <span></span>
         <span></span>
       </span>
-      <span class="menu-label">展開面板</span>
+      <span class="menu-label">撅??Ｘ</span>
     </button>
   {/if}
 
@@ -1399,13 +1481,13 @@
     <section class="favorite-panel favorite-drawer">
       <div class="favorite-header">
         <div>
-          <h3>收藏珠寶</h3>
-          <p>目前共 {favoriteCount} 筆，可匯入、匯出與快速交易。</p>
+          <h3>?嗉??窄</h3>
+          <p>目前共有 {favoriteCount} 筆收藏，可匯出或匯入 JSON。</p>
         </div>
         <div class="favorite-actions">
-          <button class="secondary-toggle" on:click={exportFavorites} disabled={favoriteCount === 0}>匯出 JSON</button>
-          <button class="secondary-toggle" on:click={openImportDialog}>匯入 JSON</button>
-          <button class="secondary-toggle" on:click={() => (favoriteDrawerOpen = false)}>關閉</button>
+          <button class="secondary-toggle" on:click={exportFavorites} disabled={favoriteCount === 0}>?臬 JSON</button>
+          <button class="secondary-toggle" on:click={openImportDialog}>?臬 JSON</button>
+          <button class="secondary-toggle" on:click={() => (favoriteDrawerOpen = false)}>??</button>
           <input
             bind:this={favoriteImportInput}
             class="hidden-input"
@@ -1419,6 +1501,16 @@
         <div class="favorite-feedback">{favoriteFeedback}</div>
       {/if}
 
+      {#if $tradeOpenFeedback}
+        <div class="trade-feedback" class:trade-feedback-warning={$tradeOpenFeedback.level === 'warning'}>
+          <div class="trade-feedback-copy">
+            <strong>{$tradeOpenFeedback.title}</strong>
+            <p>{$tradeOpenFeedback.message}</p>
+          </div>
+          <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>??</button>
+        </div>
+      {/if}
+
       {#if favoriteDraft}
         {#key `${favoriteDraft.id}:${favoriteDraft.entryType}:${favoriteDraft.seeds.join(',')}:${favoriteDraft.snapshot.length}:${favoriteDraft.buildName}:${favoriteDraft.estimatedValue}:${favoriteDraft.note}`}
           <FavoriteJewelForm
@@ -1430,7 +1522,7 @@
       {/if}
 
       {#if favoriteCount === 0}
-        <div class="favorite-empty">目前還沒有收藏珠寶，可先在 Seed 結果或反查結果按「加入收藏」。</div>
+        <div class="favorite-empty">目前尚無收藏。你可以從 Seed 結果或反查結果直接加入收藏。</div>
       {:else}
         <div class="favorite-list">
           {#each $favoriteJewels as entry}
@@ -1439,6 +1531,7 @@
               league={league?.value || 'Standard'}
               twLeague={twLeague?.value || 'Standard'}
               {tradeCondition}
+              {tradeOpenMode}
               onEdit={editFavorite}
               onDelete={deleteFavorite} />
           {/each}
@@ -1448,7 +1541,7 @@
   {/if}
 
   <div class="repo-link-wrap">
-    <span>版本 {appVersion}</span>
+    <span>? {appVersion}</span>
   </div>
 </SkillTree>
 
@@ -1777,6 +1870,66 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+
+  .trade-hint {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.18);
+    color: #bfdbfe;
+  }
+
+  .trade-feedback {
+    border-radius: 16px;
+    padding: 12px 14px;
+    background: rgba(59, 130, 246, 0.14);
+    border: 1px solid rgba(59, 130, 246, 0.22);
+    color: #dbeafe;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .trade-feedback-warning {
+    background: rgba(194, 65, 12, 0.14);
+    border-color: rgba(194, 65, 12, 0.28);
+    color: #fed7aa;
+  }
+
+  .trade-feedback-copy {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .trade-feedback-copy strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .trade-feedback-copy p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .trade-feedback-close {
+    border-radius: 16px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: inherit;
+    transition:
+      transform 0.18s ease,
+      background 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  .trade-feedback-close:hover {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.18);
   }
 
   .trade-label {

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { SearchWithSeed, TradeCondition } from '../skill_tree';
+  import type { SearchWithSeed, TradeCondition, TradeOpenMode } from '../skill_tree';
   import { formatBilingualStatHtml, skillTree, translateStatBilingual, openTrade } from '../skill_tree';
   import { translateConquerorName } from '../zh_tw';
 
-  export let highlight: (newSeed: number, passives: number[]) => void;
+  export let highlight: (newSeed: number, passives: number[], conqueror?: string) => void;
   export let onSave: ((set: SearchWithSeed) => void) | undefined = undefined;
   export let set: SearchWithSeed;
   export let jewel: number;
@@ -12,6 +12,7 @@
   export let league: string;
   export let twLeague: string;
   export let tradeCondition: TradeCondition = 'instant_buyout';
+  export let tradeOpenMode: TradeOpenMode = 'multi-tab';
 
   $: resultConqueror = set.conqueror || conqueror;
 </script>
@@ -23,11 +24,12 @@
   on:click={() =>
     highlight(
       set.seed,
-      set.skills.map((s) => s.passive)
+      set.skills.map((s) => s.passive),
+      resultConqueror
     )}
   on:keydown={(e) => {
     if (e.key === 'Enter' || e.key === ' ') {
-      highlight(set.seed, set.skills.map((s) => s.passive));
+      highlight(set.seed, set.skills.map((s) => s.passive), resultConqueror);
     }
   }}>
   <div class="result-header">
@@ -45,13 +47,22 @@
       <button
         class="trade-btn intl-trade"
         on:click|stopPropagation={() =>
-          openTrade(jewel, resultConqueror, [set], platform, league, 'international', tradeCondition)}>
+          openTrade(
+            jewel,
+            resultConqueror,
+            [set],
+            platform,
+            league,
+            'international',
+            tradeCondition,
+            tradeOpenMode
+          )}>
         國際服交易
       </button>
       <button
         class="trade-btn tw-trade"
         on:click|stopPropagation={() =>
-          openTrade(jewel, resultConqueror, [set], platform, twLeague, 'tw', tradeCondition)}>
+          openTrade(jewel, resultConqueror, [set], platform, twLeague, 'tw', tradeCondition, tradeOpenMode)}>
         台服交易
       </button>
     </div>

@@ -1,4 +1,5 @@
-import type { Translation, Node, SkillTreeData, Group, Sprite, TranslationFile } from './skill_tree_types';
+﻿import type { Translation, Node, SkillTreeData, Group, Sprite, TranslationFile } from './skill_tree_types';
+import { writable } from 'svelte/store';
 import { data } from './types';
 import { englishFallbackTranslations, getStatDescription, translateLeagueName } from './zh_tw';
 import { officialTimelessTwStatTemplates } from './timeless_tw_stat_templates';
@@ -362,6 +363,8 @@ export type BilingualStatParts = {
   english?: string;
 };
 
+const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export const splitBilingualStatText = (value: string): BilingualStatParts => {
   const separator = ' / ';
   const separatorIndex = value.indexOf(separator);
@@ -480,6 +483,16 @@ const applyRollToTemplate = (template: string, roll?: number): string => {
   return template.replace('#', roll.toString());
 };
 
+const applyValuesToTemplate = (template: string, values: string[]): string => {
+  let valueIndex = 0;
+  return template.replace(/#/g, () => values[valueIndex++] ?? '#');
+};
+
+const buildRenderedStatMatcher = (template: string): RegExp => {
+  const pattern = escapeRegex(template).replace(/#/g, '([+-]?\\d+(?:\\.\\d+)?)');
+  return new RegExp(`^${pattern}$`, 'i');
+};
+
 export const translateStat = (id: number | string, roll?: number | undefined): string => {
   const nId = typeof id === 'string' ? parseInt(id) : id;
   const translationText = getEnglishStatTemplate(nId, roll);
@@ -493,15 +506,76 @@ export const translateStat = (id: number | string, roll?: number | undefined): s
   return localizedTemplate;
 };
 
+export const translateStatEnglish = (id: number | string, roll?: number | undefined): string =>
+  applyRollToTemplate(getEnglishStatTemplate(id, roll), roll).trim();
+
 export const translateStatBilingual = (id: number | string, roll?: number | undefined): string => {
   const localized = translateStat(id, roll).trim();
-  const english = applyRollToTemplate(getEnglishStatTemplate(id, roll), roll).trim();
+  const english = translateStatEnglish(id, roll);
 
   if (!english || localized.toLowerCase() === english.toLowerCase()) {
     return localized;
   }
 
   return `${localized} / ${english}`;
+};
+
+export const translateRenderedStatBilingual = (id: number | string, englishText: string): string => {
+  const trimmedEnglish = englishText.trim();
+  const englishTemplate = getEnglishStatTemplate(id).trim();
+  const localizedTemplate = translateStat(id).trim();
+
+  if (!trimmedEnglish) {
+    return translateStatBilingual(id);
+  }
+
+  if (trimmedEnglish.toLowerCase() === englishTemplate.toLowerCase()) {
+    return translateStatBilingual(id);
+  }
+
+  const matches = trimmedEnglish.match(buildRenderedStatMatcher(englishTemplate));
+  if (!matches) {
+    return trimmedEnglish;
+  }
+
+  const values = matches.slice(1);
+  const localized = applyValuesToTemplate(localizedTemplate, values).trim();
+  if (!localized || localized.toLowerCase() === trimmedEnglish.toLowerCase()) {
+    return trimmedEnglish;
+  }
+
+  return `${localized} / ${trimmedEnglish}`;
+};
+
+export const translateRenderedStatBilingualFromCandidates = (ids: number[], englishText: string): string => {
+  const trimmedEnglish = englishText.trim();
+  if (!trimmedEnglish || ids.length === 0) {
+    return trimmedEnglish;
+  }
+
+  const matchedIds = ids.filter((id) => buildRenderedStatMatcher(getEnglishStatTemplate(id).trim()).test(trimmedEnglish));
+  if (matchedIds.length !== 1) {
+    return trimmedEnglish;
+  }
+
+  return translateRenderedStatBilingual(matchedIds[0], trimmedEnglish);
+};
+
+const maxTradeTargetsPerQuery = 180;
+
+export type TradeOpenFeedback = {
+  level: 'info' | 'warning';
+  title: string;
+  message: string;
+  totalTabs: number;
+  openedTabs: number;
+  blockedTabs: number;
+};
+
+export const tradeOpenFeedback = writable<TradeOpenFeedback | null>(null);
+
+export const clearTradeOpenFeedback = () => {
+  tradeOpenFeedback.set(null);
 };
 
 const tradeStatNames: { [key: number]: { [key: string]: string } } = {
@@ -546,6 +620,7 @@ const twTradeStatNames: { [key: number]: string } = {
 };
 
 type TradeServer = 'international' | 'tw';
+export type TradeOpenMode = 'multi-tab' | 'single-tab';
 export type TradeCondition =
   | 'instant_buyout'
   | 'in_person_online_in_league';
@@ -566,8 +641,6 @@ type TradeSeedTarget = {
   seed: number;
   statId: string;
 };
-
-const maxTradeResultsPerQuery = 45;
 
 const resolveTradeStatIds = (jewel: number, conqueror: string, server: TradeServer): string[] => {
   if (conqueror === ANY_CONQUEROR) {
@@ -625,15 +698,54 @@ const buildTradeTargets = (
   return targets;
 };
 
-const chunkTradeResults = (results: SearchWithSeed[]): SearchWithSeed[][] => {
+const countTradeTargetsForResult = (
+  jewel: number,
+  conqueror: string,
+  result: SearchWithSeed,
+  server: TradeServer
+): number => {
+  if (!Number.isFinite(result.seed)) {
+    return 0;
+  }
+
+  return resolveTradeStatIds(jewel, result.conqueror || conqueror, server).length;
+};
+
+const chunkTradeResults = (
+  jewel: number,
+  conqueror: string,
+  results: SearchWithSeed[],
+  server: TradeServer
+): SearchWithSeed[][] => {
   if (results.length === 0) {
     return [results];
   }
 
   const chunks: SearchWithSeed[][] = [];
+  let currentChunk: SearchWithSeed[] = [];
+  let currentTargetCount = 0;
 
-  for (let i = 0; i < results.length; i += maxTradeResultsPerQuery) {
-    chunks.push(results.slice(i, i + maxTradeResultsPerQuery));
+  results.forEach((result) => {
+    const targetCount = countTradeTargetsForResult(jewel, conqueror, result, server);
+
+    if (currentChunk.length > 0 && currentTargetCount + targetCount > maxTradeTargetsPerQuery) {
+      chunks.push(currentChunk);
+      currentChunk = [];
+      currentTargetCount = 0;
+    }
+
+    currentChunk.push(result);
+    currentTargetCount += targetCount;
+
+    if (currentTargetCount >= maxTradeTargetsPerQuery) {
+      chunks.push(currentChunk);
+      currentChunk = [];
+      currentTargetCount = 0;
+    }
+  });
+
+  if (currentChunk.length > 0) {
+    chunks.push(currentChunk);
   }
 
   return chunks;
@@ -702,11 +814,21 @@ export const openTrade = (
   platform: string,
   league: string,
   server: TradeServer = 'international',
-  condition: TradeCondition = 'instant_buyout'
+  condition: TradeCondition = 'instant_buyout',
+  tradeOpenMode: TradeOpenMode = 'multi-tab'
 ) => {
+  if (results.length === 0) {
+    clearTradeOpenFeedback();
+    return {
+      totalTabs: 0,
+      openedTabs: 0,
+      blockedTabs: 0
+    };
+  }
+
   const normalizedPlatform = !platform || typeof platform !== 'string' ? 'PC' : platform;
   const normalizedLeague = !league || typeof league !== 'string' ? 'Standard' : league;
-  const resultChunks = chunkTradeResults(results);
+  const resultChunks = chunkTradeResults(jewel, conqueror, results, server);
   const leagueSegment =
     server === 'tw'
       ? encodeURIComponent(translateLeagueName(normalizedLeague).trim() || translateLeagueName('Standard'))
@@ -721,7 +843,13 @@ export const openTrade = (
     url = new URL(`https://www.pathofexile.com/trade/search${platformSegment}/${leagueSegment}`);
   }
 
-  resultChunks.forEach((chunk, index) => {
+  const chunksToOpen = tradeOpenMode === 'single-tab' ? resultChunks.slice(0, 1) : resultChunks;
+  const unopenedBatches = Math.max(resultChunks.length - chunksToOpen.length, 0);
+  const openedTabs = typeof window !== 'undefined' ? chunksToOpen.map(() => window.open('', '_blank')) : [];
+  let openedCount = 0;
+  let blockedCount = 0;
+
+  chunksToOpen.forEach((chunk, index) => {
     const tradeUrl = new URL(url.toString());
     tradeUrl.searchParams.set(
       'q',
@@ -732,11 +860,69 @@ export const openTrade = (
       url: tradeUrl.toString(),
       batch: index + 1,
       totalBatches: resultChunks.length,
+      targetCount: buildTradeTargets(jewel, conqueror, chunk, server).length,
       resultSeeds: chunk.map((entry) => `${entry.seed}:${entry.conqueror || conqueror}`)
     });
 
-    window.open(tradeUrl, '_blank');
+    const openedTab = openedTabs[index];
+    if (openedTab && !openedTab.closed) {
+      try {
+        openedTab.location.replace(tradeUrl.toString());
+        openedCount += 1;
+        return;
+      } catch {
+        // Fall back to direct open below.
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      const directTab = window.open(tradeUrl.toString(), '_blank');
+      if (directTab && !directTab.closed) {
+        openedCount += 1;
+      } else {
+        blockedCount += 1;
+      }
+    }
   });
+
+  if (typeof window !== 'undefined') {
+    if (blockedCount > 0) {
+      tradeOpenFeedback.set({
+        level: 'warning',
+        title: '交易分頁被瀏覽器擋下',
+        message: `這次需要開啟 ${chunksToOpen.length} 個分頁，目前成功 ${openedCount} 個、被擋下 ${blockedCount} 個。請允許此網站的彈出式視窗與重新導向後再重試。`,
+        totalTabs: resultChunks.length,
+        openedTabs: openedCount,
+        blockedTabs: blockedCount
+      });
+    } else if (tradeOpenMode === 'single-tab' && unopenedBatches > 0) {
+      tradeOpenFeedback.set({
+        level: 'info',
+        title: '單分頁模式已啟用',
+        message: `這次共 ${resultChunks.length} 批，為避免多分頁彈窗，僅開啟第 1 批。尚有 ${unopenedBatches} 批未開啟。`,
+        totalTabs: resultChunks.length,
+        openedTabs: openedCount,
+        blockedTabs: blockedCount
+      });
+    } else if (resultChunks.length > 1) {
+      tradeOpenFeedback.set({
+        level: 'info',
+        title: '已開啟多個交易分頁',
+        message: `這次依 trade filter 上限分成 ${resultChunks.length} 個分頁，每頁最多 180 個條件。若之後沒有反應，請先允許此網站的彈出式視窗與重新導向。`,
+        totalTabs: resultChunks.length,
+        openedTabs: openedCount,
+        blockedTabs: blockedCount
+      });
+    } else {
+      clearTradeOpenFeedback();
+    }
+  }
+
+  return {
+    totalTabs: resultChunks.length,
+    openedTabs: openedCount,
+    blockedTabs: blockedCount
+  };
 };
 
 

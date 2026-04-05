@@ -11,7 +11,8 @@
     inverseSpritesActive,
     orbitAngleAt,
     skillTree,
-    translateStat,
+    splitBilingualStatText,
+    translateStatBilingual,
     toCanvasCoords
   } from '../skill_tree';
   import type { Point } from '../skill_tree';
@@ -122,21 +123,46 @@
   };
 
   const wrapText = (text: string, context: CanvasRenderingContext2D, width: number): string[] => {
-    const result = [];
+    const result: string[] = [];
+    const tokens = text.split(' ');
+    let currentLine = '';
 
-    let currentWord = '';
-    text.split(' ').forEach((word) => {
-      if (context.measureText(currentWord + word).width < width) {
-        currentWord += ' ' + word;
-      } else {
-        result.push(currentWord.trim());
-        currentWord = word;
+    const pushTokenByCharacters = (token: string) => {
+      let segment = '';
+      for (const character of token) {
+        const candidate = `${segment}${character}`;
+        if (segment && context.measureText(candidate).width >= width) {
+          result.push(segment);
+          segment = character;
+        } else {
+          segment = candidate;
+        }
       }
-    });
-    61834;
+      return segment;
+    };
 
-    if (currentWord.length > 0) {
-      result.push(currentWord.trim());
+    tokens.forEach((token) => {
+      const candidate = currentLine ? `${currentLine} ${token}` : token;
+      if (context.measureText(candidate).width < width) {
+        currentLine = candidate;
+        return;
+      }
+
+      if (currentLine) {
+        result.push(currentLine);
+        currentLine = '';
+      }
+
+      if (context.measureText(token).width < width) {
+        currentLine = token;
+        return;
+      }
+
+      currentLine = pushTokenByCharacters(token);
+    });
+
+    if (currentLine.length > 0) {
+      result.push(currentLine);
     }
 
     return result;
@@ -358,8 +384,8 @@
 
     if (hoveredNode) {
       let nodeName = hoveredNode.name || '';
-      let nodeStats: { text: string; special: boolean }[] = (hoveredNode.stats || []).map((s) => ({
-        text: s,
+      let nodeStats: { text: string; special: boolean }[] = (hoveredNode.stats || []).map((text) => ({
+        text,
         special: false
       }));
 
@@ -381,7 +407,7 @@
                   const statRoll = statRolls[i];
                   if (statRoll !== undefined) {
                     nodeStats.push({
-                      text: translateStat(statId, statRoll),
+                      text: translateStatBilingual(statId, statRoll),
                       special: true
                     });
                   }
@@ -398,7 +424,7 @@
                     const statRoll = additionRolls[i];
                     if (statRoll !== undefined) {
                       nodeStats.push({
-                        text: translateStat(statId, statRoll),
+                        text: translateStatBilingual(statId, statRoll),
                         special: true
                       });
                     }
@@ -418,14 +444,56 @@
       context.font = statsFont;
 
       const allLines: {
-        text: string;
+        localized?: string;
+        english?: string;
         offset: number;
+        indent: number;
         special: boolean;
       }[] = [];
 
       const padding = 30;
 
       let offset = 85;
+
+      const pushTooltipText = (text: string, special: boolean) => {
+        if (!special) {
+          wrapText(text, context, maxWidth - padding).forEach((line) => {
+            allLines.push({
+              localized: line,
+              offset,
+              indent: 0,
+              special: false
+            });
+            offset += 20;
+          });
+          return;
+        }
+
+        const parts = splitBilingualStatText(text);
+        wrapText(parts.localized, context, maxWidth - padding).forEach((line) => {
+          allLines.push({
+            localized: line,
+            offset,
+            indent: 0,
+            special: true
+          });
+          offset += 20;
+        });
+
+        if (!parts.english) {
+          return;
+        }
+
+        wrapText(parts.english, context, maxWidth - padding - 18).forEach((line) => {
+          allLines.push({
+            english: line,
+            offset,
+            indent: 18,
+            special: true
+          });
+          offset += 20;
+        });
+      };
 
       if (nodeStats && nodeStats.length > 0) {
         nodeStats.forEach((stat) => {
@@ -438,21 +506,14 @@
               offset += 10;
             }
 
-            const lines = wrapText(line, context, maxWidth - padding);
-            lines.forEach((l) => {
-              allLines.push({
-                text: l,
-                offset,
-                special: stat.special
-              });
-              offset += 20;
-            });
+            pushTooltipText(line, stat.special);
           });
         });
       } else if (hoveredNode.isJewelSocket) {
         allLines.push({
-          text: '點擊以選取此珠寶插槽',
+          localized: '點擊以選取此珠寶插槽',
           offset,
+          indent: 0,
           special: true
         });
 
@@ -475,13 +536,14 @@
       context.font = statsFont;
       context.textAlign = 'left';
       allLines.forEach((l) => {
-        if (l.special) {
-          context.fillStyle = '#8cf34c';
-        } else {
-          context.fillStyle = '#ffffff';
+        if (l.localized) {
+          context.fillStyle = l.special ? '#9be45f' : '#f4ead5';
+          context.fillText(l.localized, mousePos.x + padding / 2 + l.indent, mousePos.y + l.offset);
+          return;
         }
 
-        context.fillText(l.text, mousePos.x + padding / 2, mousePos.y + l.offset);
+        context.fillStyle = '#79b8ff';
+        context.fillText(l.english || '', mousePos.x + padding / 2 + l.indent, mousePos.y + l.offset);
       });
     }
 

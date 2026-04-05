@@ -1,12 +1,15 @@
 param(
   [int]$Port = 4175,
-  [switch]$SkipBuild
+  [switch]$SkipBuild,
+  [string]$Page = 'tree.html'
 )
 
 $ErrorActionPreference = 'Stop'
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
-$url = "http://127.0.0.1:$Port/"
+$buildDir = Join-Path $root 'build'
+$pagePath = if ([string]::IsNullOrWhiteSpace($Page)) { 'tree.html' } else { $Page.TrimStart('/') }
+$url = "http://127.0.0.1:$Port/$pagePath"
 $stateDir = Join-Path $env:TEMP 'poe-timeless-jewels-preview'
 $pidFile = Join-Path $stateDir 'preview.pid'
 $stdout = Join-Path $stateDir 'preview-out.log'
@@ -52,11 +55,20 @@ if (-not $SkipBuild) {
   }
 }
 
-$previewCommand = 'cd /d "' + $root + '" && pnpm preview:local 1> "' + $stdout + '" 2> "' + $stderr + '"'
+$python = Get-Command python -ErrorAction SilentlyContinue
+if (-not $python) {
+  throw "python not found. Cannot start static preview server."
+}
+
+if (-not (Test-Path $buildDir)) {
+  throw "Build directory not found: $buildDir"
+}
+
+$previewCommand = 'cd /d "' + $buildDir + '" && "' + $python.Source + '" -m http.server ' + $Port + ' --bind 127.0.0.1 1> "' + $stdout + '" 2> "' + $stderr + '"'
 $startInfo = New-Object System.Diagnostics.ProcessStartInfo
 $startInfo.FileName = 'C:\WINDOWS\System32\cmd.exe'
 $startInfo.Arguments = '/c ' + $previewCommand
-$startInfo.WorkingDirectory = $root
+$startInfo.WorkingDirectory = $buildDir
 $startInfo.UseShellExecute = $false
 $startInfo.CreateNoWindow = $true
 

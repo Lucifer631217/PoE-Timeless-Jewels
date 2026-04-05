@@ -7,6 +7,11 @@ export const FAVORITE_JEWELS_EXPORT_VERSION = 1;
 
 export type FavoriteEntryType = 'single' | 'group';
 
+export interface FavoriteTradeTarget {
+  seed: number;
+  conqueror?: string;
+}
+
 export interface FavoriteSnapshotSkill {
   passive: number;
   passiveName: string;
@@ -22,6 +27,7 @@ export interface SavedJewelEntry {
   entryType: FavoriteEntryType;
   seed: number;
   seeds: number[];
+  tradeTargets: FavoriteTradeTarget[];
   seedTotal: number;
   buildName: string;
   note: string;
@@ -76,6 +82,44 @@ const normalizeSeeds = (value: unknown, fallbackSeed?: unknown): number[] => {
   }
 
   return [...seedSet].sort((left, right) => left - right);
+};
+
+const normalizeTradeTargets = (
+  value: unknown,
+  fallbackSeeds: number[],
+  fallbackConqueror?: unknown
+): FavoriteTradeTarget[] => {
+  const targets: FavoriteTradeTarget[] = [];
+
+  if (Array.isArray(value)) {
+    value.forEach((item) => {
+      if (!isRecord(item)) {
+        return;
+      }
+
+      if (typeof item.seed !== 'number' || !Number.isFinite(item.seed)) {
+        return;
+      }
+
+      targets.push({
+        seed: Math.trunc(item.seed),
+        conqueror: typeof item.conqueror === 'string' && item.conqueror.trim() ? item.conqueror.trim() : undefined
+      });
+    });
+  }
+
+  if (targets.length === 0) {
+    const fallbackResolvedConqueror =
+      typeof fallbackConqueror === 'string' && fallbackConqueror.trim() ? fallbackConqueror.trim() : undefined;
+    fallbackSeeds.forEach((seed) => {
+      targets.push({
+        seed,
+        conqueror: fallbackResolvedConqueror
+      });
+    });
+  }
+
+  return targets;
 };
 
 const isFavoriteSnapshotSkill = (value: unknown): value is FavoriteSnapshotSkill => {
@@ -140,6 +184,7 @@ const sanitizeEntryFromUnknown = (value: unknown): SavedJewelEntry | null => {
   const rawSeedTotal =
     typeof value.seedTotal === 'number' && Number.isFinite(value.seedTotal) ? Math.trunc(value.seedTotal) : seeds.length;
   const seedTotal = entryType === 'group' ? Math.max(seeds.length, rawSeedTotal) : 1;
+  const tradeTargets = normalizeTradeTargets(value.tradeTargets, seeds, value.conqueror);
 
   return {
     id: value.id,
@@ -150,6 +195,7 @@ const sanitizeEntryFromUnknown = (value: unknown): SavedJewelEntry | null => {
     entryType,
     seed: seeds[0],
     seeds,
+    tradeTargets,
     seedTotal,
     buildName: typeof value.buildName === 'string' ? value.buildName.trim() : '',
     note: rawNote,
@@ -191,8 +237,20 @@ const parseEntries = (raw: string | null): SavedJewelEntry[] => {
   }
 };
 
+const readFavoriteStorage = (): SavedJewelEntry[] => {
+  if (!browser) {
+    return [];
+  }
+
+  try {
+    return parseEntries(localStorage.getItem(FAVORITE_JEWELS_STORAGE_KEY));
+  } catch {
+    return [];
+  }
+};
+
 const createFavoriteStore = () => {
-  const store = writable<SavedJewelEntry[]>(browser ? parseEntries(localStorage.getItem(FAVORITE_JEWELS_STORAGE_KEY)) : []);
+  const store = writable<SavedJewelEntry[]>(readFavoriteStorage());
 
   if (browser) {
     store.subscribe((entries) => {
@@ -202,7 +260,11 @@ const createFavoriteStore = () => {
         entries
       };
 
-      localStorage.setItem(FAVORITE_JEWELS_STORAGE_KEY, JSON.stringify(payload));
+      try {
+        localStorage.setItem(FAVORITE_JEWELS_STORAGE_KEY, JSON.stringify(payload));
+      } catch {
+        // Ignore storage write failures so the UI remains usable.
+      }
     });
   }
 
@@ -298,8 +360,9 @@ export const importFavoriteJewels = (text: string): FavoriteJewelImportResult =>
   };
 };
 
-export const createTradeSeedResult = (seed: number): SearchWithSeed => ({
+export const createTradeSeedResult = (seed: number, conqueror?: string): SearchWithSeed => ({
   seed,
+  conqueror,
   weight: 0,
   statCounts: {},
   skills: []

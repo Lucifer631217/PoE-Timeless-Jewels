@@ -1,10 +1,10 @@
 ﻿<script lang="ts">
-  import { openTrade, type SearchResults, type SearchWithSeed, type TradeCondition } from '../skill_tree';
+  import { openTrade, type SearchResults, type SearchWithSeed, type TradeCondition, type TradeOpenMode } from '../skill_tree';
   import SearchResult from './SearchResult.svelte';
   import VirtualList from 'svelte-tiny-virtual-list';
 
   export let searchResults: SearchResults;
-  export let highlight: (newSeed: number, passives: number[]) => void;
+  export let highlight: (newSeed: number, passives: number[], conqueror?: string) => void;
   export let onSave: ((set: SearchWithSeed) => void) | undefined = undefined;
   export let onSaveGroup: ((sets: SearchWithSeed[]) => void) | undefined = undefined;
   export let groupResults = true;
@@ -14,12 +14,20 @@
   export let league: string;
   export let twLeague: string;
   export let tradeCondition: TradeCondition = 'instant_buyout';
+  export let tradeOpenMode: TradeOpenMode = 'multi-tab';
 
   const computeSize = (r: SearchWithSeed) =>
     8 + 56 + r.skills.reduce((total, skill) => total + 36 + Object.keys(skill.stats).length * 24, 0);
 
   let expandedGroup: string | number = '';
+  let multiTabTradeHint = '';
+  $: multiTabTradeHint =
+    tradeOpenMode === 'single-tab'
+      ? '目前為單分頁模式，每次交易只會開啟 1 個分頁。'
+      : '整組交易或大量結果交易可能一次開啟多個分頁；若沒有反應，請允許此網站的彈出式視窗與重新導向。';
 </script>
+
+<div class="trade-hint-banner">{multiTabTradeHint}</div>
 
 {#if groupResults}
   <div class="group-list">
@@ -47,14 +55,25 @@
           {/if}
           <button
             class="group-trade-btn intl-trade"
+            title={multiTabTradeHint}
             on:click|stopPropagation={() =>
-              openTrade(jewel, conqueror, searchResults.grouped[k], platform, league, 'international', tradeCondition)}>
+              openTrade(
+                jewel,
+                conqueror,
+                searchResults.grouped[k],
+                platform,
+                league,
+                'international',
+                tradeCondition,
+                tradeOpenMode
+              )}>
             本組國際服交易
           </button>
           <button
             class="group-trade-btn tw-trade"
+            title={multiTabTradeHint}
             on:click|stopPropagation={() =>
-              openTrade(jewel, conqueror, searchResults.grouped[k], platform, twLeague, 'tw', tradeCondition)}>
+              openTrade(jewel, conqueror, searchResults.grouped[k], platform, twLeague, 'tw', tradeCondition, tradeOpenMode)}>
             本組台服交易
           </button>
         </div>
@@ -77,7 +96,8 @@
                 {platform}
                 {league}
                 {twLeague}
-                {tradeCondition} />
+                {tradeCondition}
+                {tradeOpenMode} />
             </div>
           </VirtualList>
         </div>
@@ -108,13 +128,25 @@
           {platform}
           {league}
           {twLeague}
-          {tradeCondition} />
+          {tradeCondition}
+          {tradeOpenMode} />
       </div>
     </VirtualList>
   </div>
 {/if}
 
 <style>
+  .trade-hint-banner {
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    color: #bfdbfe;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
   .group-list {
     display: flex;
     flex-direction: column;
