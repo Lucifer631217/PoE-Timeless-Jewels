@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { openTrade, type SearchResults, type SearchWithSeed, type TradeCondition } from '../skill_tree';
   import SearchResult from './SearchResult.svelte';
   import VirtualList from 'svelte-tiny-virtual-list';

@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import type { SavedJewelDraft } from '../favorite_jewels';
 
   export let draft: SavedJewelDraft;

@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import type { SavedJewelEntry } from '../favorite_jewels';
   import { createTradeSeedResult } from '../favorite_jewels';
   import { openTrade, type TradeCondition } from '../skill_tree';
