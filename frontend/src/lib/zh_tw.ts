@@ -599,6 +599,10 @@ export const alternateAdditionNames: Record<string, string> = {
   // ── 聖堂 ──
   'templar_small_devotion': '信念',
   'templar_notable_devotion': '信念（卓越）',
+
+  // ── 卡爾葛 ──
+  'kalguuran_small_ward': '保護',
+  'kalguuran_attribute_ward': '保護',
 };
 
 /** 把英文特殊天賦名稱翻譯為繁體中文（同時支援 Addition ID） */
