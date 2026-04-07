@@ -1,1 +1,5 @@
+/calculator.wasm /calculator.wasm 200
+/wasm_exec.js /wasm_exec.js 200
+/version.json /version.json 200
+/media/* /media/:splat 200
 /* /index.html 200
