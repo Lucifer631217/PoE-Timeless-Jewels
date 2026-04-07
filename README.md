@@ -1,7 +1,7 @@
 # PoE Timeless Jewels
 
 《流亡黯道》永恆珠寶查詢工具，提供單點 Seed 查詢、天賦樹範圍檢視、詞綴反查，以及交易連結。
-目前版本：`v1.3.1`
+目前版本：`v1.3.2`
 
 ## 功能
 
@@ -21,6 +21,13 @@
 - Extracted data: [Vilsol/go-pob-data](https://github.com/Vilsol/go-pob-data)
 
 ## 更新紀錄
+
+### 2026-04-07 快取策略與版本更新（v1.3.2）
+
+- 將 `calculator.wasm` 改為可長效快取（版本參數切版），避免每次進站重抓大檔造成下載流量暴增。
+- `frontend/src/routes/+layout.svelte` 移除 WASM 載入時 `cache: 'no-store'`，改採瀏覽器快取策略。
+- 新增 `/media/**` 長效快取標頭，降低首頁標題影片重複下載流量。
+- 版本號同步更新：`APP_VERSION`、`frontend/package.json`、`frontend/static/version.json`。
 
 ### 2026-04-07 首頁標題影片
 

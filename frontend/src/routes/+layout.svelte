@@ -47,9 +47,7 @@
   async function bootWasm() {
     // @ts-ignore
     go = new globalThis.Go();
-    const response = await fetch(`${assets}/calculator.wasm?v=${APP_VERSION}`, {
-      cache: 'no-store'
-    });
+    const response = await fetch(`${assets}/calculator.wasm?v=${APP_VERSION}`);
     const data = await response.arrayBuffer();
     const result = await WebAssembly.instantiate(data, go.importObject);
     go.run(result.instance);
