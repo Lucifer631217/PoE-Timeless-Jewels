@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { base } from '$app/paths';
+  import { assets, base } from '$app/paths';
   import { APP_VERSION } from '../lib/version';
   const appVersion = APP_VERSION;
 </script>
@@ -7,9 +7,12 @@
 <div class="page-bg">
   <div class="hero-container">
     <header class="hero-header">
-      <div class="jewel-diamond">◆</div>
-      <h1 class="main-title">流亡黯道</h1>
-      <h2 class="sub-title">永恆珠寶計算器</h2>
+      <h2 class="sr-only">永恆珠寶計算器</h2>
+      <div class="title-video-shell" aria-hidden="true">
+        <video class="title-video" autoplay muted loop playsinline preload="metadata">
+          <source src={`${assets}/media/home-title.mp4`} type="video/mp4" />
+        </video>
+      </div>
       <div class="v-chip">{appVersion}</div>
     </header>
 
@@ -44,12 +47,12 @@
     align-items: center;
     justify-content: center;
     padding: 32px 16px;
-    background: radial-gradient(circle at center, #1a1208 0%, #0d0d0f 100%);
+    background: #050505;
   }
 
   .hero-container {
     width: 100%;
-    max-width: 640px;
+    max-width: 960px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -65,34 +68,45 @@
     gap: 8px;
   }
 
-  .jewel-diamond {
-    font-size: 2.5rem;
-    color: #c8a96e;
-    text-shadow: 0 0 24px rgba(200, 169, 110, 0.6);
-    margin-bottom: 8px;
-    animation: jewel-pulse 4s ease-in-out infinite;
+  .title-video-shell {
+    position: relative;
+    width: min(100%, 960px);
+    max-height: 280px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #050505;
   }
 
-  @keyframes jewel-pulse {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
+  .title-video-shell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 72px rgba(5, 5, 5, 0.96);
   }
 
-  .main-title {
-    font-family: 'Noto Serif TC', serif;
-    font-size: 2.8rem;
-    color: #c8a96e;
-    letter-spacing: 0.2em;
-    margin: 0;
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  .title-video {
+    display: block;
+    width: 100%;
+    max-height: 280px;
+    object-fit: contain;
+    background: #050505;
+    transform: scale(1.03);
+    filter: brightness(0.9) contrast(1.04);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 70%, transparent 100%);
+    mask-image: radial-gradient(ellipse at center, #000 70%, transparent 100%);
   }
 
-  .sub-title {
-    font-size: 1.1rem;
-    color: rgba(200, 169, 110, 0.6);
-    font-weight: 400;
-    letter-spacing: 0.1em;
-    margin: 0;
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .v-chip {
@@ -221,7 +235,8 @@
   }
 
   @media (max-width: 480px) {
-    .main-title { font-size: 2rem; }
+    .title-video-shell { max-height: 180px; }
+    .title-video { max-height: 180px; }
     .mystery-prose { font-size: 0.95rem; }
     .mega-button { width: 240px; height: 100px; }
   }
