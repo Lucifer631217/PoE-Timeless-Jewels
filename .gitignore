@@ -220,4 +220,5 @@ node_modules/
 .svelte-kit/
 build/
 go-pob-data-main/
+.gocache-pages/
 

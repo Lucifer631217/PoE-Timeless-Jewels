@@ -141,3 +141,4 @@
 - 2026-04-07：移除 `firebase.json` 與 `.firebaserc`，部署管線統一改為 Cloudflare Pages。
 - 2026-04-07：修正前端啟動卡住載入畫面問題。`+layout.svelte` 新增 WASM 請求狀態檢查與錯誤處理，初始化失敗時改為顯示錯誤訊息與「重新載入」按鈕，不再無限 loading。
 - 2026-04-07：Cloudflare Pages 修正 `_redirects` 規則，先排除 `calculator.wasm`、`wasm_exec.js`、`version.json` 與 `/media/*`，避免被 SPA fallback rewrite 成 `index.html`，導致 WASM 載入失敗。
+- 2026-04-07：版本更新至 `v1.3.3`，用於強制刷新 `calculator.wasm?v=...` 請求鍵，避免先前錯誤 HTML 回應被長快取（immutable）後持續命中。
