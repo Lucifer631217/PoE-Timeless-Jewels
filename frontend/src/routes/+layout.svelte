@@ -9,6 +9,7 @@
   import { APP_VERSION } from '../lib/version';
 
   let wasmLoading = true;
+  let loadError: string | null = null;
   const VERSION_CHECK_MARKER_KEY = 'app-version-reload-marker';
 
   // eslint-disable-next-line no-undef
@@ -45,17 +46,39 @@
   }
 
   async function bootWasm() {
-    // @ts-ignore
-    go = new globalThis.Go();
-    const response = await fetch(`${assets}/calculator.wasm?v=${APP_VERSION}`);
-    const data = await response.arrayBuffer();
-    const result = await WebAssembly.instantiate(data, go.importObject);
-    go.run(result.instance);
-    wasmLoading = false;
-    initializeCrystalline();
-    loadSkillTree();
+    try {
+      // @ts-ignore
+      go = new globalThis.Go();
+      const response = await fetch(`${assets}/calculator.wasm?v=${APP_VERSION}`);
+      if (!response.ok) {
+        throw new Error(`WASM 請求失敗（HTTP ${response.status}）`);
+      }
 
-    if (syncWrap) syncWrap.boot(data);
+      const contentType = response.headers.get('content-type') ?? '';
+      if (contentType.includes('text/html')) {
+        throw new Error('WASM 路徑回傳了 HTML（可能是部署 rewrite 或檔案路徑設定錯誤）');
+      }
+
+      const data = await response.arrayBuffer();
+      const result = await WebAssembly.instantiate(data, go.importObject);
+      go.run(result.instance);
+      wasmLoading = false;
+      loadError = null;
+      initializeCrystalline();
+      loadSkillTree();
+
+      if (syncWrap) syncWrap.boot(data);
+    } catch (error) {
+      wasmLoading = false;
+      loadError = error instanceof Error ? error.message : 'WASM 初始化失敗';
+      console.error('[bootWasm] failed:', error);
+    }
+  }
+
+  async function retryBoot() {
+    wasmLoading = true;
+    loadError = null;
+    await bootWasm();
   }
 
   if (browser) {
@@ -103,6 +126,16 @@
       <h1 class="loading-title">流亡黯道</h1>
       <h2 class="loading-subtitle">永恆珠寶計算器</h2>
       <p class="loading-text">載入中...</p>
+    </div>
+  </div>
+{:else if loadError}
+  <div class="loading-screen">
+    <div class="loading-content">
+      <h1 class="loading-title">載入失敗</h1>
+      <p class="loading-text">{loadError}</p>
+      <button class="retry-button" on:click={() => void retryBoot()}>
+        重新載入
+      </button>
     </div>
   </div>
 {:else}
@@ -183,6 +216,25 @@
     letter-spacing: 0.12em;
     margin-top: 4px;
     animation: blink 1.5s ease-in-out infinite;
+  }
+
+  .retry-button {
+    border: 1px solid rgba(200, 169, 110, 0.45);
+    border-radius: 12px;
+    background: rgba(200, 169, 110, 0.12);
+    color: #f0d6a6;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.12s ease, background-color 0.16s ease;
+  }
+
+  .retry-button:hover {
+    background: rgba(200, 169, 110, 0.2);
+  }
+
+  .retry-button:active {
+    transform: scale(0.96);
   }
 
   @keyframes blink {
