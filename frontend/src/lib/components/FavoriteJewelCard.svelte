@@ -12,14 +12,14 @@
 
   const summarizeSeeds = (seeds: number[]): string => {
     if (seeds.length <= 1) {
-      return `Seed ${seeds[0]}`;
+      return `種子 ${seeds[0]}`;
     }
 
     if (seeds.length <= 8) {
-      return `Seed ${seeds.join(', ')}`;
+      return `種子 ${seeds.join(', ')}`;
     }
 
-    return `Seed ${seeds.slice(0, 8).join(', ')} ... 共 ${seeds.length} 顆`;
+    return `種子 ${seeds.slice(0, 8).join(', ')} ... 共 ${seeds.length} 顆`;
   };
 
   $: normalizedSeeds = entry.seeds.length > 0 ? entry.seeds : [entry.seed];
@@ -40,7 +40,7 @@
         {#if entry.entryType === 'group'}
           <span>群組收藏 / 共 {groupSeedTotal} 顆</span>
         {:else}
-          <span>Seed {entry.seed}</span>
+          <span>種子 {entry.seed}</span>
         {/if}
         {#if entry.buildName}
           <span class="build-name">{entry.buildName}</span>

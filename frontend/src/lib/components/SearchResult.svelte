@@ -37,7 +37,7 @@
   }}>
   <div class="result-header">
     <div class="seed-label">
-      Seed {set.seed}
+      種子 {set.seed}
       {#if set.conqueror}
         <span class="weight-label">征服者：{translateConquerorName(set.conqueror)}</span>
       {/if}

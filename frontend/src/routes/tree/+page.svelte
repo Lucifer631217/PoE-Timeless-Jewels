@@ -433,41 +433,38 @@
     updateUrl();
   };
 
-  type PassiveVisibilityMode = 'notables' | 'passives' | 'mixed';
-  let passiveVisibilityMode: PassiveVisibilityMode = 'notables';
+  let showNotables = true;
+  let showPassives = false;
 
-  const setPassiveVisibilityMode = (targetMode: 'notables' | 'passives') => {
-    const nextDisabled = new Set<number>();
+  const applyPassiveVisibility = (nextShowNotables: boolean, nextShowPassives: boolean) => {
+    const nextDisabled = new Set(disabled);
     affectedNodes.forEach((node) => {
       if (node.skill === undefined || node.isJewelSocket || node.isMastery) {
         return;
       }
-      const shouldShow = targetMode === 'notables' ? node.isNotable : !node.isNotable;
-      if (!shouldShow) {
+      const shouldShow = node.isNotable ? nextShowNotables : nextShowPassives;
+      if (shouldShow) {
+        nextDisabled.delete(node.skill);
+      } else {
         nextDisabled.add(node.skill);
       }
     });
     disabled = nextDisabled;
-    passiveVisibilityMode = targetMode;
     updateUrl();
   };
 
-  $: {
-    const hasVisibleNotables = affectedNodes.some(
-      (node) => node.isNotable && node.skill !== undefined && !disabled.has(node.skill)
-    );
-    const hasVisiblePassives = affectedNodes.some(
-      (node) => !node.isNotable && node.skill !== undefined && !disabled.has(node.skill)
-    );
+  const toggleNotableVisibility = () => {
+    applyPassiveVisibility(!showNotables, showPassives);
+  };
 
-    if (hasVisibleNotables && !hasVisiblePassives) {
-      passiveVisibilityMode = 'notables';
-    } else if (!hasVisibleNotables && hasVisiblePassives) {
-      passiveVisibilityMode = 'passives';
-    } else {
-      passiveVisibilityMode = 'mixed';
-    }
-  }
+  const togglePassiveVisibility = () => {
+    applyPassiveVisibility(showNotables, !showPassives);
+  };
+
+  $: showNotables = affectedNodes.some((node) => node.isNotable && node.skill !== undefined && !disabled.has(node.skill));
+  $: showPassives = affectedNodes.some(
+    (node) => !node.isNotable && node.skill !== undefined && !disabled.has(node.skill)
+  );
 
   let groupResults = readBooleanPreference('groupResults', true);
   $: writePreference('groupResults', groupResults ? 'true' : 'false');
@@ -1031,8 +1028,8 @@
     removeFavoriteJewel(entry.id);
     favoriteFeedback =
       entry.entryType === 'group'
-        ? `已刪除群組收藏：${entry.jewelLabel} / 共 ${entry.seeds.length} 顆 Seed`
-        : `已刪除收藏：${entry.jewelLabel} / Seed ${entry.seed}`;
+        ? `已刪除群組收藏：${entry.jewelLabel} / 共 ${entry.seeds.length} 顆種子`
+        : `已刪除收藏：${entry.jewelLabel} / 種子 ${entry.seed}`;
     if (favoriteDraft?.id === entry.id) {
       favoriteDraft = null;
     }
@@ -1116,7 +1113,7 @@
               </button>
               <div>
                 <h3>{results ? '反查結果' : '永恆珠寶查詢'}</h3>
-                <p>依照 Seed 或指定詞綴設定條件，並即時查看天賦樹受到的永恆珠寶影響。</p>
+                <p>依照種子或指定詞綴設定條件，並即時查看天賦樹受到的永恆珠寶影響。</p>
               </div>
             </div>
             <div class="panel-title-actions">
@@ -1155,7 +1152,7 @@
                   面交
                 </button>
                 <div class="panel-note trade-hint trade-condition-hint">
-                  若一次開啟多個交易分頁，請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。
+                  種子若超過180個會一次開啟多個交易分頁，請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。
                 </div>
               </div>
 
@@ -1236,15 +1233,15 @@
                 <div class="bulk-actions bulk-actions-inline compact-row-actions">
                   <button
                     class="secondary-toggle"
-                    class:grouped={passiveVisibilityMode === 'notables'}
-                    on:click={() => setPassiveVisibilityMode('notables')}
+                    class:grouped={showNotables}
+                    on:click={toggleNotableVisibility}
                     disabled={searching}>
                     核心天賦
                   </button>
                   <button
                     class="secondary-toggle"
-                    class:grouped={passiveVisibilityMode === 'passives'}
-                    on:click={() => setPassiveVisibilityMode('passives')}
+                    class:grouped={showPassives}
+                    on:click={togglePassiveVisibility}
                     disabled={searching}>
                     小天賦
                   </button>
@@ -1291,7 +1288,7 @@
                         class="selection-button"
                         class:selected={mode === 'seed'}
                         on:click={() => setMode('seed')}>
-                        依 Seed
+                        依種子
                       </button>
                       <button
                         class="selection-button"
@@ -1306,20 +1303,20 @@
 
               {#if selectedJewel}
                 {#if selectedConqueror && hasValidConquerorSelection}
-                  {#if mode === 'seed'}
-                    <div class="field-stack">
-                      <h3>Seed</h3>
-                      <input type="number" bind:value={seed} on:blur={updateUrl} min={minSeed} max={maxSeed} />
-                      {#if seed < minSeed || seed > maxSeed}
-                        <div class="warning-text">Seed 必須介於 {minSeed} 到 {maxSeed} 之間。</div>
-                      {/if}
-                    </div>
+                    {#if mode === 'seed'}
+                      <div class="field-stack">
+                        <h3>種子</h3>
+                        <input type="number" bind:value={seed} on:blur={updateUrl} min={minSeed} max={maxSeed} />
+                        {#if seed < minSeed || seed > maxSeed}
+                          <div class="warning-text">種子必須介於 {minSeed} 到 {maxSeed} 之間。</div>
+                        {/if}
+                      </div>
 
-                    {#if canSaveCurrentSeed}
-                      <div class="seed-toolbar">
-                        <button class="primary-toggle" on:click={openFavoriteForCurrentSeed}>
-                          收藏目前 Seed
-                        </button>
+                      {#if canSaveCurrentSeed}
+                        <div class="seed-toolbar">
+                          <button class="primary-toggle" on:click={openFavoriteForCurrentSeed}>
+                            收藏目前種子
+                          </button>
                         <div class="toolbar-group">
                           <Select
                             items={sortResults}
@@ -1547,7 +1544,7 @@
           {/if}
 
           {#if favoriteCount === 0}
-            <div class="favorite-empty">目前還沒有收藏珠寶，可先從 Seed 結果或反查結果加入收藏。</div>
+            <div class="favorite-empty">目前還沒有收藏珠寶，可先從種子結果或反查結果加入收藏。</div>
           {:else}
             <div class="favorite-list">
               {#each $favoriteJewels as entry}
@@ -2022,7 +2019,8 @@
   }
 
   .trade-action {
-    min-width: 120px;
+    min-width: 96px;
+    padding: 10px 8px;
     text-align: center;
   }
 

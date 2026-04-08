@@ -13,14 +13,14 @@
 
   const summarizeSeeds = (seeds: number[]): string => {
     if (seeds.length <= 1) {
-      return `Seed ${seeds[0] || draft.seed}`;
+      return `種子 ${seeds[0] || draft.seed}`;
     }
 
     if (seeds.length <= 8) {
-      return `Seed ${seeds.join(', ')}`;
+      return `種子 ${seeds.join(', ')}`;
     }
 
-    return `Seed ${seeds.slice(0, 8).join(', ')} ... 共 ${seeds.length} 顆`;
+    return `種子 ${seeds.slice(0, 8).join(', ')} ... 共 ${seeds.length} 顆`;
   };
 
   let buildName = draft.buildName;
