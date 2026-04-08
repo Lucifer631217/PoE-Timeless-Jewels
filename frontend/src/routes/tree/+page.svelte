@@ -2366,18 +2366,23 @@
     :global(.tree-panel) {
       height: 100dvh;
       max-height: 100dvh;
+      padding-top: env(safe-area-inset-top);
+      box-sizing: border-box;
     }
 
     .panel-shell {
       height: 100dvh;
       max-height: 100dvh;
+      height: calc(100dvh - env(safe-area-inset-top));
+      max-height: calc(100dvh - env(safe-area-inset-top));
       overflow-y: auto;
       overflow-x: visible;
       -webkit-overflow-scrolling: touch;
+      scroll-padding-top: 16px;
     }
 
     .panel-header {
-      padding: 16px 16px 0;
+      padding: 12px 16px 0;
       gap: 12px;
     }
 
@@ -2391,8 +2396,6 @@
     }
 
     .panel-title-row,
-    .control-toolbar-row,
-    .trade-row,
     .seed-toolbar,
     .toolbar-group,
     .favorite-actions {
@@ -2408,8 +2411,6 @@
     }
 
     .favorite-entry-toggle,
-    .trade-toggle,
-    .trade-action,
     .primary-toggle,
     .secondary-toggle,
     .trade-feedback-close {
@@ -2439,14 +2440,86 @@
     }
 
     .trade-league-group {
-      flex-direction: column;
-      align-items: stretch;
+      flex-direction: row;
+      align-items: center;
     }
 
     .trade-condition-hint {
       margin-left: 0;
       min-width: 0;
       max-width: none;
+    }
+
+    .trade-row.compact-row {
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .trade-row.compact-row .trade-label {
+      min-width: 0;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .trade-row.compact-row .trade-toggle {
+      width: auto;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .trade-row.compact-row .trade-condition-hint {
+      flex: 1 1 100%;
+    }
+
+    .trade-league-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .trade-league-group .trade-label {
+      min-width: 0;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .trade-league-group .trade-select {
+      width: auto;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .trade-league-group .trade-action {
+      width: auto;
+      min-width: 96px;
+      flex: 0 0 auto;
+    }
+
+    .control-toolbar-row {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .control-toolbar-row > .secondary-toggle {
+      width: calc(50% - 4px);
+      flex: 0 0 calc(50% - 4px);
+    }
+
+    .control-toolbar-row .bulk-actions-inline {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      flex: none;
+      margin-left: 0;
+    }
+
+    .control-toolbar-row .bulk-actions-inline .secondary-toggle {
+      width: 100%;
+      min-width: 0;
     }
 
     .inline-select-row {

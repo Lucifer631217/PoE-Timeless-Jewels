@@ -274,14 +274,18 @@
 
     .group-trade-actions {
       width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 6px;
     }
 
     .group-trade-btn {
-      flex: 1 1 calc(50% - 3px);
+      flex: 1 1 0;
       min-width: 0;
       white-space: normal;
       line-height: 1.45;
       text-align: center;
+      padding: 6px 6px;
     }
   }
 </style>
