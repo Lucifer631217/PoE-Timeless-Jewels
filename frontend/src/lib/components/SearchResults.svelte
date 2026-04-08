@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { openTrade, type SearchResults, type SearchWithSeed, type TradeCondition } from '../skill_tree';
   import SearchResult from './SearchResult.svelte';
   import VirtualList from 'svelte-tiny-virtual-list';
@@ -33,7 +33,7 @@
             <span class="group-count">[{searchResults.grouped[k].length}]</span>
           </span>
           <span class="group-arrow">
-            {expandedGroup === k ? '▾' : '▸'}
+            {expandedGroup === k ? '收起' : '展開'}
           </span>
         </button>
         <div class="group-trade-actions">
@@ -41,7 +41,7 @@
             <button
               class="group-trade-btn group-save"
               on:click|stopPropagation={() => onSaveGroup?.(searchResults.grouped[k])}>
-              本組加入收藏
+              本組收藏
             </button>
           {/if}
           <button
@@ -88,7 +88,7 @@
     {#if onSaveGroup && searchResults.raw.length > 0}
       <div class="flat-list-actions">
         <button class="group-trade-btn group-save" on:click={() => onSaveGroup?.(searchResults.raw)}>
-          全部加入收藏
+          全部收藏
         </button>
       </div>
     {/if}
@@ -195,6 +195,16 @@
     cursor: pointer;
     transition: all 0.2s;
     font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .group-trade-btn.group-save,
+  .group-trade-btn.intl-trade,
+  .group-trade-btn.tw-trade {
+    min-width: 120px;
   }
 
   .group-save {
@@ -241,5 +251,37 @@
     display: flex;
     justify-content: flex-end;
     margin-bottom: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .group-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .group-toggle {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .group-label {
+      min-width: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .group-trade-actions {
+      width: 100%;
+    }
+
+    .group-trade-btn {
+      flex: 1 1 calc(50% - 3px);
+      min-width: 0;
+      white-space: normal;
+      line-height: 1.45;
+      text-align: center;
+    }
   }
 </style>

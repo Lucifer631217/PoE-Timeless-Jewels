@@ -651,10 +651,27 @@
 <svelte:window on:pointerup={mouseUp} on:pointermove={mouseMove} on:resize={resize} />
 
 {#if width && height}
-  <div on:resize={resize} style="touch-action: none; cursor: {cursor}">
-    <Canvas {width} {height} on:pointerdown={mouseDown} on:wheel={onScroll}>
-      <Layer {render} />
-    </Canvas>
+  <div class="skill-tree-root" on:resize={resize} style="cursor: {cursor}">
+    <div class="tree-canvas-layer">
+      <Canvas {width} {height} on:pointerdown={mouseDown} on:wheel={onScroll}>
+        <Layer {render} />
+      </Canvas>
+    </div>
     <slot />
   </div>
 {/if}
+
+<style>
+  .skill-tree-root {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .tree-canvas-layer {
+    position: absolute;
+    inset: 0;
+    touch-action: none;
+  }
+</style>

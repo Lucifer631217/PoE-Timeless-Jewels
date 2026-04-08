@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import type { SavedJewelEntry } from '../favorite_jewels';
   import { createTradeSeedResult } from '../favorite_jewels';
   import { openTrade, type TradeCondition } from '../skill_tree';
@@ -19,7 +19,7 @@
       return `Seed ${seeds.join(', ')}`;
     }
 
-    return `Seed ${seeds.slice(0, 8).join(', ')} ...（共 ${seeds.length} 筆）`;
+    return `Seed ${seeds.slice(0, 8).join(', ')} ... 共 ${seeds.length} 顆`;
   };
 
   $: normalizedSeeds = entry.seeds.length > 0 ? entry.seeds : [entry.seed];
@@ -38,7 +38,7 @@
       <div class="favorite-meta">
         <span>{entry.conquerorLabel}</span>
         {#if entry.entryType === 'group'}
-          <span>整組收藏（種子總數 {groupSeedTotal}）</span>
+          <span>群組收藏 / 共 {groupSeedTotal} 顆</span>
         {:else}
           <span>Seed {entry.seed}</span>
         {/if}
@@ -58,7 +58,7 @@
 
   <div class="meta-panel">
     {#if entry.estimatedValue}
-      <div class="value-pill">預估價值：{entry.estimatedValue}</div>
+      <div class="value-pill">估價：{entry.estimatedValue}</div>
     {/if}
 
     {#if entry.note}
@@ -235,5 +235,26 @@
   .favorite-actions button:hover,
   .trade-row button:hover {
     transform: scale(0.98);
+  }
+
+  @media (max-width: 768px) {
+    .favorite-card {
+      padding: 14px;
+      gap: 10px;
+    }
+
+    .favorite-top {
+      flex-direction: column;
+    }
+
+    .favorite-actions {
+      width: 100%;
+    }
+
+    .favorite-actions button,
+    .trade-row button {
+      flex: 1 1 100%;
+      width: 100%;
+    }
   }
 </style>

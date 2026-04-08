@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import Select from 'svelte-select';
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
@@ -60,9 +60,11 @@
 
   const anyConquerorOption: SelectOption<string> = {
     value: ANY_CONQUEROR,
-    label: '全部'
+    label: '全部征服者'
   };
   const appVersion = APP_VERSION;
+  const mobileBreakpoint = 1024;
+  const detectMobileViewport = (): boolean => browser && window.innerWidth <= mobileBreakpoint;
 
   const searchParams = $page.url.searchParams;
   const timelessJewels = data.TimelessJewels || {};
@@ -609,10 +611,10 @@
   };
 
   const sortResults = [
-    { label: '數量排序', value: 'count' },
-    { label: '詞綴排序', value: 'alphabet' },
+    { label: '出現次數', value: 'count' },
+    { label: '詞綴名稱', value: 'alphabet' },
     { label: '稀有度', value: 'rarity' },
-    { label: '估值', value: 'value' }
+    { label: '詞綴價值', value: 'value' }
   ] as const;
 
   let sortOrder =
@@ -671,6 +673,8 @@
   };
 
   let collapsed = false;
+  let isMobileViewport = false;
+  $: selectSearchable = !isMobileViewport;
   const platform = { value: 'PC', label: 'PC' };
   const selectFloatingConfig = { strategy: 'fixed' };
 
@@ -907,6 +911,9 @@
   let favoriteFeedback = '';
   let favoriteImportInput: HTMLInputElement;
   let favoriteDrawerOpen = false;
+  const closeFavoritePanel = () => {
+    favoriteDrawerOpen = false;
+  };
   $: favoriteCount = $favoriteJewels.length;
   $: canSaveCurrentSeed =
     mode === 'seed' &&
@@ -1001,11 +1008,11 @@
 
     favoriteFeedback = replaced
       ? draft.entryType === 'group'
-        ? '已更新整組收藏。'
-        : '已更新收藏項目。'
+        ? '已更新收藏群組。'
+        : '已更新收藏珠寶。'
       : draft.entryType === 'group'
-      ? '已新增整組收藏。'
-      : '已新增收藏項目。';
+      ? '已加入收藏群組。'
+      : '已加入收藏珠寶。';
     favoriteDraft = null;
   };
 
@@ -1022,7 +1029,7 @@
     removeFavoriteJewel(entry.id);
     favoriteFeedback =
       entry.entryType === 'group'
-        ? `已刪除整組收藏：${entry.jewelLabel} / 共 ${entry.seeds.length} 顆 Seed`
+        ? `已刪除群組收藏：${entry.jewelLabel} / 共 ${entry.seeds.length} 顆 Seed`
         : `已刪除收藏：${entry.jewelLabel} / Seed ${entry.seed}`;
     if (favoriteDraft?.id === entry.id) {
       favoriteDraft = null;
@@ -1055,17 +1062,28 @@
 
     try {
       const result = importFavoriteJewels(await file.text());
-      favoriteFeedback = `匯入完成：新增 ${result.imported}、覆蓋 ${result.replaced}、略過 ${result.skipped}。`;
+      favoriteFeedback = `已匯入收藏：新增 ${result.imported} 筆、覆蓋 ${result.replaced} 筆、跳過 ${result.skipped} 筆。`;
     } catch (error) {
-      favoriteFeedback = error instanceof Error ? error.message : '匯入失敗。';
+      favoriteFeedback = error instanceof Error ? error.message : '匯入收藏失敗。';
     } finally {
       input.value = '';
     }
   };
 
   onMount(() => {
+    const syncViewportState = () => {
+      isMobileViewport = detectMobileViewport();
+    };
+
+    syncViewportState();
+    collapsed = isMobileViewport;
+    window.addEventListener('resize', syncViewportState, { passive: true });
     getLeagues();
     getTWLeaguesData();
+
+    return () => {
+      window.removeEventListener('resize', syncViewportState);
+    };
   });
 </script>
 
@@ -1096,14 +1114,14 @@
               </button>
               <div>
                 <h3>{results ? '反查結果' : '永恆珠寶查詢'}</h3>
-                <p>可依 Seed 或詞綴條件查詢，並快速開啟交易頁與收藏常用結果。</p>
+                <p>依照 Seed 或指定詞綴設定條件，並即時查看天賦樹受到的永恆珠寶影響。</p>
               </div>
             </div>
             <div class="panel-title-actions">
               <button
                 class="secondary-toggle favorite-entry-toggle"
                 on:click={() => (favoriteDrawerOpen = !favoriteDrawerOpen)}>
-                {favoriteDrawerOpen ? '收合收藏珠寶' : `收藏珠寶 (${favoriteCount})`}
+                {favoriteDrawerOpen ? '關閉收藏珠寶' : `收藏珠寶 (${favoriteCount})`}
               </button>
             </div>
           </div>
@@ -1126,20 +1144,25 @@
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'instant_buyout'}
                   on:click={() => (tradeCondition = 'instant_buyout')}>
-                  即刻購買
+                  立即買斷
                 </button>
                 <button
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'}
                   on:click={() => (tradeCondition = 'in_person_online_in_league')}>
-                  面對面（聯盟上線）
+                  線上可密
                 </button>
               </div>
 
               <div class="trade-row">
                 <span class="trade-label">國際服聯盟</span>
                 <div class="trade-select">
-                  <Select items={leagues} bind:value={league} clearable={false} floatingConfig={selectFloatingConfig} />
+                  <Select
+                    items={leagues}
+                    bind:value={league}
+                    clearable={false}
+                    searchable={selectSearchable}
+                    floatingConfig={selectFloatingConfig} />
                 </div>
                 <button
                   class="trade-action intl-action"
@@ -1167,6 +1190,7 @@
                     items={twLeagues}
                     bind:value={twLeague}
                     clearable={false}
+                    searchable={selectSearchable}
                     floatingConfig={selectFloatingConfig} />
                 </div>
                 <button
@@ -1188,7 +1212,7 @@
                 </button>
               </div>
               <div class="panel-note trade-hint">
-                整組交易種子超過180個會一次開啟多個交易分頁；請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。
+                台服交易站開啟後大約會保留 180 秒。若條件過多或結果太大，建議先縮小聯盟、征服者或詞綴條件，再重新開啟交易查詢。
               </div>
             </div>
           {/if}
@@ -1200,10 +1224,10 @@
                 class:grouped={groupResults}
                 on:click={() => (groupResults = !groupResults)}
                 disabled={!searchOutcome}>
-                {groupResults ? '分組顯示中' : '已關閉分組'}
+                {groupResults ? '群組顯示結果' : '平鋪顯示結果'}
               </button>
               <button class="secondary-toggle" on:click={() => (results = !results)} disabled={!searchOutcome}>
-                {results ? '隱藏反查結果' : '查看反查結果'}
+                {results ? '隱藏反查結果' : '顯示反查結果'}
               </button>
               {#if selectedConqueror && hasValidConquerorSelection && mode === 'stats'}
                 <div class="bulk-actions bulk-actions-inline compact-row-actions">
@@ -1212,15 +1236,15 @@
                   <button
                     class="secondary-toggle"
                     on:click={selectAllNotables}
-                    disabled={searching || disabled.size === 0}>全選強力天賦</button>
+                    disabled={searching || disabled.size === 0}>全選顯著天賦</button>
                   <button
                     class="secondary-toggle"
                     on:click={selectAllPassives}
-                    disabled={searching || disabled.size === 0}>全選周圍天賦</button>
+                    disabled={searching || disabled.size === 0}>全選小天賦</button>
                   <button
                     class="secondary-toggle"
                     on:click={deselectAll}
-                    disabled={searching || disabled.size >= affectedNodes.length}>全部排除</button>
+                    disabled={searching || disabled.size >= affectedNodes.length}>全部取消</button>
                 </div>
               {/if}
             </div>
@@ -1231,25 +1255,27 @@
           {#if !results}
             <section class="control-section">
               <div class="inline-select-row" class:with-mode-toggle={selectedConqueror && hasValidConquerorSelection}>
-                <div class="field-stack field-stack-half">
+                <div class="field-stack field-stack-half field-stack-jewel">
                   <h3>珠寶</h3>
                   <Select
                     class="hero-select"
                     items={jewels}
                     bind:value={selectedJewel}
                     on:change={changeJewel}
+                    searchable={selectSearchable}
                     placeholder="選擇永恆珠寶"
                     floatingConfig={selectFloatingConfig} />
                 </div>
 
                 {#if selectedJewel}
-                  <div class="field-stack field-stack-half">
+                  <div class="field-stack field-stack-half field-stack-conqueror">
                     <h3>征服者</h3>
                     <Select
                       class="hero-select"
                       items={conquerors}
                       bind:value={selectedConqueror}
                       on:change={updateUrl}
+                      searchable={selectSearchable}
                       placeholder="選擇征服者"
                       floatingConfig={selectFloatingConfig} />
                   </div>
@@ -1282,22 +1308,28 @@
                       <h3>Seed</h3>
                       <input type="number" bind:value={seed} on:blur={updateUrl} min={minSeed} max={maxSeed} />
                       {#if seed < minSeed || seed > maxSeed}
-                        <div class="warning-text">Seed 範圍需介於 {minSeed} 到 {maxSeed}。</div>
+                        <div class="warning-text">Seed 必須介於 {minSeed} 到 {maxSeed} 之間。</div>
                       {/if}
                     </div>
 
                     {#if canSaveCurrentSeed}
                       <div class="seed-toolbar">
-                        <button class="primary-toggle" on:click={openFavoriteForCurrentSeed}
-                          >加入收藏（目前 Seed）</button>
+                        <button class="primary-toggle" on:click={openFavoriteForCurrentSeed}>
+                          收藏目前 Seed
+                        </button>
                         <div class="toolbar-group">
-                          <Select items={sortResults} bind:value={sortOrder} floatingConfig={selectFloatingConfig} />
+                          <Select
+                            items={sortResults}
+                            bind:value={sortOrder}
+                            searchable={selectSearchable}
+                            floatingConfig={selectFloatingConfig} />
                           <button
                             class="secondary-toggle"
                             class:selected={colored}
-                            on:click={() => (colored = !colored)}>彩色顯示</button>
-                          <button class="secondary-toggle" class:selected={split} on:click={() => (split = !split)}
-                            >分開顯示</button>
+                            on:click={() => (colored = !colored)}>彩色標示</button>
+                          <button class="secondary-toggle" class:selected={split} on:click={() => (split = !split)}>
+                            分欄顯示
+                          </button>
                         </div>
                       </div>
 
@@ -1320,7 +1352,7 @@
                       {:else}
                         <div class="combined-results split-results">
                           <div>
-                            <h3>強力天賦</h3>
+                            <h3>顯著天賦</h3>
                             <div class:rainbow={colored}>
                               {#each sortCombined(combineResults(seedResults, colored, 'notables'), sortOrder.value) as result}
                                 <div
@@ -1338,7 +1370,7 @@
                             </div>
                           </div>
                           <div>
-                            <h3>周圍天賦</h3>
+                            <h3>小天賦</h3>
                             <div class:rainbow={colored}>
                               {#each sortCombined(combineResults(seedResults, colored, 'passives'), sortOrder.value) as result}
                                 <div
@@ -1360,13 +1392,14 @@
                     {/if}
                   {:else if mode === 'stats'}
                     <div class="field-stack field-stack-inline">
-                      <h3>選擇要反查的詞綴</h3>
+                      <h3>選擇詞綴</h3>
                       <div class="stat-picker">
                         <Select
                           items={statItems}
                           on:change={selectStat}
                           bind:this={statSelector}
-                          placeholder="選擇要加入的詞綴"
+                          searchable={selectSearchable}
+                          placeholder="選擇要反查的詞綴"
                           floatingConfig={selectFloatingConfig}>
                           <svelte:fragment slot="item" let:item>
                             <span>{@html formatBilingualStatHtml(item.label)}</span>
@@ -1383,8 +1416,9 @@
                         {#each Object.keys(selectedStats) as statId}
                           <div class="selected-stat-card">
                             <div class="selected-stat-top">
-                              <button class="remove-stat" on:click={() => removeStat(selectedStats[statId].id)}
-                                >移除</button>
+                              <button class="remove-stat" on:click={() => removeStat(selectedStats[statId].id)}>
+                                移除
+                              </button>
                               <span class="selected-stat-text"
                                 >{@html formatBilingualStatHtml(
                                   translateStatBilingual(selectedStats[statId].id)
@@ -1392,7 +1426,7 @@
                             </div>
                             <div class="selected-stat-inputs">
                               <label class="inline-label inline-label-compact">
-                                <span>最小值</span>
+                                <span>最低數值</span>
                                 <input type="number" min="0" bind:value={selectedStats[statId].min} />
                               </label>
                               <label class="inline-label inline-label-compact">
@@ -1461,16 +1495,30 @@
   {/if}
 
   {#if favoriteDrawerOpen}
-    <section class="favorite-panel favorite-drawer">
+    <div class:favorite-modal-overlay={isMobileViewport}>
+      {#if isMobileViewport}
+        <button
+          type="button"
+          class="favorite-modal-backdrop"
+          aria-label="關閉收藏珠寶彈窗"
+          on:click={closeFavoritePanel}></button>
+      {/if}
+      <section
+        class="favorite-panel"
+        class:favorite-drawer={!isMobileViewport}
+        class:favorite-modal={isMobileViewport}
+        role="dialog"
+        tabindex="-1"
+        aria-modal={isMobileViewport}>
       <div class="favorite-header">
         <div>
           <h3>收藏珠寶</h3>
-          <p>目前共有 {favoriteCount} 筆收藏，可匯出或匯入 JSON。</p>
+          <p>目前共 {favoriteCount} 筆收藏，可匯出與匯入 JSON。</p>
         </div>
         <div class="favorite-actions">
           <button class="secondary-toggle" on:click={exportFavorites} disabled={favoriteCount === 0}>匯出 JSON</button>
           <button class="secondary-toggle" on:click={openImportDialog}>匯入 JSON</button>
-          <button class="secondary-toggle" on:click={() => (favoriteDrawerOpen = false)}>關閉</button>
+          <button class="secondary-toggle" on:click={closeFavoritePanel}>關閉</button>
           <input
             bind:this={favoriteImportInput}
             class="hidden-input"
@@ -1480,36 +1528,39 @@
         </div>
       </div>
 
-      {#if favoriteFeedback}
-        <div class="favorite-feedback">{favoriteFeedback}</div>
-      {/if}
+        <div class="favorite-content">
+          {#if favoriteFeedback}
+            <div class="favorite-feedback">{favoriteFeedback}</div>
+          {/if}
 
-      {#if favoriteDraft}
-        {#key `${favoriteDraft.id}:${favoriteDraft.entryType}:${favoriteDraft.seeds.join(',')}:${favoriteDraft.snapshot.length}:${favoriteDraft.buildName}:${favoriteDraft.estimatedValue}:${favoriteDraft.note}`}
-          <FavoriteJewelForm
-            draft={favoriteDraft}
-            existing={!!findFavoriteJewel(favoriteDraft.id)}
-            onSave={saveFavoriteDraft}
-            onCancel={() => (favoriteDraft = null)} />
-        {/key}
-      {/if}
+          {#if favoriteDraft}
+            {#key `${favoriteDraft.id}:${favoriteDraft.entryType}:${favoriteDraft.seeds.join(',')}:${favoriteDraft.snapshot.length}:${favoriteDraft.buildName}:${favoriteDraft.estimatedValue}:${favoriteDraft.note}`}
+              <FavoriteJewelForm
+                draft={favoriteDraft}
+                existing={!!findFavoriteJewel(favoriteDraft.id)}
+                onSave={saveFavoriteDraft}
+                onCancel={() => (favoriteDraft = null)} />
+            {/key}
+          {/if}
 
-      {#if favoriteCount === 0}
-        <div class="favorite-empty">目前尚無收藏。你可以從 Seed 結果或反查結果直接加入收藏。</div>
-      {:else}
-        <div class="favorite-list">
-          {#each $favoriteJewels as entry}
-            <FavoriteJewelCard
-              {entry}
-              league={league?.value || 'Standard'}
-              twLeague={twLeague?.value || 'Standard'}
-              {tradeCondition}
-              onEdit={editFavorite}
-              onDelete={deleteFavorite} />
-          {/each}
+          {#if favoriteCount === 0}
+            <div class="favorite-empty">目前還沒有收藏珠寶，可先從 Seed 結果或反查結果加入收藏。</div>
+          {:else}
+            <div class="favorite-list">
+              {#each $favoriteJewels as entry}
+                <FavoriteJewelCard
+                  {entry}
+                  league={league?.value || 'Standard'}
+                  twLeague={twLeague?.value || 'Standard'}
+                  {tradeCondition}
+                  onEdit={editFavorite}
+                  onDelete={deleteFavorite} />
+              {/each}
+            </div>
+          {/if}
         </div>
-      {/if}
-    </section>
+      </section>
+    </div>
   {/if}
 
   <div class="repo-link-wrap">
@@ -1518,6 +1569,11 @@
 </SkillTree>
 
 <style lang="postcss">
+  :global(html),
+  :global(body) {
+    overscroll-behavior-y: none;
+  }
+
   :global(.tree-panel) {
     position: absolute;
     top: 0;
@@ -1545,6 +1601,7 @@
     height: 100vh;
     max-height: 100vh;
     overflow: visible;
+    overscroll-behavior-y: contain;
   }
 
   .panel-header {
@@ -1566,6 +1623,8 @@
     overflow-x: visible;
     position: relative;
     z-index: 1;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   .panel-title-row {
@@ -2124,6 +2183,17 @@
     line-height: 1.6;
   }
 
+  .favorite-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .favorite-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2223,6 +2293,42 @@
     box-shadow: -10px 0 28px rgba(0, 0, 0, 0.45);
   }
 
+  .favorite-modal-overlay {
+    position: fixed;
+    inset: 0;
+    padding: 20px;
+    background: rgba(5, 7, 11, 0.58);
+    backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+  }
+
+  .favorite-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .favorite-modal.favorite-panel {
+    width: min(960px, calc(100vw - 40px));
+    max-height: min(860px, calc(100vh - 40px));
+    height: min(860px, calc(100vh - 40px));
+    border-radius: 24px;
+    background: #111317;
+    border: 1px solid rgba(200, 169, 110, 0.24);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+  }
+
   @media (max-width: 1024px) {
     :global(.tree-panel),
     .favorite-drawer {
@@ -2230,8 +2336,95 @@
       max-width: 100vw;
     }
 
+    :global(.tree-panel) {
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+
+    .panel-shell {
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow-y: auto;
+      overflow-x: visible;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .panel-header {
+      padding: 16px 16px 0;
+      gap: 12px;
+    }
+
+    .panel-body {
+      flex: none;
+      min-height: auto;
+      overflow: visible;
+      padding: 16px;
+      padding-top: 12px;
+      gap: 16px;
+    }
+
+    .panel-title-row,
+    .control-toolbar-row,
+    .trade-row,
+    .seed-toolbar,
+    .toolbar-group,
+    .favorite-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .panel-title-actions,
+    .trade-select,
+    .toolbar-group,
+    .favorite-actions {
+      width: 100%;
+    }
+
+    .favorite-entry-toggle,
+    .trade-toggle,
+    .trade-action,
+    .primary-toggle,
+    .secondary-toggle,
+    .trade-feedback-close {
+      width: 100%;
+    }
+
+    .trade-feedback {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .control-section,
+    .favorite-panel,
+    .trade-panel {
+      border-radius: 20px;
+    }
+
+    .control-section,
+    .favorite-panel {
+      padding: 14px;
+      gap: 14px;
+    }
+
+    .trade-panel {
+      padding: 14px;
+      gap: 10px;
+    }
+
     .inline-select-row {
       grid-template-columns: 1fr;
+    }
+
+    .field-stack-jewel {
+      order: 1;
+    }
+
+    .field-stack-conqueror {
+      order: 2;
+    }
+
+    .field-stack-mode {
+      order: 3;
     }
 
     .inline-mode-toggle,
@@ -2245,6 +2438,15 @@
       min-width: 0;
     }
 
+    .inline-mode-toggle {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .inline-mode-toggle .selection-button {
+      width: 100%;
+    }
+
     .compact-row-actions {
       margin-left: 0;
     }
@@ -2254,13 +2456,55 @@
       align-items: stretch;
     }
 
+    .field-stack-inline h3 {
+      white-space: normal;
+    }
+
     .selected-stat-card {
       flex-direction: column;
       align-items: stretch;
+      padding: 12px;
     }
 
     .selected-stat-inputs {
       flex-wrap: wrap;
+    }
+
+    .search-control-row .search-button {
+      margin-left: 0;
+    }
+
+    .selection-button,
+    .secondary-toggle,
+    .primary-toggle,
+    .trade-toggle,
+    .trade-action {
+      min-height: 44px;
+      font-size: 13px;
+    }
+
+    .combined-row {
+      padding: 12px;
+      line-height: 1.6;
+    }
+
+    .favorite-modal-overlay {
+      padding: 0;
+      align-items: stretch;
+    }
+
+    .favorite-modal.favorite-panel {
+      width: 100vw;
+      max-width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .repo-link-wrap {
+      position: static;
+      margin: 0 20px 20px;
     }
   }
 
@@ -2302,3 +2546,6 @@
     }
   }
 </style>
+
+
+

@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import type { SearchWithSeed, TradeCondition } from '../skill_tree';
   import { formatBilingualStatHtml, skillTree, translateStatBilingual, openTrade } from '../skill_tree';
   import { translateConquerorName } from '../zh_tw';
@@ -39,13 +39,13 @@
     <div class="seed-label">
       Seed {set.seed}
       {#if set.conqueror}
-        <span class="weight-label">征服者 {translateConquerorName(set.conqueror)}</span>
+        <span class="weight-label">征服者：{translateConquerorName(set.conqueror)}</span>
       {/if}
-      <span class="weight-label">權重 {set.weight}</span>
+      <span class="weight-label">權重：{set.weight}</span>
     </div>
     <div class="trade-actions">
       {#if onSave}
-        <button class="trade-btn save-btn" on:click|stopPropagation={() => onSave?.(set)}>加入收藏</button>
+        <button class="trade-btn save-btn" on:click|stopPropagation={() => onSave?.(set)}>收藏</button>
       {/if}
       <button
         class="trade-btn intl-trade"
@@ -135,6 +135,16 @@
     cursor: pointer;
     transition: all 0.2s;
     font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .save-btn,
+  .intl-trade,
+  .tw-trade {
+    min-width: 104px;
   }
 
   .save-btn {
@@ -200,5 +210,28 @@
     flex-direction: column;
     gap: 2px;
     line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .result-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .seed-label {
+      text-align: left;
+    }
+
+    .trade-actions {
+      justify-content: stretch;
+    }
+
+    .trade-btn {
+      flex: 1 1 calc(50% - 3px);
+      min-width: 0;
+      white-space: normal;
+      line-height: 1.45;
+      text-align: center;
+    }
   }
 </style>

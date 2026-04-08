@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import type { SavedJewelDraft } from '../favorite_jewels';
 
   export let draft: SavedJewelDraft;
@@ -20,7 +20,7 @@
       return `Seed ${seeds.join(', ')}`;
     }
 
-    return `Seed ${seeds.slice(0, 8).join(', ')} ...（共 ${seeds.length} 筆）`;
+    return `Seed ${seeds.slice(0, 8).join(', ')} ... 共 ${seeds.length} 顆`;
   };
 
   let buildName = draft.buildName;
@@ -47,7 +47,7 @@
       <p>
         {draft.jewelLabel} / {draft.conquerorLabel} /
         {#if draft.entryType === 'group'}
-          整組收藏
+          群組收藏
         {:else}
           單顆收藏
         {/if}
@@ -58,23 +58,23 @@
   </div>
 
   <label class="editor-field">
-    <span>流派 / 角色</span>
-    <input class="build-name-input" bind:value={buildName} placeholder="例如：毒弓遊俠、冰矛秘術家" />
+    <span>角色名稱 / 流派名稱</span>
+    <input class="build-name-input" bind:value={buildName} placeholder="例如：暴徒旋風斬、秘術漩渦" />
   </label>
 
   <label class="editor-field">
-    <span>預估價值</span>
-    <input bind:value={estimatedValue} placeholder="例如：50 Divine、3 鏡子" />
+    <span>預估價格</span>
+    <input bind:value={estimatedValue} placeholder="例如：10 Divine、50 Chaos" />
   </label>
 
   <label class="editor-field">
     <span>備註</span>
-    <textarea bind:value={note} rows="3" placeholder="可記錄用途、交易條件、角色需求等"></textarea>
+    <textarea bind:value={note} rows="3" placeholder="可記錄用途、交易備忘、適用流派或其他補充資訊"></textarea>
   </label>
 
   <div class="editor-actions">
     <button class="primary-action" type="button" on:click={handleSave}>
-      {existing ? '更新收藏' : '儲存收藏'}
+      {existing ? '更新收藏' : '加入收藏'}
     </button>
     <button class="secondary-action" type="button" on:click={onCancel}>取消</button>
   </div>
@@ -195,5 +195,24 @@
   .primary-action:hover,
   .secondary-action:hover {
     transform: scale(0.98);
+  }
+
+  @media (max-width: 768px) {
+    .favorite-editor {
+      padding: 14px;
+      gap: 10px;
+    }
+
+    .editor-header,
+    .editor-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .editor-close,
+    .primary-action,
+    .secondary-action {
+      width: 100%;
+    }
   }
 </style>
