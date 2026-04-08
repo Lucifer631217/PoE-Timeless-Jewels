@@ -1152,6 +1152,9 @@
                   on:click={() => (tradeCondition = 'in_person_online_in_league')}>
                   線上可密
                 </button>
+                <div class="panel-note trade-hint trade-condition-hint">
+                  台服交易站開啟後大約會保留 180 秒。若條件過多或結果太大，建議先縮小聯盟、征服者或詞綴條件，再重新開啟交易查詢。
+                </div>
               </div>
 
               <div class="trade-row">
@@ -1210,9 +1213,6 @@
                   disabled={!searchOutcome || !twLeague}>
                   台服交易
                 </button>
-              </div>
-              <div class="panel-note trade-hint">
-                台服交易站開啟後大約會保留 180 秒。若條件過多或結果太大，建議先縮小聯盟、征服者或詞綴條件，再重新開啟交易查詢。
               </div>
             </div>
           {/if}
@@ -1909,6 +1909,13 @@
     color: #bfdbfe;
   }
 
+  .trade-condition-hint {
+    margin-left: auto;
+    flex: 1;
+    min-width: 320px;
+    max-width: 640px;
+  }
+
   .trade-feedback {
     border-radius: 16px;
     padding: 12px 14px;
@@ -1995,6 +2002,11 @@
     padding: 10px 14px;
     color: white;
     font-size: 12px;
+  }
+
+  .trade-action {
+    min-width: 120px;
+    text-align: center;
   }
 
   .intl-action {
@@ -2409,6 +2421,12 @@
     .trade-panel {
       padding: 14px;
       gap: 10px;
+    }
+
+    .trade-condition-hint {
+      margin-left: 0;
+      min-width: 0;
+      max-width: none;
     }
 
     .inline-select-row {
