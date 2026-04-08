@@ -319,6 +319,8 @@
 
   let results = false;
   let minTotalWeight: number | undefined = 0;
+  let minTotalWeightInput: HTMLInputElement | undefined;
+  let minTotalWeightSearchButton: HTMLButtonElement | undefined;
   let searching = false;
   let currentSeed = 0;
   let searchOutcome: SearchResultsType | undefined;
@@ -455,6 +457,34 @@
 
   const clearMinTotalWeight = () => {
     minTotalWeight = undefined;
+  };
+
+  const revealMinWeightControls = () => {
+    if (!browser || !isMobileViewport) {
+      return;
+    }
+
+    const target = minTotalWeightSearchButton || minTotalWeightInput;
+    if (!target) {
+      return;
+    }
+
+    const scrollIntoView = () => {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    };
+
+    scrollIntoView();
+    window.setTimeout(scrollIntoView, 120);
+    window.setTimeout(scrollIntoView, 280);
+  };
+
+  const handleMinTotalWeightFocus = () => {
+    clearMinTotalWeight();
+    revealMinWeightControls();
   };
 
   const normalizeMinTotalWeight = () => {
@@ -1454,11 +1484,16 @@
                           <input
                             type="number"
                             min="0"
+                            bind:this={minTotalWeightInput}
                             bind:value={minTotalWeight}
-                            on:focus={clearMinTotalWeight}
+                            on:focus={handleMinTotalWeightFocus}
                             on:blur={normalizeMinTotalWeight} />
                         </label>
-                        <button class="primary-toggle search-button" on:click={search} disabled={searching}>
+                        <button
+                          class="primary-toggle search-button"
+                          bind:this={minTotalWeightSearchButton}
+                          on:click={search}
+                          disabled={searching}>
                           {#if searching && selectedJewel}
                             搜尋中 {currentSeed} / {maxSeed}
                           {:else}
@@ -2631,6 +2666,15 @@
     .repo-link-wrap {
       position: static;
       margin: 0 20px 20px;
+    }
+
+    .collapsed-trigger {
+      position: fixed;
+      top: 12px;
+      top: calc(env(safe-area-inset-top) + 12px);
+      left: 12px;
+      margin: 0;
+      z-index: 80;
     }
   }
 
