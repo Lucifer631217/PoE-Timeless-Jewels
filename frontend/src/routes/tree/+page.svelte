@@ -318,7 +318,7 @@
   };
 
   let results = false;
-  let minTotalWeight = 0;
+  let minTotalWeight: number | undefined = 0;
   let searching = false;
   let currentSeed = 0;
   let searchOutcome: SearchResultsType | undefined;
@@ -395,7 +395,7 @@
           conqueror: conquerorValue,
           nodes: searchNodes,
           stats: Object.values(selectedStats),
-          minTotalWeight
+          minTotalWeight: minTotalWeight ?? 0
         };
 
         const result = await syncWrap.search(
@@ -451,6 +451,16 @@
     });
     disabled = nextDisabled;
     updateUrl();
+  };
+
+  const clearMinTotalWeight = () => {
+    minTotalWeight = undefined;
+  };
+
+  const normalizeMinTotalWeight = () => {
+    if (minTotalWeight === undefined || Number.isNaN(minTotalWeight) || minTotalWeight < 0) {
+      minTotalWeight = 0;
+    }
   };
 
   const toggleNotableVisibility = () => {
@@ -1441,7 +1451,12 @@
                       <div class="field-stack compact-field search-control-row">
                         <label class="inline-label inline-label-compact inline-label-total">
                           <span>最低總權重</span>
-                          <input type="number" min="0" bind:value={minTotalWeight} />
+                          <input
+                            type="number"
+                            min="0"
+                            bind:value={minTotalWeight}
+                            on:focus={clearMinTotalWeight}
+                            on:blur={normalizeMinTotalWeight} />
                         </label>
                         <button class="primary-toggle search-button" on:click={search} disabled={searching}>
                           {#if searching && selectedJewel}
@@ -2364,21 +2379,21 @@
     }
 
     :global(.tree-panel) {
-      height: 100dvh;
-      max-height: 100dvh;
+      position: fixed;
+      top: 0;
+      height: 100svh;
+      max-height: 100svh;
       padding-top: env(safe-area-inset-top);
       box-sizing: border-box;
     }
 
     .panel-shell {
-      height: 100dvh;
-      max-height: 100dvh;
-      height: calc(100dvh - env(safe-area-inset-top));
-      max-height: calc(100dvh - env(safe-area-inset-top));
+      height: 100%;
+      max-height: 100%;
       overflow-y: auto;
       overflow-x: visible;
       -webkit-overflow-scrolling: touch;
-      scroll-padding-top: 16px;
+      scroll-padding-top: calc(env(safe-area-inset-top) + 16px);
     }
 
     .panel-header {
