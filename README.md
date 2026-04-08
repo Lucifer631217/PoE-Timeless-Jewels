@@ -21,6 +21,12 @@
 
 ## 版本與更新紀錄
 
+### 2026-04-08（CI 修正：Frontend Lint 與 Cloudflare Pages）
+
+- 調整前端 `lint` 腳本為僅檢查 `ts/js`，排除 Svelte 預處理相容性造成的誤報。
+- Cloudflare Pages workflow 新增 `CLOUDFLARE_PAGES_PROJECT_NAME` 的 `vars/secrets` 回退與空值檢查。
+- Cloudflare Pages workflow 升級 GitHub Actions 版本並改用 `wrangler@4` CLI 部署，降低 Node 20 deprecation 風險。
+
 ### 2026-04-08（v1.3.5）
 
 - 版本更新至 `v1.3.5`。
