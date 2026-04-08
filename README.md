@@ -27,6 +27,7 @@
 - Cloudflare Pages workflow 新增 `CLOUDFLARE_PAGES_PROJECT_NAME` 的 `vars/secrets` 回退與空值檢查。
 - Cloudflare Pages workflow 升級 GitHub Actions 版本並改用 `wrangler@4` CLI 部署，降低 Node 20 deprecation 風險。
 - Cloudflare Pages workflow 在未設定 `CLOUDFLARE_PAGES_PROJECT_NAME` 時，改為自動回退使用 repository 名稱，避免在部署前直接中止。
+- Cloudflare Pages workflow 新增 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID` 前置檢查，缺少時提前輸出明確錯誤。
 
 ### 2026-04-08（v1.3.5）
 
