@@ -62,8 +62,8 @@ jobs:
         run: |
           project_name="${CF_PAGES_PROJECT_VAR:-$CF_PAGES_PROJECT_SECRET}"
           if [ -z "$project_name" ]; then
-            echo "::error::Missing CLOUDFLARE_PAGES_PROJECT_NAME in repository vars or secrets."
-            exit 1
+            project_name="${GITHUB_REPOSITORY#*/}"
+            echo "::warning::CLOUDFLARE_PAGES_PROJECT_NAME not set. Falling back to repository name: $project_name"
           fi
           echo "project_name=$project_name" >> "$GITHUB_OUTPUT"
 
