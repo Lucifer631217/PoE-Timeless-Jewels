@@ -28,6 +28,7 @@
 - Cloudflare Pages workflow 升級 GitHub Actions 版本並改用 `wrangler@4` CLI 部署，降低 Node 20 deprecation 風險。
 - Cloudflare Pages workflow 在未設定 `CLOUDFLARE_PAGES_PROJECT_NAME` 時，改為自動回退使用 repository 名稱，避免在部署前直接中止。
 - Cloudflare Pages workflow 新增 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID` 前置檢查，缺少時提前輸出明確錯誤。
+- Cloudflare Pages 改回使用 Cloudflare 原生 Git 連動部署；GitHub workflow 只保留 wasm 與前端建置檢查，不再用 wrangler 發佈。
 
 ### 2026-04-08（v1.3.5）
 
