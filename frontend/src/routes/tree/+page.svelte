@@ -433,39 +433,41 @@
     updateUrl();
   };
 
-  const selectAll = () => {
-    disabled.clear();
-    disabled = disabled;
-  };
+  type PassiveVisibilityMode = 'notables' | 'passives' | 'mixed';
+  let passiveVisibilityMode: PassiveVisibilityMode = 'notables';
 
-  const selectAllNotables = () => {
+  const setPassiveVisibilityMode = (targetMode: 'notables' | 'passives') => {
+    const nextDisabled = new Set<number>();
     affectedNodes.forEach((node) => {
-      if (node.isNotable && node.skill !== undefined) {
-        disabled.delete(node.skill);
+      if (node.skill === undefined || node.isJewelSocket || node.isMastery) {
+        return;
+      }
+      const shouldShow = targetMode === 'notables' ? node.isNotable : !node.isNotable;
+      if (!shouldShow) {
+        nextDisabled.add(node.skill);
       }
     });
-    disabled = disabled;
+    disabled = nextDisabled;
+    passiveVisibilityMode = targetMode;
+    updateUrl();
   };
 
-  const selectAllPassives = () => {
-    affectedNodes.forEach((node) => {
-      if (!node.isNotable && node.skill !== undefined) {
-        disabled.delete(node.skill);
-      }
-    });
-    disabled = disabled;
-  };
+  $: {
+    const hasVisibleNotables = affectedNodes.some(
+      (node) => node.isNotable && node.skill !== undefined && !disabled.has(node.skill)
+    );
+    const hasVisiblePassives = affectedNodes.some(
+      (node) => !node.isNotable && node.skill !== undefined && !disabled.has(node.skill)
+    );
 
-  const deselectAll = () => {
-    affectedNodes
-      .filter((node) => !node.isJewelSocket && !node.isMastery && node.skill !== undefined)
-      .forEach((node) => {
-        if (node.skill !== undefined) {
-          disabled.add(node.skill);
-        }
-      });
-    disabled = disabled;
-  };
+    if (hasVisibleNotables && !hasVisiblePassives) {
+      passiveVisibilityMode = 'notables';
+    } else if (!hasVisibleNotables && hasVisiblePassives) {
+      passiveVisibilityMode = 'passives';
+    } else {
+      passiveVisibilityMode = 'mixed';
+    }
+  }
 
   let groupResults = readBooleanPreference('groupResults', true);
   $: writePreference('groupResults', groupResults ? 'true' : 'false');
@@ -1144,75 +1146,76 @@
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'instant_buyout'}
                   on:click={() => (tradeCondition = 'instant_buyout')}>
-                  立即買斷
+                  即刻購買
                 </button>
                 <button
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'}
                   on:click={() => (tradeCondition = 'in_person_online_in_league')}>
-                  線上可密
+                  面交
                 </button>
                 <div class="panel-note trade-hint trade-condition-hint">
-                  台服交易站開啟後大約會保留 180 秒。若條件過多或結果太大，建議先縮小聯盟、征服者或詞綴條件，再重新開啟交易查詢。
+                  若一次開啟多個交易分頁，請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。
                 </div>
               </div>
 
-              <div class="trade-row">
-                <span class="trade-label">國際服聯盟</span>
-                <div class="trade-select">
-                  <Select
-                    items={leagues}
-                    bind:value={league}
-                    clearable={false}
-                    searchable={selectSearchable}
-                    floatingConfig={selectFloatingConfig} />
+              <div class="trade-row trade-league-row">
+                <div class="trade-league-group">
+                  <span class="trade-label">國際服聯盟</span>
+                  <div class="trade-select">
+                    <Select
+                      items={leagues}
+                      bind:value={league}
+                      clearable={false}
+                      searchable={selectSearchable}
+                      floatingConfig={selectFloatingConfig} />
+                  </div>
+                  <button
+                    class="trade-action intl-action"
+                    on:click={() =>
+                      searchOutcome &&
+                      league &&
+                      openTrade(
+                        searchJewel,
+                        searchConqueror,
+                        searchOutcome.raw,
+                        platform.value,
+                        league.value,
+                        'international',
+                        tradeCondition
+                      )}
+                    disabled={!searchOutcome || !league}>
+                    國際服交易
+                  </button>
                 </div>
-                <button
-                  class="trade-action intl-action"
-                  on:click={() =>
-                    searchOutcome &&
-                    league &&
-                    openTrade(
-                      searchJewel,
-                      searchConqueror,
-                      searchOutcome.raw,
-                      platform.value,
-                      league.value,
-                      'international',
-                      tradeCondition
-                    )}
-                  disabled={!searchOutcome || !league}>
-                  國際服交易
-                </button>
-              </div>
-
-              <div class="trade-row">
-                <span class="trade-label">台服聯盟</span>
-                <div class="trade-select">
-                  <Select
-                    items={twLeagues}
-                    bind:value={twLeague}
-                    clearable={false}
-                    searchable={selectSearchable}
-                    floatingConfig={selectFloatingConfig} />
+                <div class="trade-league-group">
+                  <span class="trade-label">台服聯盟</span>
+                  <div class="trade-select">
+                    <Select
+                      items={twLeagues}
+                      bind:value={twLeague}
+                      clearable={false}
+                      searchable={selectSearchable}
+                      floatingConfig={selectFloatingConfig} />
+                  </div>
+                  <button
+                    class="trade-action tw-action"
+                    on:click={() =>
+                      searchOutcome &&
+                      twLeague &&
+                      openTrade(
+                        searchJewel,
+                        searchConqueror,
+                        searchOutcome.raw,
+                        'PC',
+                        twLeague.value,
+                        'tw',
+                        tradeCondition
+                      )}
+                    disabled={!searchOutcome || !twLeague}>
+                    台服交易
+                  </button>
                 </div>
-                <button
-                  class="trade-action tw-action"
-                  on:click={() =>
-                    searchOutcome &&
-                    twLeague &&
-                    openTrade(
-                      searchJewel,
-                      searchConqueror,
-                      searchOutcome.raw,
-                      'PC',
-                      twLeague.value,
-                      'tw',
-                      tradeCondition
-                    )}
-                  disabled={!searchOutcome || !twLeague}>
-                  台服交易
-                </button>
               </div>
             </div>
           {/if}
@@ -1231,20 +1234,20 @@
               </button>
               {#if selectedConqueror && hasValidConquerorSelection && mode === 'stats'}
                 <div class="bulk-actions bulk-actions-inline compact-row-actions">
-                  <button class="secondary-toggle" on:click={selectAll} disabled={searching || disabled.size === 0}
-                    >全選</button>
                   <button
                     class="secondary-toggle"
-                    on:click={selectAllNotables}
-                    disabled={searching || disabled.size === 0}>全選顯著天賦</button>
+                    class:grouped={passiveVisibilityMode === 'notables'}
+                    on:click={() => setPassiveVisibilityMode('notables')}
+                    disabled={searching}>
+                    核心天賦
+                  </button>
                   <button
                     class="secondary-toggle"
-                    on:click={selectAllPassives}
-                    disabled={searching || disabled.size === 0}>全選小天賦</button>
-                  <button
-                    class="secondary-toggle"
-                    on:click={deselectAll}
-                    disabled={searching || disabled.size >= affectedNodes.length}>全部取消</button>
+                    class:grouped={passiveVisibilityMode === 'passives'}
+                    on:click={() => setPassiveVisibilityMode('passives')}
+                    disabled={searching}>
+                    小天賦
+                  </button>
                 </div>
               {/if}
             </div>
@@ -1980,6 +1983,20 @@
     flex: 1;
   }
 
+  .trade-league-row {
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .trade-league-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+  }
+
   .trade-toggle,
   .secondary-toggle {
     padding: 10px 12px;
@@ -2421,6 +2438,11 @@
     .trade-panel {
       padding: 14px;
       gap: 10px;
+    }
+
+    .trade-league-group {
+      flex-direction: column;
+      align-items: stretch;
     }
 
     .trade-condition-hint {
