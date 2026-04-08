@@ -512,7 +512,9 @@ export const translateStat = (id: number | string, roll?: number | undefined): s
 
 export const translateStatEnglish = (id: number | string, roll?: number | undefined): string => {
   const template = getEnglishStatTemplate(id, roll);
-  if (!template) return '';
+  if (!template) {
+    return '';
+  }
   return applyRollToTemplate(template, roll).trim();
 };
 
@@ -520,12 +522,16 @@ export const translateStatBilingual = (id: number | string, roll?: number | unde
   const localized = (translateStat(id, roll) || '').trim();
   const english = (translateStatEnglish(id, roll) || '').trim();
 
-  if (!localized && !english) return '';
+  if (!localized && !english) {
+    return '';
+  }
   if (!english || localized.toLowerCase() === english.toLowerCase()) {
     return localized;
   }
 
-  if (!localized) return english;
+  if (!localized) {
+    return english;
+  }
 
   return `${localized} / ${english}`;
 };

@@ -618,14 +618,10 @@ export const translateAlternateSkillName = (englishName: string): string => {
 };
 
 /** 把英文珠寶名稱翻譯為繁體中文 */
-export const translateJewelName = (id: number, englishName: string): string => {
-  return jewelNames[id] ?? englishName;
-};
+export const translateJewelName = (id: number, englishName: string): string => jewelNames[id] ?? englishName;
 
 /** 把英文征服者名稱翻譯為繁體中文 */
-export const translateConquerorName = (englishName: string): string => {
-  return conquerorNames[englishName] ?? englishName;
-};
+export const translateConquerorName = (englishName: string): string => conquerorNames[englishName] ?? englishName;
 
 export const englishFallbackTranslations: Record<string, string> = {
   'Divine Flesh': '神聖血肉',
@@ -864,9 +860,8 @@ const lookupEnglishFallbackTranslation = (englishTemplate: string): string | und
   );
 };
 
-export const getStatDescription = (id: number, englishTemplate: string): string => {
-  return lookupEnglishFallbackTranslation(englishTemplate) ?? statDescriptions[id] ?? englishTemplate;
-};
+export const getStatDescription = (id: number, englishTemplate: string): string =>
+  lookupEnglishFallbackTranslation(englishTemplate) ?? statDescriptions[id] ?? englishTemplate;
 
 /** 翻譯屬性文字並填入數值 */
 export const translateStatText = (id: number, template: string, roll: number): string => {
