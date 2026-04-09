@@ -4,7 +4,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { proxy } from 'comlink';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import SkillTree from '../../lib/components/SkillTree.svelte';
   import FavoriteJewelCard from '../../lib/components/FavoriteJewelCard.svelte';
   import FavoriteJewelForm from '../../lib/components/FavoriteJewelForm.svelte';
@@ -18,6 +18,7 @@
     removeFavoriteJewel,
     serializeFavoriteJewels,
     upsertFavoriteJewel,
+    type FavoriteQueryContext,
     type FavoriteTradeTarget,
     type FavoriteSnapshotSkill,
     type SavedJewelDraft,
@@ -879,13 +880,216 @@
     };
   };
 
+  const buildDefaultDisabledForLocation = (location: number): number[] => {
+    const socket = skillTree.nodes[location];
+    if (!socket) {
+      return [];
+    }
+
+    return getAffectedNodes(socket)
+      .filter((node) => node.skill !== undefined && !node.isJewelSocket && !node.isMastery && !node.isNotable)
+      .map((node) => node.skill as number)
+      .sort((left, right) => left - right);
+  };
+
+  const buildCurrentQueryContext = (
+    modeValue: 'seed' | 'stats',
+    options: {
+      conquerorOverride?: string;
+      seedOverride?: number;
+    } = {}
+  ): FavoriteQueryContext | undefined => {
+    if (!selectedJewel || !selectedConqueror) {
+      return undefined;
+    }
+
+    const queryContext: FavoriteQueryContext = {
+      mode: modeValue,
+      jewel: selectedJewel.value,
+      conqueror: options.conquerorOverride || selectedConqueror.value
+    };
+
+    if (modeValue === 'seed') {
+      if (circledNode !== undefined) {
+        queryContext.location = circledNode;
+        queryContext.disabled = buildDefaultDisabledForLocation(circledNode);
+      }
+
+      const resolvedSeed = options.seedOverride ?? seed;
+      if (Number.isFinite(resolvedSeed) && resolvedSeed > 0) {
+        queryContext.seed = Math.trunc(resolvedSeed);
+      }
+
+      return queryContext;
+    }
+
+    if (circledNode !== undefined) {
+      queryContext.location = circledNode;
+    }
+
+    queryContext.disabled = [...disabled].sort((left, right) => left - right);
+    queryContext.selectedStats = Object.values(selectedStats).map((item) => ({
+      id: item.id,
+      min: item.min,
+      weight: item.weight
+    }));
+    queryContext.minTotalWeight = minTotalWeight ?? 0;
+
+    return queryContext;
+  };
+
+  const buildSnapshotComparisonKey = (snapshot: FavoriteSnapshotSkill[]): string =>
+    mergeSnapshotSkills([snapshot])
+      .map((item) => `${item.passive}:${uniqueStrings(item.stats).sort().join('|')}`)
+      .sort()
+      .join('||');
+
+  const inferLegacyFavoriteQueryContext = (entry: SavedJewelEntry): FavoriteQueryContext | null => {
+    if (entry.entryType !== 'single' || entry.seed <= 0) {
+      return null;
+    }
+
+    const conquerorCandidates =
+      entry.conqueror === ANY_CONQUEROR
+        ? Object.keys(timelessJewelConquerors[entry.jewel] || {})
+        : [entry.conqueror].filter(Boolean);
+
+    if (conquerorCandidates.length === 0) {
+      return null;
+    }
+
+    const expectedKey = buildSnapshotComparisonKey(entry.snapshot);
+    if (!expectedKey) {
+      return null;
+    }
+
+    const matchedLocations = (skillTree.jewelSlots || []).filter((socketId) => {
+      const socket = skillTree.nodes[socketId];
+      if (!socket) {
+        return false;
+      }
+
+      const calculatedSnapshot = getAffectedNodes(socket)
+        .filter((node) => node.skill !== undefined && !!treeToPassive[node.skill] && !node.isJewelSocket && !node.isMastery)
+        .flatMap((node) => {
+          const skillId = node.skill;
+          if (skillId === undefined) {
+            return [];
+          }
+
+          const passive = treeToPassive[skillId];
+          return conquerorCandidates
+            .map((conquerorValue) =>
+              calculator.Calculate(passive ? passive.Index : 0, entry.seed, entry.jewel, conquerorValue)
+            )
+            .map((result) => (result ? buildSnapshotFromCalculatedResult({ node: skillId, conqueror: '', result }) : null))
+            .filter((item): item is FavoriteSnapshotSkill => !!item);
+        });
+
+      return buildSnapshotComparisonKey(calculatedSnapshot) === expectedKey;
+    });
+
+    if (matchedLocations.length !== 1) {
+      return null;
+    }
+
+    return {
+      mode: 'seed',
+      jewel: entry.jewel,
+      conqueror: entry.conqueror,
+      seed: entry.seed,
+      location: matchedLocations[0],
+      disabled: buildDefaultDisabledForLocation(matchedLocations[0])
+    };
+  };
+
+  const applyFavoriteQueryContext = async (
+    queryContext: FavoriteQueryContext,
+    options: {
+      runSearch?: boolean;
+      highlightedPassives?: number[];
+    } = {}
+  ): Promise<boolean> => {
+    const matchedJewel = jewels.find((item) => item.value === queryContext.jewel);
+    if (!matchedJewel) {
+      favoriteFeedback = '這筆收藏對應的珠寶已不存在，無法回推到查詢。';
+      return false;
+    }
+
+    const availableConquerors = timelessJewelConquerors[queryContext.jewel] || {};
+    const matchedConqueror =
+      queryContext.conqueror === ANY_CONQUEROR
+        ? anyConquerorOption
+        : availableConquerors[queryContext.conqueror]
+          ? {
+              value: queryContext.conqueror,
+              label: translateConquerorName(queryContext.conqueror)
+            }
+          : undefined;
+
+    if (!matchedConqueror) {
+      favoriteFeedback = '這筆收藏對應的征服者已不存在，無法回推到查詢。';
+      return false;
+    }
+
+    const availableStatsForJewel = new Set(Object.keys(allPossibleStats[queryContext.jewel.toString()] || {}).map((id) => parseInt(id)));
+    const nextSelectedStats: Record<string, StatConfig> = {};
+    (queryContext.selectedStats || []).forEach((stat) => {
+      if (!availableStatsForJewel.has(stat.id)) {
+        return;
+      }
+
+      nextSelectedStats[stat.id] = {
+        id: stat.id,
+        min: stat.min,
+        weight: stat.weight
+      };
+    });
+
+    selectedJewel = matchedJewel;
+    selectedConqueror = matchedConqueror;
+    mode = queryContext.mode;
+    seed = queryContext.seed ?? 0;
+    circledNode = queryContext.location;
+    disabled = new Set(
+      queryContext.location !== undefined
+        ? (queryContext.disabled && queryContext.disabled.length > 0
+            ? queryContext.disabled
+            : buildDefaultDisabledForLocation(queryContext.location))
+        : []
+    );
+    defaultDisabledInitializedNode = queryContext.location;
+    selectedStats = nextSelectedStats;
+    minTotalWeight = queryContext.minTotalWeight ?? 0;
+    highlighted = options.highlightedPassives ? [...new Set(options.highlightedPassives)] : [];
+    searchOutcome = undefined;
+    results = false;
+    favoriteDraft = null;
+    favoriteDrawerOpen = !isMobileViewport;
+    updateUrl();
+
+    await tick();
+
+    if (
+      options.runSearch &&
+      queryContext.mode === 'stats' &&
+      queryContext.location !== undefined &&
+      Object.keys(nextSelectedStats).length > 0
+    ) {
+      await search();
+    }
+
+    return true;
+  };
+
   const createFavoriteDraft = ({
     seeds,
     tradeTargets,
     snapshot,
     entryType,
     conquerorOverride,
-    seedTotal
+    seedTotal,
+    queryContext
   }: {
     seeds: number[];
     tradeTargets?: FavoriteTradeTarget[];
@@ -893,6 +1097,7 @@
     entryType?: 'single' | 'group';
     conquerorOverride?: string;
     seedTotal?: number;
+    queryContext?: FavoriteQueryContext;
   }): SavedJewelDraft | null => {
     if (!selectedJewel || !selectedConqueror) {
       return null;
@@ -942,7 +1147,8 @@
       buildName: '',
       note: collectSnapshotNote(snapshot),
       estimatedValue: '',
-      snapshot
+      snapshot,
+      queryContext
     });
   };
 
@@ -972,7 +1178,8 @@
         { seed, conqueror: selectedConquerorValue === ANY_CONQUEROR ? undefined : selectedConquerorValue }
       ],
       snapshot,
-      entryType: 'single'
+      entryType: 'single',
+      queryContext: buildCurrentQueryContext('seed')
     });
     if (!draft) {
       return;
@@ -989,7 +1196,11 @@
       tradeTargets: [{ seed: set.seed, conqueror: set.conqueror }],
       snapshot: buildSnapshotFromSearchResult(set),
       entryType: 'single',
-      conquerorOverride: set.conqueror
+      conquerorOverride: set.conqueror,
+      queryContext: buildCurrentQueryContext('stats', {
+        conquerorOverride: set.conqueror,
+        seedOverride: set.seed
+      })
     });
     if (!draft) {
       return;
@@ -1025,7 +1236,10 @@
       snapshot,
       entryType: 'group',
       conquerorOverride,
-      seedTotal: sets.length
+      seedTotal: sets.length,
+      queryContext: buildCurrentQueryContext('stats', {
+        conquerorOverride
+      })
     });
     if (!draft) {
       return;
@@ -1062,6 +1276,49 @@
     favoriteDrawerOpen = true;
     favoriteFeedback = '';
     results = false;
+  };
+
+  const applyFavoriteToQuery = async (entry: SavedJewelEntry) => {
+    const highlightedPassives = entry.snapshot.map((item) => item.passive);
+    const resolvedQueryContext = entry.queryContext || inferLegacyFavoriteQueryContext(entry);
+
+    if (resolvedQueryContext) {
+      const applied = await applyFavoriteQueryContext(resolvedQueryContext, {
+        runSearch: resolvedQueryContext.mode === 'stats',
+        highlightedPassives: resolvedQueryContext.mode === 'seed' ? highlightedPassives : undefined
+      });
+
+      if (!applied) {
+        return;
+      }
+
+      favoriteFeedback = entry.queryContext
+        ? '已將收藏回推到查詢。'
+        : '已將舊收藏回推到查詢，並自動補回可辨識的插槽位置。';
+      return;
+    }
+
+    const fallbackMode: 'seed' | 'stats' = entry.entryType === 'single' ? 'seed' : 'stats';
+    const applied = await applyFavoriteQueryContext(
+      {
+        mode: fallbackMode,
+        jewel: entry.jewel,
+        conqueror: entry.conqueror,
+        seed: entry.entryType === 'single' ? entry.seed : undefined
+      },
+      {
+        highlightedPassives: fallbackMode === 'seed' ? highlightedPassives : undefined
+      }
+    );
+
+    if (!applied) {
+      return;
+    }
+
+    favoriteFeedback =
+      entry.entryType === 'group'
+        ? '這筆舊的群組收藏沒有保存原始查詢條件，已先帶入珠寶與征服者；若要完整回推，需重新收藏一次。'
+        : '這筆舊收藏缺少插槽位置，只帶入了珠寶、征服者與種子；若要完整回推，需重新收藏一次。';
   };
 
   const deleteFavorite = (entry: SavedJewelEntry) => {
@@ -1603,6 +1860,7 @@
                   league={league?.value || 'Standard'}
                   twLeague={twLeague?.value || 'Standard'}
                   {tradeCondition}
+                  onApplyQuery={applyFavoriteToQuery}
                   onEdit={editFavorite}
                   onDelete={deleteFavorite} />
               {/each}

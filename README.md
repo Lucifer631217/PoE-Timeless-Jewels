@@ -18,23 +18,15 @@
 - 上游專案：https://github.com/Vilsol/timeless-jewels
 - 參考資料：https://github.com/Vilsol/go-pob-data
 
-
 ## 版本與更新紀錄
 
-### 2026-04-08（CI 修正：Frontend Lint 與 Cloudflare Pages）
+### 2026-04-09（v1.4.0）
 
-- 調整前端 `lint` 腳本為僅檢查 `ts/js`，排除 Svelte 預處理相容性造成的誤報。
-- Cloudflare Pages workflow 新增 `CLOUDFLARE_PAGES_PROJECT_NAME` 的 `vars/secrets` 回退與空值檢查。
-- Cloudflare Pages workflow 升級 GitHub Actions 版本並改用 `wrangler@4` CLI 部署，降低 Node 20 deprecation 風險。
-- Cloudflare Pages workflow 在未設定 `CLOUDFLARE_PAGES_PROJECT_NAME` 時，改為自動回退使用 repository 名稱，避免在部署前直接中止。
-- Cloudflare Pages workflow 新增 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID` 前置檢查，缺少時提前輸出明確錯誤。
-- Cloudflare Pages 改回使用 Cloudflare 原生 Git 連動部署；GitHub workflow 只保留 wasm 與前端建置檢查，不再用 wrangler 發佈。
-
-### 2026-04-08（v1.3.5）
-
-- 版本更新至 `v1.3.5`。
-- 整理行動版天賦樹面板互動、收藏彈窗與按鈕排版。
-- 清理天賦樹頁、收藏卡片、收藏表單與搜尋結果元件的繁中文案顯示。
+- 版本更新至 `v1.4.0`。
+- 收藏珠寶新增「回推查詢」操作，可將收藏內容帶回天賦樹查詢面板。
+- 新建立的收藏會同步保存查詢上下文，之後可完整回填珠寶、征服者、插槽位置、反查詞綴與權重條件。
+- 舊的單顆收藏若未保存查詢上下文，會嘗試依收藏快照自動推回插槽位置。
+- 舊的群組收藏若缺少原始查詢條件，會先帶入可還原的珠寶與征服者資訊，並提示需重新收藏才能完整回推。
 
 ### 2026-04-08（行動介面優化）
 
@@ -49,5 +41,5 @@
 
 ### 2026-04-07（v1.3.3）
 
- 搬家到 Cloudflare Pages
- 更新首頁標題
+搬家到 Cloudflare Pages
+更新首頁標題

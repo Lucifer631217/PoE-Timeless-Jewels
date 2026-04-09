@@ -7,6 +7,7 @@
   export let league = 'Standard';
   export let twLeague = 'Standard';
   export let tradeCondition: TradeCondition = 'instant_buyout';
+  export let onApplyQuery: (entry: SavedJewelEntry) => void;
   export let onEdit: (entry: SavedJewelEntry) => void;
   export let onDelete: (entry: SavedJewelEntry) => void;
 
@@ -51,6 +52,7 @@
       {/if}
     </div>
     <div class="favorite-actions">
+      <button type="button" on:click={() => onApplyQuery(entry)}>回推查詢</button>
       <button type="button" on:click={() => onEdit(entry)}>編輯</button>
       <button type="button" class="danger" on:click={() => onDelete(entry)}>刪除</button>
     </div>

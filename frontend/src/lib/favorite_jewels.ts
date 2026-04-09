@@ -18,6 +18,23 @@ export interface FavoriteSnapshotSkill {
   stats: string[];
 }
 
+export interface FavoriteQueryStat {
+  id: number;
+  min: number;
+  weight: number;
+}
+
+export interface FavoriteQueryContext {
+  mode: 'seed' | 'stats';
+  jewel: number;
+  conqueror: string;
+  seed?: number;
+  location?: number;
+  disabled?: number[];
+  selectedStats?: FavoriteQueryStat[];
+  minTotalWeight?: number;
+}
+
 export interface SavedJewelEntry {
   id: string;
   jewel: number;
@@ -33,6 +50,7 @@ export interface SavedJewelEntry {
   note: string;
   estimatedValue: string;
   snapshot: FavoriteSnapshotSkill[];
+  queryContext?: FavoriteQueryContext;
   createdAt: string;
   updatedAt: string;
 }
@@ -82,6 +100,20 @@ const normalizeSeeds = (value: unknown, fallbackSeed?: unknown): number[] => {
   }
 
   return [...seedSet].sort((left, right) => left - right);
+};
+
+const normalizeIntegerArray = (value: unknown): number[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return [
+    ...new Set(
+      value
+        .filter((item): item is number => typeof item === 'number' && Number.isFinite(item))
+        .map((item) => Math.trunc(item))
+    )
+  ].sort((left, right) => left - right);
 };
 
 const normalizeTradeTargets = (
@@ -151,6 +183,75 @@ const sanitizeSnapshot = (snapshot: unknown): FavoriteSnapshotSkill[] => {
     .filter((item) => item.stats.length > 0);
 };
 
+const sanitizeFavoriteQueryStats = (value: unknown): FavoriteQueryStat[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .filter(isRecord)
+    .filter(
+      (item) =>
+        typeof item.id === 'number' &&
+        Number.isFinite(item.id) &&
+        typeof item.min === 'number' &&
+        Number.isFinite(item.min) &&
+        typeof item.weight === 'number' &&
+        Number.isFinite(item.weight)
+    )
+    .map((item) => ({
+      id: Math.trunc(item.id as number),
+      min: Math.max(0, Math.trunc(item.min as number)),
+      weight: Math.max(0, Math.trunc(item.weight as number))
+    }));
+};
+
+const sanitizeFavoriteQueryContext = (value: unknown): FavoriteQueryContext | undefined => {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  if (
+    (value.mode !== 'seed' && value.mode !== 'stats') ||
+    typeof value.jewel !== 'number' ||
+    !Number.isFinite(value.jewel) ||
+    typeof value.conqueror !== 'string' ||
+    !value.conqueror.trim()
+  ) {
+    return undefined;
+  }
+
+  const queryContext: FavoriteQueryContext = {
+    mode: value.mode,
+    jewel: Math.trunc(value.jewel),
+    conqueror: value.conqueror.trim()
+  };
+
+  if (typeof value.seed === 'number' && Number.isFinite(value.seed)) {
+    queryContext.seed = Math.trunc(value.seed);
+  }
+
+  if (typeof value.location === 'number' && Number.isFinite(value.location)) {
+    queryContext.location = Math.trunc(value.location);
+  }
+
+  const disabled = normalizeIntegerArray(value.disabled);
+  if (disabled.length > 0) {
+    queryContext.disabled = disabled;
+  }
+
+  const selectedStats = sanitizeFavoriteQueryStats(value.selectedStats);
+  if (selectedStats.length > 0) {
+    queryContext.selectedStats = selectedStats;
+  }
+
+  if (typeof value.minTotalWeight === 'number' && Number.isFinite(value.minTotalWeight)) {
+    queryContext.minTotalWeight = Math.max(0, Math.trunc(value.minTotalWeight));
+  }
+
+  return queryContext;
+};
+
 const sanitizeEntryFromUnknown = (value: unknown): SavedJewelEntry | null => {
   if (!isRecord(value)) {
     return null;
@@ -182,7 +283,9 @@ const sanitizeEntryFromUnknown = (value: unknown): SavedJewelEntry | null => {
   const declaredEntryType = value.entryType === 'group' || value.entryType === 'single' ? value.entryType : undefined;
   const entryType: FavoriteEntryType = declaredEntryType || (seeds.length > 1 ? 'group' : 'single');
   const rawSeedTotal =
-    typeof value.seedTotal === 'number' && Number.isFinite(value.seedTotal) ? Math.trunc(value.seedTotal) : seeds.length;
+    typeof value.seedTotal === 'number' && Number.isFinite(value.seedTotal)
+      ? Math.trunc(value.seedTotal)
+      : seeds.length;
   const seedTotal = entryType === 'group' ? Math.max(seeds.length, rawSeedTotal) : 1;
   const tradeTargets = normalizeTradeTargets(value.tradeTargets, seeds, value.conqueror);
 
@@ -201,6 +304,7 @@ const sanitizeEntryFromUnknown = (value: unknown): SavedJewelEntry | null => {
     note: rawNote,
     estimatedValue: typeof value.estimatedValue === 'string' ? value.estimatedValue.trim() : '',
     snapshot: sanitizeSnapshot(value.snapshot),
+    queryContext: sanitizeFavoriteQueryContext(value.queryContext),
     createdAt,
     updatedAt
   };
@@ -228,8 +332,8 @@ const parseEntries = (raw: string | null): SavedJewelEntry[] => {
     const entries = Array.isArray(parsed)
       ? parsed
       : isRecord(parsed) && Array.isArray(parsed.entries)
-        ? parsed.entries
-        : [];
+      ? parsed.entries
+      : [];
 
     return sortEntries(entries.map(sanitizeEntryFromUnknown).filter((entry): entry is SavedJewelEntry => !!entry));
   } catch {
