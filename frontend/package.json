@@ -1,7 +1,8 @@
 {
   "name": "frontend",
-  "version": "1.4.0",
+  "version": "1.5.3",
   "scripts": {
+    "build:wasm": "powershell -ExecutionPolicy Bypass -File .\\build-wasm.ps1",
     "dev": "vite dev",
     "build": "vite build",
     "package": "svelte-kit package",

@@ -7,6 +7,7 @@
   import { syncWrap } from '../lib/worker';
   import { initializeCrystalline } from '../lib/types';
   import { APP_VERSION } from '../lib/version';
+  import { currentUiMessages, initializeLocale, locale, localeOptions, setLocale, type OfficialStatLocale } from '../lib/i18n';
 
   let wasmLoading = true;
   let loadError: string | null = null;
@@ -84,6 +85,7 @@
   if (browser) {
     onMount(() => {
       let disposed = false;
+      initializeLocale();
 
       const ensureFreshRuntime = async () => {
         if (disposed) return;
@@ -116,6 +118,19 @@
   }
 </script>
 
+<div class="locale-switcher-shell">
+  <label class="locale-switcher">
+    <span>{$currentUiMessages.languageLabel}</span>
+    <select
+      value={$locale}
+      on:change={(event) => setLocale((event.currentTarget as HTMLSelectElement).value as OfficialStatLocale)}>
+      {#each localeOptions as option}
+        <option value={option.value}>{option.label}</option>
+      {/each}
+    </select>
+  </label>
+</div>
+
 {#if wasmLoading}
   <div class="loading-screen">
     <div class="loading-content">
@@ -123,18 +138,18 @@
         <div class="jewel-ring"></div>
         <div class="jewel-core"></div>
       </div>
-      <h1 class="loading-title">流亡黯道</h1>
-      <h2 class="loading-subtitle">永恆珠寶計算器</h2>
-      <p class="loading-text">載入中...</p>
+      <h1 class="loading-title">Path of Exile</h1>
+      <h2 class="loading-subtitle">{$currentUiMessages.appTitle}</h2>
+      <p class="loading-text">{$currentUiMessages.loading}</p>
     </div>
   </div>
 {:else if loadError}
   <div class="loading-screen">
     <div class="loading-content">
-      <h1 class="loading-title">載入失敗</h1>
+      <h1 class="loading-title">{$currentUiMessages.loadFailed}</h1>
       <p class="loading-text">{loadError}</p>
       <button class="retry-button" on:click={() => void retryBoot()}>
-        重新載入
+        {$currentUiMessages.reload}
       </button>
     </div>
   </div>
@@ -143,6 +158,39 @@
 {/if}
 
 <style lang="postcss">
+  .locale-switcher-shell {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 120;
+    pointer-events: none;
+  }
+
+  .locale-switcher {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(200, 169, 110, 0.18);
+    background: rgba(18, 18, 22, 0.72);
+    backdrop-filter: blur(18px);
+    color: rgba(241, 226, 193, 0.82);
+    font-size: 12px;
+    line-height: 1.6;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .locale-switcher select {
+    border-radius: 16px;
+    border: 1px solid rgba(200, 169, 110, 0.18);
+    background: rgba(8, 8, 10, 0.78);
+    color: #f4ead5;
+    padding: 8px 12px;
+    line-height: 1.6;
+  }
+
   .loading-screen {
     display: flex;
     align-items: center;
@@ -240,5 +288,18 @@
   @keyframes blink {
     0%, 100% { opacity: 0.4; }
     50% { opacity: 0.9; }
+  }
+
+  @media (max-width: 640px) {
+    .locale-switcher-shell {
+      top: calc(env(safe-area-inset-top) + 12px);
+      right: 12px;
+      left: 12px;
+    }
+
+    .locale-switcher {
+      width: 100%;
+      justify-content: space-between;
+    }
   }
 </style>

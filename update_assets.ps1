@@ -129,7 +129,17 @@ Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/ra
 Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/raw/PassiveSkills.json.gz" -OutFile ".\data\passive_skills.json.gz"
 Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/raw/Stats.json.gz" -OutFile ".\data\stats.json.gz"
 
-# Stat translations (EN)
+# Stat translations (all official locales)
+$officialStatLocales = @('cn', 'de', 'en', 'es', 'fr', 'jp', 'kr', 'po', 'ru', 'th', 'tw')
+New-Item -ItemType Directory -Force -Path ".\data\stat_translations" | Out-Null
+foreach ($locale in $officialStatLocales) {
+    New-Item -ItemType Directory -Force -Path ".\data\stat_translations\$locale" | Out-Null
+    Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/stat_translations/$locale/stat_descriptions.json.gz" -OutFile ".\data\stat_translations\$locale\stat_descriptions.json.gz"
+    Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/stat_translations/$locale/passive_skill_stat_descriptions.json.gz" -OutFile ".\data\stat_translations\$locale\passive_skill_stat_descriptions.json.gz"
+    Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/stat_translations/$locale/passive_skill_aura_stat_descriptions.json.gz" -OutFile ".\data\stat_translations\$locale\passive_skill_aura_stat_descriptions.json.gz"
+}
+
+# Keep legacy English exports for compatibility with the current data package.
 Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/stat_translations/en/stat_descriptions.json.gz" -OutFile ".\data\stat_descriptions.json.gz"
 Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/stat_translations/en/passive_skill_stat_descriptions.json.gz" -OutFile ".\data\passive_skill_stat_descriptions.json.gz"
 Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/stat_translations/en/passive_skill_aura_stat_descriptions.json.gz" -OutFile ".\data\passive_skill_aura_stat_descriptions.json.gz"

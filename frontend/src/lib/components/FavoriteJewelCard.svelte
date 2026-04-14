@@ -1,7 +1,9 @@
 ﻿<script lang="ts">
   import type { SavedJewelEntry } from '../favorite_jewels';
   import { createTradeSeedResult } from '../favorite_jewels';
-  import { openTrade, type TradeCondition } from '../skill_tree';
+  import { ANY_CONQUEROR, openTrade, type TradeCondition } from '../skill_tree';
+  import { currentUiMessages, locale, translateUi } from '../i18n';
+  import { translateConquerorName, translateJewelName } from '../zh_tw';
 
   export let entry: SavedJewelEntry;
   export let league = 'Standard';
@@ -13,14 +15,17 @@
 
   const summarizeSeeds = (seeds: number[]): string => {
     if (seeds.length <= 1) {
-      return `種子 ${seeds[0]}`;
+      return translateUi('favoriteSeedLabel', { seed: seeds[0] });
     }
 
     if (seeds.length <= 8) {
-      return `種子 ${seeds.join(', ')}`;
+      return translateUi('favoriteSeedSummary', { seeds: seeds.join(', ') });
     }
 
-    return `種子 ${seeds.slice(0, 8).join(', ')} ... 共 ${seeds.length} 顆`;
+    return translateUi('favoriteSeedSummaryMore', {
+      seeds: seeds.slice(0, 8).join(', '),
+      count: seeds.length
+    });
   };
 
   $: normalizedSeeds = entry.seeds.length > 0 ? entry.seeds : [entry.seed];
@@ -29,19 +34,23 @@
     entry.tradeTargets && entry.tradeTargets.length > 0
       ? entry.tradeTargets.map((target) => createTradeSeedResult(target.seed, target.conqueror))
       : normalizedSeeds.map((seed) => createTradeSeedResult(seed));
-  $: seedSummary = summarizeSeeds(normalizedSeeds);
+  let seedSummary = '';
+  $: $locale, seedSummary = summarizeSeeds(normalizedSeeds);
+  $: localizedJewelLabel = translateJewelName(entry.jewel, entry.jewelLabel);
+  $: localizedConquerorLabel =
+    entry.conqueror === ANY_CONQUEROR ? $currentUiMessages.allConquerors : translateConquerorName(entry.conqueror);
 </script>
 
 <div class="favorite-card" class:is-group={entry.entryType === 'group'}>
   <div class="favorite-top">
     <div>
-      <div class="favorite-title">{entry.jewelLabel}</div>
+      <div class="favorite-title">{localizedJewelLabel}</div>
       <div class="favorite-meta">
-        <span>{entry.conquerorLabel}</span>
+        <span>{localizedConquerorLabel}</span>
         {#if entry.entryType === 'group'}
-          <span>群組收藏 / 共 {groupSeedTotal} 顆</span>
+          <span>{translateUi('favoriteGroupLabel', { count: groupSeedTotal })}</span>
         {:else}
-          <span>種子 {entry.seed}</span>
+          <span>{translateUi('favoriteSeedLabel', { seed: entry.seed })}</span>
         {/if}
         {#if entry.buildName}
           <span class="build-name">{entry.buildName}</span>
@@ -52,20 +61,20 @@
       {/if}
     </div>
     <div class="favorite-actions">
-      <button type="button" on:click={() => onApplyQuery(entry)}>回推查詢</button>
-      <button type="button" on:click={() => onEdit(entry)}>編輯</button>
-      <button type="button" class="danger" on:click={() => onDelete(entry)}>刪除</button>
+      <button type="button" on:click={() => onApplyQuery(entry)}>{$currentUiMessages.applyFavoriteQuery}</button>
+      <button type="button" on:click={() => onEdit(entry)}>{$currentUiMessages.editFavorite}</button>
+      <button type="button" class="danger" on:click={() => onDelete(entry)}>{$currentUiMessages.deleteFavorite}</button>
     </div>
   </div>
 
   <div class="meta-panel">
     {#if entry.estimatedValue}
-      <div class="value-pill">估價：{entry.estimatedValue}</div>
+      <div class="value-pill">{translateUi('estimatedValue', { value: entry.estimatedValue })}</div>
     {/if}
 
     {#if entry.note}
       <div class="note-block">
-        <span class="note-label">備註</span>
+        <span class="note-label">{$currentUiMessages.noteLabel}</span>
         <p>{entry.note}</p>
       </div>
     {/if}
@@ -77,13 +86,13 @@
       class="intl-trade"
       on:click={() =>
         openTrade(entry.jewel, entry.conqueror, tradeSeeds, 'PC', league, 'international', tradeCondition)}>
-      {entry.entryType === 'group' ? '本組國際服交易' : '國際服交易'}
+      {entry.entryType === 'group' ? $currentUiMessages.favoriteGroupIntlTrade : $currentUiMessages.intlTrade}
     </button>
     <button
       type="button"
       class="tw-trade"
       on:click={() => openTrade(entry.jewel, entry.conqueror, tradeSeeds, 'PC', twLeague, 'tw', tradeCondition)}>
-      {entry.entryType === 'group' ? '本組台服交易' : '台服交易'}
+      {entry.entryType === 'group' ? $currentUiMessages.favoriteGroupTwTrade : $currentUiMessages.twTrade}
     </button>
   </div>
 </div>

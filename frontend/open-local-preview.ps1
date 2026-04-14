@@ -8,6 +8,7 @@ $ErrorActionPreference = 'Stop'
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $buildDir = Join-Path $root 'build'
+$staticWasmPath = Join-Path $root 'static\calculator.wasm'
 $pagePath = if ([string]::IsNullOrWhiteSpace($Page)) { 'tree.html' } else { $Page.TrimStart('/') }
 $url = "http://127.0.0.1:$Port/$pagePath"
 $stateDir = Join-Path $env:TEMP 'poe-timeless-jewels-preview'
@@ -19,6 +20,33 @@ Set-Location $root
 
 if (-not (Test-Path $stateDir)) {
   New-Item -ItemType Directory -Path $stateDir | Out-Null
+}
+
+function Test-IsValidWasm([string]$Path) {
+  if (-not (Test-Path $Path)) {
+    return $false
+  }
+
+  try {
+    $stream = [System.IO.File]::OpenRead($Path)
+    try {
+      if ($stream.Length -lt 4) {
+        return $false
+      }
+
+      $header = New-Object byte[] 4
+      $read = $stream.Read($header, 0, 4)
+      return $read -eq 4 -and
+        $header[0] -eq 0x00 -and
+        $header[1] -eq 0x61 -and
+        $header[2] -eq 0x73 -and
+        $header[3] -eq 0x6D
+    } finally {
+      $stream.Dispose()
+    }
+  } catch {
+    return $false
+  }
 }
 
 function Stop-PreviewProcess([int]$ProcessId) {
@@ -48,7 +76,20 @@ foreach ($listener in $listeners) {
 
 Remove-Item -LiteralPath $stdout, $stderr -Force -ErrorAction SilentlyContinue
 
+if ($SkipBuild -and -not (Test-IsValidWasm (Join-Path $buildDir 'calculator.wasm'))) {
+  Write-Output 'Detected invalid build/calculator.wasm. Running fresh build instead of SkipBuild.'
+  $SkipBuild = $false
+}
+
 if (-not $SkipBuild) {
+  if (-not (Test-IsValidWasm $staticWasmPath)) {
+    Write-Output 'Detected invalid static/calculator.wasm. Rebuilding wasm asset first.'
+    & powershell -ExecutionPolicy Bypass -File (Join-Path $root 'build-wasm.ps1')
+    if ($LASTEXITCODE -ne 0) {
+      throw "build-wasm.ps1 failed. Cannot start local preview."
+    }
+  }
+
   & pnpm build
   if ($LASTEXITCODE -ne 0) {
     throw "pnpm build failed. Cannot start local preview."

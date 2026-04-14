@@ -2,6 +2,7 @@
   import { openTrade, type SearchResults, type SearchWithSeed, type TradeCondition } from '../skill_tree';
   import SearchResult from './SearchResult.svelte';
   import VirtualList from 'svelte-tiny-virtual-list';
+  import { currentUiMessages, translateUi } from '../i18n';
 
   export let searchResults: SearchResults;
   export let highlight: (newSeed: number, passives: number[], conqueror?: string) => void;
@@ -29,11 +30,11 @@
       <div class="group-header">
         <button class="group-toggle" on:click={() => (expandedGroup = expandedGroup === k ? '' : k)}>
           <span class="group-label">
-            {k} 權重
+            {translateUi('groupWeight', { weight: k })}
             <span class="group-count">[{searchResults.grouped[k].length}]</span>
           </span>
           <span class="group-arrow">
-            {expandedGroup === k ? '收起' : '展開'}
+            {expandedGroup === k ? $currentUiMessages.collapse : $currentUiMessages.expand}
           </span>
         </button>
         <div class="group-trade-actions">
@@ -41,20 +42,20 @@
             <button
               class="group-trade-btn group-save"
               on:click|stopPropagation={() => onSaveGroup?.(searchResults.grouped[k])}>
-              本組收藏
+              {$currentUiMessages.saveGroup}
             </button>
           {/if}
           <button
             class="group-trade-btn intl-trade"
             on:click|stopPropagation={() =>
               openTrade(jewel, conqueror, searchResults.grouped[k], platform, league, 'international', tradeCondition)}>
-            本組國際服交易
+            {$currentUiMessages.groupIntlTrade}
           </button>
           <button
             class="group-trade-btn tw-trade"
             on:click|stopPropagation={() =>
               openTrade(jewel, conqueror, searchResults.grouped[k], platform, twLeague, 'tw', tradeCondition)}>
-            本組台服交易
+            {$currentUiMessages.groupTwTrade}
           </button>
         </div>
       </div>
@@ -87,9 +88,7 @@
   <div class="flat-list">
     {#if onSaveGroup && searchResults.raw.length > 0}
       <div class="flat-list-actions">
-        <button class="group-trade-btn group-save" on:click={() => onSaveGroup?.(searchResults.raw)}>
-          全部收藏
-        </button>
+        <button class="group-trade-btn group-save" on:click={() => onSaveGroup?.(searchResults.raw)}>{$currentUiMessages.saveAll}</button>
       </div>
     {/if}
     <VirtualList

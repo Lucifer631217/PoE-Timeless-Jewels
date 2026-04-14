@@ -1,5 +1,8 @@
 ﻿<script lang="ts">
   import type { SavedJewelDraft } from '../favorite_jewels';
+  import { currentUiMessages, locale, translateUi } from '../i18n';
+  import { ANY_CONQUEROR } from '../skill_tree';
+  import { translateConquerorName, translateJewelName } from '../zh_tw';
 
   export let draft: SavedJewelDraft;
   export let existing = false;
@@ -13,14 +16,17 @@
 
   const summarizeSeeds = (seeds: number[]): string => {
     if (seeds.length <= 1) {
-      return `種子 ${seeds[0] || draft.seed}`;
+      return translateUi('favoriteSeedLabel', { seed: seeds[0] || draft.seed });
     }
 
     if (seeds.length <= 8) {
-      return `種子 ${seeds.join(', ')}`;
+      return translateUi('favoriteSeedSummary', { seeds: seeds.join(', ') });
     }
 
-    return `種子 ${seeds.slice(0, 8).join(', ')} ... 共 ${seeds.length} 顆`;
+    return translateUi('favoriteSeedSummaryMore', {
+      seeds: seeds.slice(0, 8).join(', '),
+      count: seeds.length
+    });
   };
 
   let buildName = draft.buildName;
@@ -28,7 +34,11 @@
   let note = draft.note;
 
   $: normalizedSeeds = normalizeSeeds(draft.seeds, draft.seed);
-  $: seedSummary = summarizeSeeds(normalizedSeeds);
+  let seedSummary = '';
+  $: $locale, seedSummary = summarizeSeeds(normalizedSeeds);
+  $: localizedJewelLabel = translateJewelName(draft.jewel, draft.jewelLabel);
+  $: localizedConquerorLabel =
+    draft.conqueror === ANY_CONQUEROR ? $currentUiMessages.allConquerors : translateConquerorName(draft.conqueror);
 
   const handleSave = () => {
     onSave({
@@ -43,40 +53,40 @@
 <div class="favorite-editor">
   <div class="editor-header">
     <div>
-      <h3>{existing ? '更新收藏珠寶' : '加入收藏珠寶'}</h3>
+      <h3>{existing ? $currentUiMessages.favoriteEditorUpdate : $currentUiMessages.favoriteEditorCreate}</h3>
       <p>
-        {draft.jewelLabel} / {draft.conquerorLabel} /
+        {localizedJewelLabel} / {localizedConquerorLabel} /
         {#if draft.entryType === 'group'}
-          群組收藏
+          {$currentUiMessages.favoriteEditorGroup}
         {:else}
-          單顆收藏
+          {$currentUiMessages.favoriteEditorSingle}
         {/if}
       </p>
       <p class="seed-summary">{seedSummary}</p>
     </div>
-    <button class="editor-close" type="button" on:click={onCancel}>關閉</button>
+    <button class="editor-close" type="button" on:click={onCancel}>{$currentUiMessages.close}</button>
   </div>
 
   <label class="editor-field">
-    <span>角色名稱 / 流派名稱</span>
-    <input class="build-name-input" bind:value={buildName} placeholder="例如：暴徒旋風斬、秘術漩渦" />
+    <span>{$currentUiMessages.buildNameLabel}</span>
+    <input class="build-name-input" bind:value={buildName} placeholder={translateUi('buildNamePlaceholder')} />
   </label>
 
   <label class="editor-field">
-    <span>預估價格</span>
-    <input bind:value={estimatedValue} placeholder="例如：10 Divine、50 Chaos" />
+    <span>{$currentUiMessages.priceLabel}</span>
+    <input bind:value={estimatedValue} placeholder={translateUi('pricePlaceholder')} />
   </label>
 
   <label class="editor-field">
-    <span>備註</span>
-    <textarea bind:value={note} rows="3" placeholder="可記錄用途、交易備忘、適用流派或其他補充資訊"></textarea>
+    <span>{$currentUiMessages.noteLabel}</span>
+    <textarea bind:value={note} rows="3" placeholder={translateUi('notePlaceholder')}></textarea>
   </label>
 
   <div class="editor-actions">
     <button class="primary-action" type="button" on:click={handleSave}>
-      {existing ? '更新收藏' : '加入收藏'}
+      {existing ? $currentUiMessages.saveFavoriteUpdate : $currentUiMessages.saveFavoriteCreate}
     </button>
-    <button class="secondary-action" type="button" on:click={onCancel}>取消</button>
+    <button class="secondary-action" type="button" on:click={onCancel}>{$currentUiMessages.cancel}</button>
   </div>
 </div>
 

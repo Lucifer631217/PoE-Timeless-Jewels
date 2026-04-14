@@ -1,17 +1,28 @@
 <script lang="ts">
   import { assets, base } from '$app/paths';
   import { APP_VERSION } from '../lib/version';
+  import { currentUiMessages, locale, type OfficialStatLocale } from '../lib/i18n';
   const appVersion = APP_VERSION;
+  const homeTitleVideos: Partial<Record<OfficialStatLocale, string>> = {
+    tw: 'home-title.mp4',
+    en: 'home-title-en.mp4',
+    cn: 'home-title-cn.mp4',
+    jp: 'home-title-jp.mp4'
+  };
+
+  $: titleVideoSrc = `${assets}/media/${homeTitleVideos[$locale] ?? homeTitleVideos.tw ?? 'home-title.mp4'}`;
 </script>
 
 <div class="page-bg">
   <div class="hero-container">
     <header class="hero-header">
-      <h2 class="sr-only">永恆珠寶計算器</h2>
+      <h2 class="sr-only">{$currentUiMessages.appTitle}</h2>
       <div class="title-video-shell" aria-hidden="true">
-        <video class="title-video" autoplay muted loop playsinline preload="metadata">
-          <source src={`${assets}/media/home-title.mp4`} type="video/mp4" />
-        </video>
+        {#key titleVideoSrc}
+          <video class="title-video" autoplay muted loop playsinline preload="metadata">
+            <source src={titleVideoSrc} type="video/mp4" />
+          </video>
+        {/key}
       </div>
       <div class="v-chip">{appVersion}</div>
     </header>
@@ -19,14 +30,14 @@
     <main class="hero-content">
       <a href="{base}/tree" class="mega-button">
         <span class="btn-glow"></span>
-        <span class="btn-label">開啟天賦樹視圖</span>
-        <span class="btn-sublabel">Explore Passive Tree</span>
+        <span class="btn-label">{$currentUiMessages.homeOpenTree}</span>
+        <span class="btn-sublabel">{$currentUiMessages.homeExploreTree}</span>
       </a>
 
       <div class="mystery-prose">
-        <p>探索瓦爾遺產的祕密</p>
-        <p>在古老的天賦樹上定位您的永恆珠寶</p>
-        <p>計算其賦予的強大詞綴</p>
+        <p>{$currentUiMessages.homeMysteryLine1}</p>
+        <p>{$currentUiMessages.homeMysteryLine2}</p>
+        <p>{$currentUiMessages.homeMysteryLine3}</p>
       </div>
     </main>
 

@@ -3,6 +3,7 @@ package data
 import (
 	"bytes"
 	"compress/gzip"
+	"embed"
 	"encoding/json"
 	"io"
 
@@ -64,6 +65,16 @@ var PassiveSkillStatTranslationsJSON []byte
 //go:embed passive_skill_aura_stat_descriptions.json.gz
 var passiveSkillAuraStatTranslationsGz []byte
 var PassiveSkillAuraStatTranslationsJSON []byte
+
+//go:embed stat_translations/*/*.json.gz
+var statTranslationsFS embed.FS
+
+var (
+	OfficialStatTranslationLocales               []string
+	StatTranslationsByLocaleJSON                 map[string]string
+	PassiveSkillStatTranslationsByLocaleJSON     map[string]string
+	PassiveSkillAuraStatTranslationsByLocaleJSON map[string]string
+)
 
 //go:embed possible_stats.json.gz
 var possibleStatsGz []byte
@@ -129,6 +140,10 @@ func init() {
 	StatTranslationsJSON = unzipTo(statTranslationsGz)
 	PassiveSkillStatTranslationsJSON = unzipTo(passiveSkillStatTranslationsGz)
 	PassiveSkillAuraStatTranslationsJSON = unzipTo(passiveSkillAuraStatTranslationsGz)
+	StatTranslationsByLocaleJSON = loadTranslationJSONByLocale("stat_descriptions.json.gz")
+	PassiveSkillStatTranslationsByLocaleJSON = loadTranslationJSONByLocale("passive_skill_stat_descriptions.json.gz")
+	PassiveSkillAuraStatTranslationsByLocaleJSON = loadTranslationJSONByLocale("passive_skill_aura_stat_descriptions.json.gz")
+	OfficialStatTranslationLocales = collectOfficialStatTranslationLocales()
 
 	PossibleStatsJSON = unzipTo(possibleStatsGz)
 }
@@ -154,4 +169,34 @@ func unzipTo(data []byte) []byte {
 	}
 
 	return all
+}
+
+func collectOfficialStatTranslationLocales() []string {
+	entries, err := statTranslationsFS.ReadDir("stat_translations")
+	if err != nil {
+		panic(err)
+	}
+
+	locales := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		if entry.IsDir() {
+			locales = append(locales, entry.Name())
+		}
+	}
+
+	return locales
+}
+
+func loadTranslationJSONByLocale(fileName string) map[string]string {
+	result := make(map[string]string)
+	for _, locale := range collectOfficialStatTranslationLocales() {
+		content, err := statTranslationsFS.ReadFile("stat_translations/" + locale + "/" + fileName)
+		if err != nil {
+			panic(err)
+		}
+
+		result[locale] = string(unzipTo(content))
+	}
+
+	return result
 }

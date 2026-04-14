@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 import { data } from './types';
 import { englishFallbackTranslations, getStatDescription, translateLeagueName } from './zh_tw';
 import { officialTimelessTwStatTemplates } from './timeless_tw_stat_templates';
+import { getCurrentLocale, shouldShowBilingualStats, translateUi, type OfficialStatLocale } from './i18n';
 
 export let skillTree: SkillTreeData;
 
@@ -13,8 +14,28 @@ export const inverseSprites: Record<string, Sprite> = {};
 export const inverseSpritesActive: Record<string, Sprite> = {};
 
 export const inverseTranslations: Record<string, Translation> = {};
+export const inverseTranslationsByLocale: Record<string, Record<string, Translation>> = {};
 
 export const passiveToTree: Record<number, number> = {};
+
+const appendInverseTranslations = (locale: string, rawJson: string) => {
+  if (!rawJson) {
+    return;
+  }
+
+  if (!(locale in inverseTranslationsByLocale)) {
+    inverseTranslationsByLocale[locale] = {};
+  }
+
+  const translations: TranslationFile = JSON.parse(rawJson);
+  translations.descriptors.forEach((descriptor) => {
+    descriptor.ids.forEach((id) => {
+      if (!(id in inverseTranslationsByLocale[locale])) {
+        inverseTranslationsByLocale[locale][id] = descriptor;
+      }
+    });
+  });
+};
 
 export const loadSkillTree = () => {
   skillTree = JSON.parse(data.SkillTree);
@@ -90,22 +111,27 @@ export const loadSkillTree = () => {
     (c) => (inverseSprites[c] = skillTree.sprites.frame['0.3835'])
   );
 
-  const translationFiles = [
-    data.StatTranslationsJSON,
-    data.PassiveSkillStatTranslationsJSON,
-    data.PassiveSkillAuraStatTranslationsJSON
-  ];
+  Object.keys(inverseTranslations).forEach((key) => delete inverseTranslations[key]);
+  Object.keys(inverseTranslationsByLocale).forEach((locale) => delete inverseTranslationsByLocale[locale]);
 
-  translationFiles.forEach((f) => {
-    const translations: TranslationFile = JSON.parse(f);
+  const localeTranslationGroups = [
+    data.StatTranslationsByLocaleJSON || {},
+    data.PassiveSkillStatTranslationsByLocaleJSON || {},
+    data.PassiveSkillAuraStatTranslationsByLocaleJSON || {}
+  ] as Array<Record<string, string>>;
 
-    translations.descriptors.forEach((t) => {
-      t.ids.forEach((id) => {
-        if (!(id in inverseTranslations)) {
-          inverseTranslations[id] = t;
-        }
-      });
+  localeTranslationGroups.forEach((group) => {
+    Object.entries(group).forEach(([locale, rawJson]) => {
+      appendInverseTranslations(locale, rawJson);
     });
+  });
+
+  [data.StatTranslationsJSON, data.PassiveSkillStatTranslationsJSON, data.PassiveSkillAuraStatTranslationsJSON].forEach(
+    (rawJson) => appendInverseTranslations('en', rawJson)
+  );
+
+  Object.entries(inverseTranslationsByLocale.en || {}).forEach(([id, descriptor]) => {
+    inverseTranslations[id] = descriptor;
   });
 
   const treeToPassive = data.TreeToPassive;
@@ -311,11 +337,23 @@ const statCache: Record<number, Stat> = {};
 export const getStat = (id: number | string): Stat => {
   const nId = typeof id === 'string' ? parseInt(id) : id;
   if (!(nId in statCache)) {
-    const rawStat = data.GetStatByIndex(nId);
+    const rawStat = data.GetStatByIndex(nId) as
+      | (Partial<Stat> & {
+          Id?: string;
+          id?: string;
+          Text?: string;
+          text?: string;
+          _key?: number;
+        })
+      | undefined;
     if (!rawStat) {
       return { Index: nId, ID: nId.toString(), Text: nId.toString() };
     }
-    statCache[nId] = rawStat;
+    statCache[nId] = {
+      Index: rawStat.Index ?? rawStat._key ?? nId,
+      ID: rawStat.ID ?? rawStat.Id ?? rawStat.id ?? nId.toString(),
+      Text: rawStat.Text ?? rawStat.text ?? rawStat.ID ?? rawStat.Id ?? rawStat.id ?? nId.toString()
+    };
   }
   return statCache[nId];
 };
@@ -459,10 +497,18 @@ const pickTranslationString = (translation: Translation, value?: number): string
 const normalizeTemplatePlaceholders = (template: string): string =>
   template.replace(/\{\d(?::(.*?)d(.*?))\}/g, '$1#$2').replace(/\{\d\}/g, '#');
 
+const resolveStatLocale = (locale?: OfficialStatLocale): string => {
+  const requested = locale ?? getCurrentLocale();
+  return inverseTranslationsByLocale[requested] ? requested : 'en';
+};
+
+const getTranslationForLocale = (locale: string, statId: string): Translation | undefined =>
+  inverseTranslationsByLocale[locale]?.[statId] ?? inverseTranslations[statId];
+
 const getEnglishStatTemplate = (id: number | string, roll?: number): string => {
   const nId = typeof id === 'string' ? parseInt(id) : id;
   const stat = getStat(nId);
-  const translation = inverseTranslations[stat.ID];
+  const translation = getTranslationForLocale('en', stat.ID);
   let englishTemplate = normalizeTemplatePlaceholders(stat.Text || stat.ID);
 
   if (translation && translation.list && translation.list.length) {
@@ -493,21 +539,48 @@ const buildRenderedStatMatcher = (template: string): RegExp => {
   return new RegExp(`^${pattern}$`, 'i');
 };
 
-export const translateStat = (id: number | string, roll?: number | undefined): string => {
+const getLocaleSpecificTemplate = (locale: string, id: number | string, roll?: number): string => {
   const nId = typeof id === 'string' ? parseInt(id) : id;
-  const translationText = getEnglishStatTemplate(nId, roll);
-  // Prefer exact EN->TW template mapping first to keep bilingual lines aligned.
-  const localizedTemplate =
-    englishFallbackTranslations[translationText] ||
-    englishFallbackTranslations[translationText.replace(/\\n/g, '\n')] ||
-    englishFallbackTranslations[translationText.replace(/\n/g, '\\n')] ||
-    officialTimelessTwStatTemplates[nId] ||
-    getStatDescription(nId, translationText);
-  if (roll !== undefined) {
-    return applyRollToTemplate(localizedTemplate, roll);
+  const stat = getStat(nId);
+  const localeTranslation = getTranslationForLocale(locale, stat.ID);
+  const englishTemplate = getEnglishStatTemplate(nId, roll);
+
+  if (localeTranslation && localeTranslation.list && localeTranslation.list.length) {
+    const selectedTemplate = pickTranslationString(localeTranslation, roll);
+    if (selectedTemplate) {
+      return normalizeTemplatePlaceholders(selectedTemplate);
+    }
   }
 
-  return localizedTemplate;
+  if (locale === 'tw') {
+    return (
+      englishFallbackTranslations[englishTemplate] ||
+      englishFallbackTranslations[englishTemplate.replace(/\\n/g, '\n')] ||
+      englishFallbackTranslations[englishTemplate.replace(/\n/g, '\\n')] ||
+      officialTimelessTwStatTemplates[nId] ||
+      getStatDescription(nId, englishTemplate)
+    );
+  }
+
+  return englishTemplate;
+};
+
+export const translateStat = (
+  id: number | string,
+  roll?: number | undefined,
+  locale?: OfficialStatLocale
+): string => {
+  const resolvedLocale = resolveStatLocale(locale);
+  const template = getLocaleSpecificTemplate(resolvedLocale, id, roll);
+  if (!template) {
+    return '';
+  }
+
+  if (roll !== undefined) {
+    return applyRollToTemplate(template, roll).trim();
+  }
+
+  return template.trim();
 };
 
 export const translateStatEnglish = (id: number | string, roll?: number | undefined): string => {
@@ -518,12 +591,20 @@ export const translateStatEnglish = (id: number | string, roll?: number | undefi
   return applyRollToTemplate(template, roll).trim();
 };
 
-export const translateStatBilingual = (id: number | string, roll?: number | undefined): string => {
-  const localized = (translateStat(id, roll) || '').trim();
+export const translateStatBilingual = (
+  id: number | string,
+  roll?: number | undefined,
+  locale?: OfficialStatLocale
+): string => {
+  const resolvedLocale = resolveStatLocale(locale);
+  const localized = (translateStat(id, roll, locale) || '').trim();
   const english = (translateStatEnglish(id, roll) || '').trim();
 
   if (!localized && !english) {
     return '';
+  }
+  if (!shouldShowBilingualStats(resolvedLocale as OfficialStatLocale)) {
+    return english || localized;
   }
   if (!english || localized.toLowerCase() === english.toLowerCase()) {
     return localized;
@@ -536,17 +617,22 @@ export const translateStatBilingual = (id: number | string, roll?: number | unde
   return `${localized} / ${english}`;
 };
 
-export const translateRenderedStatBilingual = (id: number | string, englishText: string): string => {
+export const translateRenderedStatBilingual = (
+  id: number | string,
+  englishText: string,
+  locale?: OfficialStatLocale
+): string => {
   const trimmedEnglish = englishText.trim();
   const englishTemplate = getEnglishStatTemplate(id).trim();
-  const localizedTemplate = translateStat(id).trim();
+  const localizedTemplate = translateStat(id, undefined, locale).trim();
+  const resolvedLocale = resolveStatLocale(locale);
 
   if (!trimmedEnglish) {
-    return translateStatBilingual(id);
+    return translateStatBilingual(id, undefined, locale);
   }
 
   if (trimmedEnglish.toLowerCase() === englishTemplate.toLowerCase()) {
-    return translateStatBilingual(id);
+    return translateStatBilingual(id, undefined, locale);
   }
 
   const matches = trimmedEnglish.match(buildRenderedStatMatcher(englishTemplate));
@@ -559,11 +645,18 @@ export const translateRenderedStatBilingual = (id: number | string, englishText:
   if (!localized || localized.toLowerCase() === trimmedEnglish.toLowerCase()) {
     return trimmedEnglish;
   }
+  if (!shouldShowBilingualStats(resolvedLocale as OfficialStatLocale)) {
+    return trimmedEnglish;
+  }
 
   return `${localized} / ${trimmedEnglish}`;
 };
 
-export const translateRenderedStatBilingualFromCandidates = (ids: number[], englishText: string): string => {
+export const translateRenderedStatBilingualFromCandidates = (
+  ids: number[],
+  englishText: string,
+  locale?: OfficialStatLocale
+): string => {
   const trimmedEnglish = englishText.trim();
   if (!trimmedEnglish || ids.length === 0) {
     return trimmedEnglish;
@@ -576,7 +669,7 @@ export const translateRenderedStatBilingualFromCandidates = (ids: number[], engl
     return trimmedEnglish;
   }
 
-  return translateRenderedStatBilingual(matchedIds[0], trimmedEnglish);
+  return translateRenderedStatBilingual(matchedIds[0], trimmedEnglish, locale);
 };
 
 const maxTradeTargetsPerQuery = 180;
@@ -901,8 +994,12 @@ export const openTrade = (
     if (blockedCount > 0) {
       tradeOpenFeedback.set({
         level: 'warning',
-        title: '交易分頁被瀏覽器擋下',
-        message: `這次需要開啟 ${resultChunks.length} 個分頁，目前成功 ${openedCount} 個、被擋下 ${blockedCount} 個。請允許此網站的彈出式視窗與重新導向後再重試。`,
+        title: translateUi('tradePopupBlockedTitle'),
+        message: translateUi('tradePopupBlockedMessage', {
+          totalTabs: resultChunks.length,
+          openedTabs: openedCount,
+          blockedTabs: blockedCount
+        }),
         totalTabs: resultChunks.length,
         openedTabs: openedCount,
         blockedTabs: blockedCount
@@ -910,8 +1007,10 @@ export const openTrade = (
     } else if (resultChunks.length > 1) {
       tradeOpenFeedback.set({
         level: 'info',
-        title: '已開啟多個交易分頁',
-        message: `這次依 trade filter 上限分成 ${resultChunks.length} 個分頁，每頁最多 180 個條件。若之後沒有反應，請先允許此網站的彈出式視窗與重新導向。`,
+        title: translateUi('tradeMultiTabsTitle'),
+        message: translateUi('tradeMultiTabsMessage', {
+          totalTabs: resultChunks.length
+        }),
         totalTabs: resultChunks.length,
         openedTabs: openedCount,
         blockedTabs: blockedCount

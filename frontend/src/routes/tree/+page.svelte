@@ -46,7 +46,8 @@
   import { APP_VERSION } from '../../lib/version';
   import { statValues } from '../../lib/values';
   import { syncWrap } from '../../lib/worker';
-  import { translateConquerorName, translateJewelName, translateLeagueName } from '../../lib/zh_tw';
+  import { currentUiMessages, locale, translateUi } from '../../lib/i18n';
+  import { localizeLeagueName, translateConquerorName, translateJewelName, translateLeagueName } from '../../lib/zh_tw';
 
   type SelectOption<T> = {
     value: T;
@@ -59,10 +60,14 @@
     result: data.AlternatePassiveSkillInformation;
   };
 
-  const anyConquerorOption: SelectOption<string> = {
-    value: ANY_CONQUEROR,
-    label: '全部征服者'
-  };
+  let anyConquerorOption: SelectOption<string>;
+  $: {
+    $locale;
+    anyConquerorOption = {
+      value: ANY_CONQUEROR,
+      label: translateUi('allConquerors')
+    };
+  }
   const appVersion = APP_VERSION;
   const mobileBreakpoint = 1024;
   const detectMobileViewport = (): boolean => browser && window.innerWidth <= mobileBreakpoint;
@@ -115,16 +120,27 @@
 
   const uniqueStrings = (values: string[]): string[] => Array.from(new Set(values));
 
-  const jewels = Object.keys(timelessJewels)
-    .map((key) => ({
-      value: parseInt(key),
-      label: translateJewelName(parseInt(key), timelessJewels[parseInt(key)] || '')
-    }))
-    .sort((left, right) => left.value - right.value);
+  let jewels: SelectOption<number>[] = [];
+  $: {
+    $locale;
+    jewels = Object.keys(timelessJewels)
+      .map((key) => ({
+        value: parseInt(key),
+        label: translateJewelName(parseInt(key), timelessJewels[parseInt(key)] || '')
+      }))
+      .sort((left, right) => left.value - right.value);
+  }
 
-  let selectedJewel: SelectOption<number> | undefined = searchParams.has('jewel')
-    ? jewels.find((jewel) => jewel.value.toString() === searchParams.get('jewel'))
-    : undefined;
+  let selectedJewel: SelectOption<number> | undefined = undefined;
+  $: if (!selectedJewel && searchParams.has('jewel') && jewels.length > 0) {
+    selectedJewel = jewels.find((jewel) => jewel.value.toString() === searchParams.get('jewel'));
+  }
+  $: if (selectedJewel) {
+    const localizedJewel = jewels.find((jewel) => jewel.value === selectedJewel?.value);
+    if (localizedJewel && localizedJewel.label !== selectedJewel.label) {
+      selectedJewel = localizedJewel;
+    }
+  }
 
   $: selectedJewelValue = selectedJewel?.value;
   $: currentConquerors = selectedJewelValue !== undefined ? timelessJewelConquerors[selectedJewelValue] || {} : {};
@@ -147,10 +163,25 @@
         const value = searchParams.get('conqueror') || '';
         return {
           value,
-          label: value === ANY_CONQUEROR ? anyConquerorOption.label : translateConquerorName(value)
+          label: value === ANY_CONQUEROR ? translateUi('allConquerors') : translateConquerorName(value)
         };
       })()
     : undefined;
+  $: {
+    $locale;
+    if (selectedConqueror) {
+      const localizedConquerorLabel =
+        selectedConqueror.value === ANY_CONQUEROR
+          ? anyConquerorOption.label
+          : translateConquerorName(selectedConqueror.value);
+      if (localizedConquerorLabel !== selectedConqueror.label) {
+        selectedConqueror = {
+          ...selectedConqueror,
+          label: localizedConquerorLabel
+        };
+      }
+    }
+  }
 
   $: if (
     selectedConqueror &&
@@ -278,17 +309,22 @@
 
   const getStatValue = (id: string): number => (statValues as Record<string, number>)[id] || 0;
 
+  let availableStats: string[] = [];
+  let statItems: Array<{ label: string; value: number }> = [];
   $: availableStats =
     selectedJewelValue !== undefined ? Object.keys(allPossibleStats[selectedJewelValue.toString()] || {}) : [];
-  $: statItems = availableStats
-    .map((statId) => {
-      const id = parseInt(statId);
-      return {
-        label: translateStatBilingual(id),
-        value: id
-      };
-    })
-    .filter((stat) => !(stat.value in selectedStats));
+  $: {
+    $locale;
+    statItems = availableStats
+      .map((statId) => {
+        const id = parseInt(statId);
+        return {
+          label: translateStatBilingual(id),
+          value: id
+        };
+      })
+      .filter((stat) => !(stat.value in selectedStats));
+  }
 
   let statSelector: Select;
   const selectStat = (event: CustomEvent<{ value: number }>) => {
@@ -650,15 +686,32 @@
     return combinedResults;
   };
 
-  const sortResults = [
-    { label: '出現次數', value: 'count' },
-    { label: '詞綴名稱', value: 'alphabet' },
-    { label: '稀有度', value: 'rarity' },
-    { label: '詞綴價值', value: 'value' }
-  ] as const;
+  type SortOption = { label: string; value: 'count' | 'alphabet' | 'rarity' | 'value' };
+  let sortResults: SortOption[] = [];
+  $: {
+    $locale;
+    sortResults = [
+      { label: translateUi('sortByCount'), value: 'count' },
+      { label: translateUi('sortByName'), value: 'alphabet' },
+      { label: translateUi('sortByRarity'), value: 'rarity' },
+      { label: translateUi('sortByValue'), value: 'value' }
+    ] as const;
+  }
 
-  let sortOrder =
-    sortResults.find((item) => item.value === readStringPreference('sortOrder', 'count')) || sortResults[0];
+  const savedSortOrderValue = readStringPreference('sortOrder', 'count') as SortOption['value'];
+  let sortOrder: SortOption = { label: '', value: savedSortOrderValue };
+  $: if (sortResults.length > 0 && !sortResults.some((item) => item.value === sortOrder.value)) {
+    sortOrder = sortResults[0];
+  }
+  $: if (sortResults.length > 0 && sortOrder.label === '') {
+    sortOrder = sortResults.find((item) => item.value === savedSortOrderValue) || sortResults[0];
+  }
+  $: if (sortOrder && sortResults) {
+    const localizedSortOrder = sortResults.find((item) => item.value === sortOrder.value);
+    if (localizedSortOrder && localizedSortOrder.label !== sortOrder.label) {
+      sortOrder = localizedSortOrder;
+    }
+  }
   $: if (sortOrder) writePreference('sortOrder', sortOrder.value);
 
   let colored = readBooleanPreference('colored', true);
@@ -727,7 +780,7 @@
       .filter(Boolean)
       .map((value) => ({
         value,
-        label: translateLeagueName(value)
+        label: localizeLeagueName(value)
       }));
 
     return mapped.filter(
@@ -741,12 +794,33 @@
     return {
       options,
       selected: options.find((option) => option.value === selectedValue) ||
-        options[0] || { value: fallback, label: translateLeagueName(fallback) }
+        options[0] || { value: fallback, label: localizeLeagueName(fallback) }
     };
+  };
+
+  const refreshLeagueOptions = () => {
+    if (rawIntlLeagues.length > 0) {
+      const resolved = resolveLeagueSelection(rawIntlLeagues, league?.value || 'Standard');
+      leagues = resolved.options;
+      league = resolved.options.find((option) => option.value === league?.value) || resolved.selected;
+    } else {
+      leagues = [{ value: 'Standard', label: localizeLeagueName('Standard') }];
+      league = leagues[0];
+    }
+
+    if (rawTwLeagues.length > 0) {
+      const resolved = resolveLeagueSelection(rawTwLeagues, twLeague?.value || 'Standard');
+      twLeagues = resolved.options;
+      twLeague = resolved.options.find((option) => option.value === twLeague?.value) || resolved.selected;
+    } else {
+      twLeagues = [{ value: 'Standard', label: localizeLeagueName('Standard') }];
+      twLeague = twLeagues[0];
+    }
   };
 
   let leagues: LeagueOption[] = [];
   let league: LeagueOption | undefined;
+  let rawIntlLeagues: LeagueLike[] = [];
   const getLeagues = async () => {
     try {
       const response = await fetch('https://api.poe.watch/leagues');
@@ -754,18 +828,17 @@
         throw new Error('failed');
       }
 
-      const rawLeagues: LeagueLike[] = await response.json();
-      const resolved = resolveLeagueSelection(rawLeagues, 'Standard');
-      leagues = resolved.options;
-      league = resolved.selected;
+      rawIntlLeagues = await response.json();
+      refreshLeagueOptions();
     } catch {
-      leagues = [{ value: 'Standard', label: translateLeagueName('Standard') }];
-      league = leagues[0];
+      rawIntlLeagues = [];
+      refreshLeagueOptions();
     }
   };
 
   let twLeagues: LeagueOption[] = [];
   let twLeague: LeagueOption | undefined;
+  let rawTwLeagues: LeagueLike[] = [];
   const getTWLeaguesData = async () => {
     try {
       const response = await fetch('https://api.pathofexile.com/leagues?type=main&realm=garena');
@@ -773,15 +846,15 @@
         throw new Error('failed');
       }
 
-      const rawLeagues: LeagueLike[] = await response.json();
-      const resolved = resolveLeagueSelection(rawLeagues, 'Standard');
-      twLeagues = resolved.options;
-      twLeague = twLeagues.find((option) => option.value === twLeague?.value) || resolved.selected;
+      rawTwLeagues = await response.json();
+      refreshLeagueOptions();
     } catch {
-      twLeagues = [{ value: 'Standard', label: translateLeagueName('Standard') }];
-      twLeague = twLeagues[0];
+      rawTwLeagues = [];
+      refreshLeagueOptions();
     }
   };
+
+  $: $locale, refreshLeagueOptions();
 
   let tradeCondition: TradeCondition = 'instant_buyout';
   const extractTranslatedStats = (result: data.AlternatePassiveSkillInformation): string[] => {
@@ -1012,7 +1085,7 @@
   ): Promise<boolean> => {
     const matchedJewel = jewels.find((item) => item.value === queryContext.jewel);
     if (!matchedJewel) {
-      favoriteFeedback = '這筆收藏對應的珠寶已不存在，無法回推到查詢。';
+      favoriteFeedback = translateUi('favoriteMissingJewel');
       return false;
     }
 
@@ -1028,7 +1101,7 @@
           : undefined;
 
     if (!matchedConqueror) {
-      favoriteFeedback = '這筆收藏對應的征服者已不存在，無法回推到查詢。';
+      favoriteFeedback = translateUi('favoriteMissingConqueror');
       return false;
     }
 
@@ -1261,11 +1334,11 @@
 
     favoriteFeedback = replaced
       ? draft.entryType === 'group'
-        ? '已更新收藏群組。'
-        : '已更新收藏珠寶。'
+        ? translateUi('favoriteUpdatedGroup')
+        : translateUi('favoriteUpdatedSingle')
       : draft.entryType === 'group'
-      ? '已加入收藏群組。'
-      : '已加入收藏珠寶。';
+      ? translateUi('favoriteAddedGroup')
+      : translateUi('favoriteAddedSingle');
     favoriteDraft = null;
   };
 
@@ -1293,8 +1366,8 @@
       }
 
       favoriteFeedback = entry.queryContext
-        ? '已將收藏回推到查詢。'
-        : '已將舊收藏回推到查詢，並自動補回可辨識的插槽位置。';
+        ? translateUi('favoriteApplied')
+        : translateUi('favoriteAppliedLegacy');
       return;
     }
 
@@ -1317,16 +1390,16 @@
 
     favoriteFeedback =
       entry.entryType === 'group'
-        ? '這筆舊的群組收藏沒有保存原始查詢條件，已先帶入珠寶與征服者；若要完整回推，需重新收藏一次。'
-        : '這筆舊收藏缺少插槽位置，只帶入了珠寶、征服者與種子；若要完整回推，需重新收藏一次。';
+        ? translateUi('favoriteLegacyGroup')
+        : translateUi('favoriteLegacyNoSocket');
   };
 
   const deleteFavorite = (entry: SavedJewelEntry) => {
     removeFavoriteJewel(entry.id);
     favoriteFeedback =
       entry.entryType === 'group'
-        ? `已刪除群組收藏：${entry.jewelLabel} / 共 ${entry.seeds.length} 顆種子`
-        : `已刪除收藏：${entry.jewelLabel} / 種子 ${entry.seed}`;
+        ? translateUi('favoriteDeletedGroup', { jewelLabel: entry.jewelLabel, count: entry.seeds.length })
+        : translateUi('favoriteDeletedSingle', { jewelLabel: entry.jewelLabel, seed: entry.seed });
     if (favoriteDraft?.id === entry.id) {
       favoriteDraft = null;
     }
@@ -1344,7 +1417,7 @@
     link.download = `timeless-jewels-favorites-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
-    favoriteFeedback = `已匯出 ${favoriteCount} 筆收藏。`;
+    favoriteFeedback = translateUi('favoriteExported', { count: favoriteCount });
   };
 
   const openImportDialog = () => favoriteImportInput?.click();
@@ -1358,9 +1431,13 @@
 
     try {
       const result = importFavoriteJewels(await file.text());
-      favoriteFeedback = `已匯入收藏：新增 ${result.imported} 筆、覆蓋 ${result.replaced} 筆、跳過 ${result.skipped} 筆。`;
+      favoriteFeedback = translateUi('favoriteImported', {
+        imported: result.imported,
+        replaced: result.replaced,
+        skipped: result.skipped
+      });
     } catch (error) {
-      favoriteFeedback = error instanceof Error ? error.message : '匯入收藏失敗。';
+      favoriteFeedback = error instanceof Error ? error.message : translateUi('favoriteImportFailed');
     } finally {
       input.value = '';
     }
@@ -1400,24 +1477,30 @@
         <div class="panel-header">
           <div class="panel-title-row">
             <div class="panel-title-group">
-              <button class="burger-menu" aria-label="收合面板" title="收合面板" on:click={() => (collapsed = true)}>
+              <button
+                class="burger-menu"
+                aria-label={translateUi('treeCollapsePanel')}
+                title={translateUi('treeCollapsePanel')}
+                on:click={() => (collapsed = true)}>
                 <span class="burger-icon" aria-hidden="true">
                   <span></span>
                   <span></span>
                   <span></span>
                 </span>
-                <span class="menu-label">收合面板</span>
+                <span class="menu-label">{$currentUiMessages.treeCollapsePanel}</span>
               </button>
               <div>
-                <h3>{results ? '反查結果' : '永恆珠寶查詢'}</h3>
-                <p>依照種子或指定詞綴設定條件，並即時查看天賦樹受到的永恆珠寶影響。</p>
+                <h3>{results ? $currentUiMessages.treeResultsTitle : $currentUiMessages.treeTitle}</h3>
+                <p>{$currentUiMessages.treeSubtitle}</p>
               </div>
             </div>
             <div class="panel-title-actions">
               <button
                 class="secondary-toggle favorite-entry-toggle"
                 on:click={() => (favoriteDrawerOpen = !favoriteDrawerOpen)}>
-                {favoriteDrawerOpen ? '關閉收藏珠寶' : `收藏珠寶 (${favoriteCount})`}
+                {favoriteDrawerOpen
+                  ? $currentUiMessages.favoritesToggleClose
+                  : translateUi('favoritesToggleOpen', { count: favoriteCount })}
               </button>
             </div>
           </div>
@@ -1428,34 +1511,36 @@
                 <strong>{$tradeOpenFeedback.title}</strong>
                 <p>{$tradeOpenFeedback.message}</p>
               </div>
-              <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>關閉</button>
+              <button class="trade-feedback-close" type="button" on:click={clearTradeOpenFeedback}>
+                {$currentUiMessages.close}
+              </button>
             </div>
           {/if}
 
           {#if searchOutcome}
             <div class="trade-panel">
               <div class="trade-row compact-row">
-                <span class="trade-label">交易條件</span>
+                <span class="trade-label">{$currentUiMessages.tradeCondition}</span>
                 <button
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'instant_buyout'}
                   on:click={() => (tradeCondition = 'instant_buyout')}>
-                  即刻購買
+                  {$currentUiMessages.instantBuyout}
                 </button>
                 <button
                   class="trade-toggle"
                   class:trade-toggle-active={tradeCondition === 'in_person_online_in_league'}
                   on:click={() => (tradeCondition = 'in_person_online_in_league')}>
-                  面交
+                  {$currentUiMessages.inPersonTrade}
                 </button>
                 <div class="panel-note trade-hint trade-condition-hint">
-                  種子若超過180個會一次開啟多個交易分頁，請先在瀏覽器允許此網站的「彈出式視窗與重新導向」，避免分頁被阻擋。
+                  {$currentUiMessages.tradeHint}
                 </div>
               </div>
 
               <div class="trade-row trade-league-row">
                 <div class="trade-league-group">
-                  <span class="trade-label">國際服聯盟</span>
+                  <span class="trade-label">{$currentUiMessages.intlLeague}</span>
                   <div class="trade-select">
                     <Select
                       items={leagues}
@@ -1479,11 +1564,11 @@
                         tradeCondition
                       )}
                     disabled={!searchOutcome || !league}>
-                    國際服交易
+                    {$currentUiMessages.intlTrade}
                   </button>
                 </div>
                 <div class="trade-league-group">
-                  <span class="trade-label">台服聯盟</span>
+                  <span class="trade-label">{$currentUiMessages.twLeague}</span>
                   <div class="trade-select">
                     <Select
                       items={twLeagues}
@@ -1507,7 +1592,7 @@
                         tradeCondition
                       )}
                     disabled={!searchOutcome || !twLeague}>
-                    台服交易
+                    {$currentUiMessages.twTrade}
                   </button>
                 </div>
               </div>
@@ -1521,10 +1606,10 @@
                 class:grouped={groupResults}
                 on:click={() => (groupResults = !groupResults)}
                 disabled={!searchOutcome}>
-                {groupResults ? '群組顯示結果' : '平鋪顯示結果'}
+                {groupResults ? $currentUiMessages.groupedResults : $currentUiMessages.flatResults}
               </button>
               <button class="secondary-toggle" on:click={() => (results = !results)} disabled={!searchOutcome}>
-                {results ? '隱藏反查結果' : '顯示反查結果'}
+                {results ? $currentUiMessages.hideResults : $currentUiMessages.showResults}
               </button>
               {#if selectedConqueror && hasValidConquerorSelection && mode === 'stats'}
                 <div class="bulk-actions bulk-actions-inline compact-row-actions">
@@ -1533,14 +1618,14 @@
                     class:grouped={showNotables}
                     on:click={toggleNotableVisibility}
                     disabled={searching}>
-                    核心天賦
+                    {$currentUiMessages.notablePassives}
                   </button>
                   <button
                     class="secondary-toggle"
                     class:grouped={showPassives}
                     on:click={togglePassiveVisibility}
                     disabled={searching}>
-                    小天賦
+                    {$currentUiMessages.smallPassives}
                   </button>
                 </div>
               {/if}
@@ -1553,27 +1638,27 @@
             <section class="control-section">
               <div class="inline-select-row" class:with-mode-toggle={selectedConqueror && hasValidConquerorSelection}>
                 <div class="field-stack field-stack-half field-stack-jewel">
-                  <h3>珠寶</h3>
+                  <h3>{$currentUiMessages.jewelLabel}</h3>
                   <Select
                     class="hero-select"
                     items={jewels}
                     bind:value={selectedJewel}
                     on:change={changeJewel}
                     searchable={selectSearchable}
-                    placeholder="選擇永恆珠寶"
+                    placeholder={$currentUiMessages.selectJewel}
                     floatingConfig={selectFloatingConfig} />
                 </div>
 
                 {#if selectedJewel}
                   <div class="field-stack field-stack-half field-stack-conqueror">
-                    <h3>征服者</h3>
+                    <h3>{$currentUiMessages.conquerorLabel}</h3>
                     <Select
                       class="hero-select"
                       items={conquerors}
                       bind:value={selectedConqueror}
                       on:change={updateUrl}
                       searchable={selectSearchable}
-                      placeholder="選擇征服者"
+                      placeholder={$currentUiMessages.selectConqueror}
                       floatingConfig={selectFloatingConfig} />
                   </div>
                 {/if}
@@ -1585,13 +1670,13 @@
                         class="selection-button"
                         class:selected={mode === 'seed'}
                         on:click={() => setMode('seed')}>
-                        依種子
+                        {$currentUiMessages.bySeed}
                       </button>
                       <button
                         class="selection-button"
                         class:selected={mode === 'stats'}
                         on:click={() => setMode('stats')}>
-                        依詞綴反查
+                        {$currentUiMessages.byStats}
                       </button>
                     </div>
                   </div>
@@ -1602,17 +1687,17 @@
                 {#if selectedConqueror && hasValidConquerorSelection}
                     {#if mode === 'seed'}
                       <div class="field-stack">
-                        <h3>種子</h3>
+                        <h3>{$currentUiMessages.seedLabel}</h3>
                         <input type="number" bind:value={seed} on:blur={updateUrl} min={minSeed} max={maxSeed} />
                         {#if seed < minSeed || seed > maxSeed}
-                          <div class="warning-text">種子必須介於 {minSeed} 到 {maxSeed} 之間。</div>
+                          <div class="warning-text">{translateUi('seedRangeWarning', { minSeed, maxSeed })}</div>
                         {/if}
                       </div>
 
                       {#if canSaveCurrentSeed}
                         <div class="seed-toolbar">
                           <button class="primary-toggle" on:click={openFavoriteForCurrentSeed}>
-                            收藏目前種子
+                            {$currentUiMessages.saveCurrentSeed}
                           </button>
                         <div class="toolbar-group">
                           <Select
@@ -1623,9 +1708,9 @@
                           <button
                             class="secondary-toggle"
                             class:selected={colored}
-                            on:click={() => (colored = !colored)}>彩色標示</button>
+                            on:click={() => (colored = !colored)}>{$currentUiMessages.colorHighlight}</button>
                           <button class="secondary-toggle" class:selected={split} on:click={() => (split = !split)}>
-                            分欄顯示
+                            {$currentUiMessages.splitView}
                           </button>
                         </div>
                       </div>
@@ -1649,7 +1734,7 @@
                       {:else}
                         <div class="combined-results split-results">
                           <div>
-                            <h3>顯著天賦</h3>
+                            <h3>{$currentUiMessages.notablesTitle}</h3>
                             <div class:rainbow={colored}>
                               {#each sortCombined(combineResults(seedResults, colored, 'notables'), sortOrder.value) as result}
                                 <div
@@ -1667,7 +1752,7 @@
                             </div>
                           </div>
                           <div>
-                            <h3>小天賦</h3>
+                            <h3>{$currentUiMessages.passivesTitle}</h3>
                             <div class:rainbow={colored}>
                               {#each sortCombined(combineResults(seedResults, colored, 'passives'), sortOrder.value) as result}
                                 <div
@@ -1689,14 +1774,14 @@
                     {/if}
                   {:else if mode === 'stats'}
                     <div class="field-stack field-stack-inline">
-                      <h3>選擇詞綴</h3>
+                      <h3>{$currentUiMessages.selectStat}</h3>
                       <div class="stat-picker">
                         <Select
                           items={statItems}
                           on:change={selectStat}
                           bind:this={statSelector}
                           searchable={selectSearchable}
-                          placeholder="選擇要反查的詞綴"
+                          placeholder={$currentUiMessages.selectStatPlaceholder}
                           floatingConfig={selectFloatingConfig}>
                           <svelte:fragment slot="item" let:item>
                             <span>{@html formatBilingualStatHtml(item.label)}</span>
@@ -1714,7 +1799,7 @@
                           <div class="selected-stat-card">
                             <div class="selected-stat-top">
                               <button class="remove-stat" on:click={() => removeStat(selectedStats[statId].id)}>
-                                移除
+                                {$currentUiMessages.remove}
                               </button>
                               <span class="selected-stat-text"
                                 >{@html formatBilingualStatHtml(
@@ -1723,11 +1808,11 @@
                             </div>
                             <div class="selected-stat-inputs">
                               <label class="inline-label inline-label-compact">
-                                <span>最低數值</span>
+                                <span>{$currentUiMessages.minValue}</span>
                                 <input type="number" min="0" bind:value={selectedStats[statId].min} />
                               </label>
                               <label class="inline-label inline-label-compact">
-                                <span>權重</span>
+                                <span>{$currentUiMessages.weight}</span>
                                 <input type="number" min="0" bind:value={selectedStats[statId].weight} />
                               </label>
                             </div>
@@ -1737,7 +1822,7 @@
 
                       <div class="field-stack compact-field search-control-row">
                         <label class="inline-label inline-label-compact inline-label-total">
-                          <span>最低總權重</span>
+                          <span>{$currentUiMessages.minTotalWeight}</span>
                           <input
                             type="number"
                             min="0"
@@ -1752,9 +1837,9 @@
                           on:click={search}
                           disabled={searching}>
                           {#if searching && selectedJewel}
-                            搜尋中 {currentSeed} / {maxSeed}
+                            {translateUi('searchingProgress', { currentSeed, maxSeed })}
                           {:else}
-                            開始反查
+                            {$currentUiMessages.startReverseSearch}
                           {/if}
                         </button>
                       </div>
@@ -1762,7 +1847,7 @@
                   {/if}
 
                   {#if !circledNode}
-                    <h2 class="panel-note">請先在技能樹點選一個珠寶插槽，才會顯示可影響的天賦與反查結果。</h2>
+                    <h2 class="panel-note">{$currentUiMessages.chooseSocketNote}</h2>
                   {/if}
                 {/if}
               {/if}
@@ -1789,15 +1874,15 @@
   {:else}
     <button
       class="burger-menu collapsed-trigger"
-      aria-label="展開面板"
-      title="展開面板"
+      aria-label={$currentUiMessages.treeExpandPanel}
+      title={$currentUiMessages.treeExpandPanel}
       on:click={() => (collapsed = false)}>
       <span class="burger-icon" aria-hidden="true">
         <span></span>
         <span></span>
         <span></span>
       </span>
-      <span class="menu-label">展開面板</span>
+      <span class="menu-label">{$currentUiMessages.treeExpandPanel}</span>
     </button>
   {/if}
 
@@ -1807,7 +1892,7 @@
         <button
           type="button"
           class="favorite-modal-backdrop"
-          aria-label="關閉收藏珠寶彈窗"
+          aria-label={$currentUiMessages.favoritesToggleClose}
           on:click={closeFavoritePanel}></button>
       {/if}
       <section
@@ -1819,13 +1904,15 @@
         aria-modal={isMobileViewport}>
       <div class="favorite-header">
         <div>
-          <h3>收藏珠寶</h3>
-          <p>目前共 {favoriteCount} 筆收藏，可匯出與匯入 JSON。</p>
+          <h3>{$currentUiMessages.favoritesTitle}</h3>
+          <p>{translateUi('favoritesSummary', { count: favoriteCount })}</p>
         </div>
         <div class="favorite-actions">
-          <button class="secondary-toggle" on:click={exportFavorites} disabled={favoriteCount === 0}>匯出 JSON</button>
-          <button class="secondary-toggle" on:click={openImportDialog}>匯入 JSON</button>
-          <button class="secondary-toggle" on:click={closeFavoritePanel}>關閉</button>
+          <button class="secondary-toggle" on:click={exportFavorites} disabled={favoriteCount === 0}>
+            {$currentUiMessages.exportJson}
+          </button>
+          <button class="secondary-toggle" on:click={openImportDialog}>{$currentUiMessages.importJson}</button>
+          <button class="secondary-toggle" on:click={closeFavoritePanel}>{$currentUiMessages.close}</button>
           <input
             bind:this={favoriteImportInput}
             class="hidden-input"
@@ -1851,7 +1938,7 @@
           {/if}
 
           {#if favoriteCount === 0}
-            <div class="favorite-empty">目前還沒有收藏珠寶，可先從種子結果或反查結果加入收藏。</div>
+            <div class="favorite-empty">{$currentUiMessages.favoritesEmpty}</div>
           {:else}
             <div class="favorite-list">
               {#each $favoriteJewels as entry}
@@ -1872,7 +1959,7 @@
   {/if}
 
   <div class="repo-link-wrap">
-    <span>版本 {appVersion}</span>
+    <span>{translateUi('versionLabel', { version: appVersion })}</span>
   </div>
 </SkillTree>
 

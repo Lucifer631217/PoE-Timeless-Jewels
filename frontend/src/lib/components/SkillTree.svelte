@@ -19,6 +19,7 @@
   import { translateAlternateSkillName } from '../zh_tw';
   import { derived } from 'svelte/store';
   import { calculator, data } from '../types';
+  import { locale, translateUi } from '../i18n';
 
   export let clickNode: (node: Node) => void;
   export let circledNode: number | undefined;
@@ -44,6 +45,7 @@
   const statsFont = '17px Roboto Mono';
 
   let scaling = 10;
+  $: $locale;
 
   let offsetX = 0;
   let offsetY = 0;
@@ -512,7 +514,7 @@
         });
       } else if (hoveredNode.isJewelSocket) {
         allLines.push({
-          localized: '點擊以選取此珠寶插槽',
+          localized: translateUi('tooltipSelectSocket'),
           offset,
           indent: 0,
           special: true

@@ -16,6 +16,7 @@ export declare namespace data {
     Stat2Max: number;
     PassiveType?: Array<number>;
     GetStatMinMax(arg1: boolean, arg2: number): number;
+    UnmarshalJSON(data?: Uint8Array): Error;
   }
   interface AlternatePassiveAdditionInformation {
     AlternatePassiveAddition?: data.AlternatePassiveAddition;
@@ -41,7 +42,9 @@ export declare namespace data {
     RandomMin: number;
     RandomMax: number;
     ConquerorVersion: number;
+    EnabledWeight: number;
     GetStatMinMax(arg1: boolean, arg2: number): number;
+    UnmarshalJSON(data?: Uint8Array): Error;
   }
   interface AlternatePassiveSkillInformation {
     AlternatePassiveSkill?: data.AlternatePassiveSkill;
@@ -77,11 +80,15 @@ export declare namespace data {
   function GetAlternatePassiveSkillByIndex(index: number): (data.AlternatePassiveSkill | undefined);
   function GetPassiveSkillByIndex(index: number): (data.PassiveSkill | undefined);
   function GetStatByIndex(index: number): (data.Stat | undefined);
+  const OfficialStatTranslationLocales: Array<string> | undefined;
+  const PassiveSkillAuraStatTranslationsByLocaleJSON: Record<string, string> | undefined;
   const PassiveSkillAuraStatTranslationsJSON: string;
+  const PassiveSkillStatTranslationsByLocaleJSON: Record<string, string> | undefined;
   const PassiveSkillStatTranslationsJSON: string;
   const PassiveSkills: Array<data.PassiveSkill | undefined> | undefined;
   const PossibleStats: string;
   const SkillTree: string;
+  const StatTranslationsByLocaleJSON: Record<string, string> | undefined;
   const StatTranslationsJSON: string;
   const TimelessJewelConquerors: Record<number, Record<string, data.TimelessJewelConqueror | undefined> | undefined> | undefined;
   const TimelessJewelSeedRanges: Record<number, data.Range> | undefined;

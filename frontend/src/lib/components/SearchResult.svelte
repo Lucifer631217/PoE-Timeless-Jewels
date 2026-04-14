@@ -2,6 +2,7 @@
   import type { SearchWithSeed, TradeCondition } from '../skill_tree';
   import { formatBilingualStatHtml, skillTree, translateStatBilingual, openTrade } from '../skill_tree';
   import { translateConquerorName } from '../zh_tw';
+  import { currentUiMessages, locale, translateUi } from '../i18n';
 
   export let highlight: (newSeed: number, passives: number[], conqueror?: string) => void;
   export let onSave: ((set: SearchWithSeed) => void) | undefined = undefined;
@@ -14,6 +15,7 @@
   export let tradeCondition: TradeCondition = 'instant_buyout';
 
   $: resultConqueror = set.conqueror || conqueror;
+  $: $locale;
 </script>
 
 <div
@@ -37,27 +39,30 @@
   }}>
   <div class="result-header">
     <div class="seed-label">
-      種子 {set.seed}
+      {translateUi('searchSeedLabel', { seed: set.seed })}
       {#if set.conqueror}
-        <span class="weight-label">征服者：{translateConquerorName(set.conqueror)}</span>
+        <span class="weight-label"
+          >{translateUi('conquerorValue', { conqueror: translateConquerorName(set.conqueror) })}</span>
       {/if}
-      <span class="weight-label">權重：{set.weight}</span>
+      <span class="weight-label">{translateUi('weightValue', { weight: set.weight })}</span>
     </div>
     <div class="trade-actions">
       {#if onSave}
-        <button class="trade-btn save-btn" on:click|stopPropagation={() => onSave?.(set)}>收藏</button>
+        <button class="trade-btn save-btn" on:click|stopPropagation={() => onSave?.(set)}>
+          {$currentUiMessages.saveFavorite}
+        </button>
       {/if}
       <button
         class="trade-btn intl-trade"
         on:click|stopPropagation={() =>
           openTrade(jewel, resultConqueror, [set], platform, league, 'international', tradeCondition)}>
-        國際服交易
+        {$currentUiMessages.intlTrade}
       </button>
       <button
         class="trade-btn tw-trade"
         on:click|stopPropagation={() =>
           openTrade(jewel, resultConqueror, [set], platform, twLeague, 'tw', tradeCondition)}>
-        台服交易
+        {$currentUiMessages.twTrade}
       </button>
     </div>
   </div>

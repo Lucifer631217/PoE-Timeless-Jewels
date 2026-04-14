@@ -1,3 +1,5 @@
+import { getCurrentLocale, type OfficialStatLocale } from './i18n';
+
 /**
  * 流亡黯道官方繁體中文術語對應表
  * 參考官方資料與 PoEDB (https://poedb.tw/tw/Timeless_Jewel)
@@ -11,6 +13,82 @@ export const jewelNames: Record<number, string> = {
   4: '激進的信仰', // Militant Faith
   5: '優雅的高傲', // Elegant Hubris
   6: '英勇的悲劇' // Heroic Tragedy
+};
+
+const jewelNamesByLocale: Partial<Record<OfficialStatLocale, Record<number, string>>> = {
+  tw: jewelNames,
+  cn: {
+    1: '辉煌的虚荣',
+    2: '致命的骄傲',
+    3: '残酷的纪律',
+    4: '激进的信仰',
+    5: '优雅的高傲',
+    6: '英勇的悲剧'
+  },
+  de: {
+    1: 'Glorreiche Eitelkeit',
+    2: 'Tödlicher Stolz',
+    3: 'Brutale Zurückhaltung',
+    4: 'Militanter Glaube',
+    5: 'Elegante Hybris',
+    6: 'Heroische Tragödie'
+  },
+  es: {
+    1: 'Vanidad gloriosa',
+    2: 'Orgullo letal',
+    3: 'Contención brutal',
+    4: 'Fe militante',
+    5: 'Arrogancia elegante',
+    6: 'Tragedia heroica'
+  },
+  fr: {
+    1: 'Vanité glorieuse',
+    2: 'Fierté mortelle',
+    3: 'Retenue brutale',
+    4: 'Foi militante',
+    5: 'Hubris élégante',
+    6: 'Tragédie héroïque'
+  },
+  jp: {
+    1: '栄光の虚栄',
+    2: '致命的な誇り',
+    3: '残忍な抑制',
+    4: '過激な信仰',
+    5: '優雅な傲慢',
+    6: '英雄的悲劇'
+  },
+  kr: {
+    1: '영광스러운 허영',
+    2: '치명적인 긍지',
+    3: '잔혹한 절제',
+    4: '전투적인 신앙',
+    5: '우아한 오만',
+    6: '영웅적 비극'
+  },
+  po: {
+    1: 'Vaidade Gloriosa',
+    2: 'Orgulho Letal',
+    3: 'Restrição Brutal',
+    4: 'Fé Militante',
+    5: 'Hubris Elegante',
+    6: 'Tragédia Heroica'
+  },
+  ru: {
+    1: 'Славное тщеславие',
+    2: 'Смертельная гордость',
+    3: 'Жестокая сдержанность',
+    4: 'Воинственная вера',
+    5: 'Изысканная гордыня',
+    6: 'Героическая трагедия'
+  },
+  th: {
+    1: 'ความทะนงอันรุ่งโรจน์',
+    2: 'ศักดิ์ศรีมรณะ',
+    3: 'การยับยั้งอันโหดร้าย',
+    4: 'ศรัทธาอันแข็งกร้าว',
+    5: 'ความโอหังอันสง่างาม',
+    6: 'โศกนาฏกรรมวีรชน'
+  }
 };
 
 /** 征服者（傳說人物）名稱 */
@@ -51,6 +129,135 @@ export const conquerorNames: Record<string, string> = {
   Medved: '梅德偉'
 };
 
+const conquerorNamesByLocale: Partial<Record<OfficialStatLocale, Record<string, string>>> = {
+  tw: conquerorNames,
+  cn: {
+    Xibaqua: '赛巴昆',
+    Zerphi: '泽佛伊',
+    Ahuana: '阿呼阿娜',
+    Doryani: '多里亚尼',
+    Kaom: '冈姆',
+    Rakiata: '拉其塔',
+    Kiloava: '基洛阿瓦',
+    Akoya: '阿寇亚',
+    Deshret: '德什雷特',
+    Balbala: '贝尔巴拉',
+    Asenath: '安赛娜丝',
+    Nasima: '纳西玛',
+    Venarius: '维那利斯',
+    Maxarius: '玛萨里欧斯',
+    Dominus: '神主',
+    Avarius: '阿瓦里乌斯',
+    Cadiro: '卡迪罗',
+    Victario: '维多里奥',
+    Chitus: '切特斯',
+    Caspiro: '卡斯皮罗',
+    Vorana: '沃拉娜',
+    Uhtred: '乌特雷德',
+    Medved: '梅德韦德'
+  },
+  jp: {
+    Xibaqua: 'ジバクア',
+    Zerphi: 'ザーフィ',
+    Ahuana: 'アフアナ',
+    Doryani: 'ドリヤニ',
+    Kaom: 'カオム',
+    Rakiata: 'ラキアタ',
+    Kiloava: 'キロアヴァ',
+    Akoya: 'アコヤ',
+    Deshret: 'デシュレット',
+    Balbala: 'バルバラ',
+    Asenath: 'アセナス',
+    Nasima: 'ナシマ',
+    Venarius: 'ヴェナリウス',
+    Maxarius: 'マクサリウス',
+    Dominus: 'ドミナス',
+    Avarius: 'アヴァリウス',
+    Cadiro: 'カディロ',
+    Victario: 'ヴィクタリオ',
+    Chitus: 'チタス',
+    Caspiro: 'カスピロ',
+    Vorana: 'ヴォラナ',
+    Uhtred: 'ウートレッド',
+    Medved: 'メドヴェド'
+  },
+  kr: {
+    Xibaqua: '지바쿠아',
+    Zerphi: '제르피',
+    Ahuana: '아후아나',
+    Doryani: '도리아니',
+    Kaom: '카옴',
+    Rakiata: '라키아타',
+    Kiloava: '킬로아바',
+    Akoya: '아코야',
+    Deshret: '데슈렛',
+    Balbala: '발발라',
+    Asenath: '아세나스',
+    Nasima: '나시마',
+    Venarius: '베나리우스',
+    Maxarius: '막사리우스',
+    Dominus: '도미누스',
+    Avarius: '아바리우스',
+    Cadiro: '카디로',
+    Victario: '빅타리오',
+    Chitus: '치투스',
+    Caspiro: '카스피로',
+    Vorana: '보라나',
+    Uhtred: '우트레드',
+    Medved: '메드베드'
+  },
+  ru: {
+    Xibaqua: 'Зибакуа',
+    Zerphi: 'Зерфи',
+    Ahuana: 'Ахуана',
+    Doryani: 'Дориани',
+    Kaom: 'Каом',
+    Rakiata: 'Ракиата',
+    Kiloava: 'Килоава',
+    Akoya: 'Акоя',
+    Deshret: 'Дешрет',
+    Balbala: 'Балбала',
+    Asenath: 'Асенат',
+    Nasima: 'Насима',
+    Venarius: 'Венариус',
+    Maxarius: 'Максариус',
+    Dominus: 'Доминус',
+    Avarius: 'Авариус',
+    Cadiro: 'Кадиро',
+    Victario: 'Виктарио',
+    Chitus: 'Читус',
+    Caspiro: 'Каспиро',
+    Vorana: 'Ворана',
+    Uhtred: 'Утред',
+    Medved: 'Медвед'
+  },
+  th: {
+    Xibaqua: 'ซิบาควา',
+    Zerphi: 'เซอร์ฟี',
+    Ahuana: 'อาฮัวนา',
+    Doryani: 'ดอริยานี',
+    Kaom: 'คาโอ姆',
+    Rakiata: 'ราเคียตา',
+    Kiloava: 'คิโลอาวา',
+    Akoya: 'อาโคยา',
+    Deshret: 'เดชเรต',
+    Balbala: 'บัลบาลา',
+    Asenath: 'อาเซนาธ',
+    Nasima: 'นาซิมา',
+    Venarius: 'เวนาเรียส',
+    Maxarius: 'แมกซาเรียส',
+    Dominus: 'โดมินัส',
+    Avarius: 'อาวาเรียส',
+    Cadiro: 'คาดิโร',
+    Victario: 'วิคทาริโอ',
+    Chitus: 'ไคทัส',
+    Caspiro: 'คาสปิโร',
+    Vorana: 'โวรานา',
+    Uhtred: 'อูเทร็ด',
+    Medved: 'เมดเวด'
+  }
+};
+
 const exactLeagueNames: Record<string, string> = {
   Standard: '標準模式',
   Hardcore: '專家模式',
@@ -89,6 +296,91 @@ const leaguePhraseNames: Array<[string, string]> = [
   ['SSF', '自力'],
   ['HC', '專家']
 ];
+
+const leaguePhraseNamesByLocale: Partial<Record<OfficialStatLocale, Array<[string, string]>>> = {
+  tw: leaguePhraseNames,
+  cn: [
+    ['Solo Self-Found', '自力'],
+    ['Hardcore', '专家'],
+    ['Ruthless', '残暴'],
+    ['Standard', '标准'],
+    ['Mirage', '蜃景'],
+    ['SSF', '自力'],
+    ['HC', '专家']
+  ],
+  de: [
+    ['Solo Self-Found', 'Solo-Selbstgefunden'],
+    ['Hardcore', 'Hardcore'],
+    ['Ruthless', 'Rücksichtslos'],
+    ['Standard', 'Standard'],
+    ['Mirage', 'Mirage'],
+    ['SSF', 'SSF'],
+    ['HC', 'HC']
+  ],
+  es: [
+    ['Solo Self-Found', 'Solo autoencontrado'],
+    ['Hardcore', 'Hardcore'],
+    ['Ruthless', 'Despiadado'],
+    ['Standard', 'Estándar'],
+    ['Mirage', 'Espejismo'],
+    ['SSF', 'SSF'],
+    ['HC', 'HC']
+  ],
+  fr: [
+    ['Solo Self-Found', 'Solo Self-Found'],
+    ['Hardcore', 'Hardcore'],
+    ['Ruthless', 'Impitoyable'],
+    ['Standard', 'Standard'],
+    ['Mirage', 'Mirage'],
+    ['SSF', 'SSF'],
+    ['HC', 'HC']
+  ],
+  jp: [
+    ['Solo Self-Found', 'ソロセルフファウンド'],
+    ['Hardcore', 'ハードコア'],
+    ['Ruthless', 'ルースレス'],
+    ['Standard', 'スタンダード'],
+    ['Mirage', 'ミラージュ'],
+    ['SSF', 'SSF'],
+    ['HC', 'HC']
+  ],
+  kr: [
+    ['Solo Self-Found', '솔로 자급자족'],
+    ['Hardcore', '하드코어'],
+    ['Ruthless', '무자비'],
+    ['Standard', '스탠다드'],
+    ['Mirage', '신기루'],
+    ['SSF', 'SSF'],
+    ['HC', 'HC']
+  ],
+  po: [
+    ['Solo Self-Found', 'Solo Autoencontrado'],
+    ['Hardcore', 'Hardcore'],
+    ['Ruthless', 'Implacável'],
+    ['Standard', 'Padrão'],
+    ['Mirage', 'Miragem'],
+    ['SSF', 'SSF'],
+    ['HC', 'HC']
+  ],
+  ru: [
+    ['Solo Self-Found', 'Соло-самостоятельная'],
+    ['Hardcore', 'Хардкор'],
+    ['Ruthless', 'Безжалостная'],
+    ['Standard', 'Стандарт'],
+    ['Mirage', 'Мираж'],
+    ['SSF', 'SSF'],
+    ['HC', 'HC']
+  ],
+  th: [
+    ['Solo Self-Found', 'เล่นเดี่ยวหาเอง'],
+    ['Hardcore', 'ฮาร์ดคอร์'],
+    ['Ruthless', 'ไร้ปรานี'],
+    ['Standard', 'มาตรฐาน'],
+    ['Mirage', 'ภาพลวงตา'],
+    ['SSF', 'SSF'],
+    ['HC', 'HC']
+  ]
+};
 
 const exactLeagueNamesLower = Object.fromEntries(
   Object.entries(exactLeagueNames).map(([key, value]) => [key.toLowerCase(), value])
@@ -612,16 +904,32 @@ export const alternateAdditionNames: Record<string, string> = {
 };
 
 /** 把英文特殊天賦名稱翻譯為繁體中文（同時支援 Addition ID） */
-export const translateAlternateSkillName = (englishName: string): string => {
+const resolveLocale = (locale?: OfficialStatLocale): OfficialStatLocale => locale ?? getCurrentLocale();
+
+const shouldUseTraditionalChinese = (locale?: OfficialStatLocale): boolean => resolveLocale(locale) === 'tw';
+
+export const translateAlternateSkillName = (englishName: string, locale?: OfficialStatLocale): string => {
+  if (!shouldUseTraditionalChinese(locale)) {
+    return englishName;
+  }
+
   const normalized = englishName.trim();
-  return alternateSkillNames[normalized] ?? alternateAdditionNames[normalized] ?? alternateSkillNames[englishName] ?? alternateAdditionNames[englishName] ?? englishName;
+  return (
+    alternateSkillNames[normalized] ??
+    alternateAdditionNames[normalized] ??
+    alternateSkillNames[englishName] ??
+    alternateAdditionNames[englishName] ??
+    englishName
+  );
 };
 
 /** 把英文珠寶名稱翻譯為繁體中文 */
-export const translateJewelName = (id: number, englishName: string): string => jewelNames[id] ?? englishName;
+export const translateJewelName = (id: number, englishName: string, locale?: OfficialStatLocale): string =>
+  jewelNamesByLocale[resolveLocale(locale)]?.[id] ?? englishName;
 
 /** 把英文征服者名稱翻譯為繁體中文 */
-export const translateConquerorName = (englishName: string): string => conquerorNames[englishName] ?? englishName;
+export const translateConquerorName = (englishName: string, locale?: OfficialStatLocale): string =>
+  conquerorNamesByLocale[resolveLocale(locale)]?.[englishName] ?? englishName;
 
 export const englishFallbackTranslations: Record<string, string> = {
   'Divine Flesh': '神聖血肉',
@@ -869,7 +1177,7 @@ export const translateStatText = (id: number, template: string, roll: number): s
   return localizedTemplate.replace('#', roll.toString());
 };
 
-/** 聯盟顯示名稱翻譯，保留 value 供 API / trade 使用 */
+/** 台服 trade URL 需要使用繁中聯盟名稱，因此這裡固定回傳繁中。 */
 export const translateLeagueName = (englishName: string): string => {
   if (!englishName) {
     return englishName;
@@ -892,4 +1200,29 @@ export const translateLeagueName = (englishName: string): string => {
   }
 
   return translated.replace(/\s+/g, '');
+};
+
+/** UI 顯示用聯盟名稱；交易 URL 仍由 translateLeagueName 固定使用繁中。 */
+export const localizeLeagueName = (englishName: string, locale?: OfficialStatLocale): string => {
+  if (!englishName) {
+    return englishName;
+  }
+
+  const resolvedLocale = resolveLocale(locale);
+  if (resolvedLocale === 'tw') {
+    return translateLeagueName(englishName);
+  }
+
+  const normalized = englishName.trim();
+  const phraseNames = leaguePhraseNamesByLocale[resolvedLocale];
+  if (!phraseNames) {
+    return normalized;
+  }
+
+  let translated = normalized;
+  for (const [source, target] of phraseNames) {
+    translated = translated.replace(new RegExp(source, 'gi'), target);
+  }
+
+  return translated.replace(/\s+/g, resolvedLocale === 'cn' || resolvedLocale === 'jp' || resolvedLocale === 'kr' ? '' : ' ');
 };
