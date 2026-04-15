@@ -767,9 +767,20 @@
 
   let collapsed = false;
   let isMobileViewport = false;
+  const TREE_PANEL_STATE_EVENT = 'timeless-tree-panel-state';
   $: selectSearchable = !isMobileViewport;
   const platform = { value: 'PC', label: 'PC' };
   const selectFloatingConfig = { strategy: 'fixed' };
+
+  const dispatchTreePanelState = () => {
+    if (!browser) {
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent(TREE_PANEL_STATE_EVENT, { detail: { collapsed } }));
+  };
+
+  $: collapsed, dispatchTreePanelState();
 
   type LeagueOption = SelectOption<string>;
 
@@ -1450,6 +1461,7 @@
 
     syncViewportState();
     collapsed = isMobileViewport;
+    dispatchTreePanelState();
     window.addEventListener('resize', syncViewportState, { passive: true });
     getLeagues();
     getTWLeaguesData();

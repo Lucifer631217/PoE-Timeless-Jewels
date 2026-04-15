@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.5.3",
+  "version": "1.5.5",
   "scripts": {
     "build:wasm": "powershell -ExecutionPolicy Bypass -File .\\build-wasm.ps1",
     "dev": "vite dev",

@@ -2,6 +2,7 @@
   import '../app.scss';
   import { assets } from '$app/paths';
   import { browser } from '$app/environment';
+  import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import { loadSkillTree } from '../lib/skill_tree';
   import { syncWrap } from '../lib/worker';
@@ -12,6 +13,10 @@
   let wasmLoading = true;
   let loadError: string | null = null;
   const VERSION_CHECK_MARKER_KEY = 'app-version-reload-marker';
+  const TREE_PANEL_STATE_EVENT = 'timeless-tree-panel-state';
+  let treePanelExpanded = false;
+  $: isTreeRoute = $page.url.pathname.endsWith('/tree');
+  $: hideLocaleSwitcher = isTreeRoute && treePanelExpanded;
 
   // eslint-disable-next-line no-undef
   let go: any;
@@ -105,20 +110,27 @@
         }
       };
 
+      const handleTreePanelState = (event: Event) => {
+        const detail = (event as CustomEvent<{ collapsed?: boolean }>).detail;
+        treePanelExpanded = detail?.collapsed === false;
+      };
+
       void ensureFreshRuntime();
       window.addEventListener('focus', handleFocus);
       document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener(TREE_PANEL_STATE_EVENT, handleTreePanelState);
 
       return () => {
         disposed = true;
         window.removeEventListener('focus', handleFocus);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener(TREE_PANEL_STATE_EVENT, handleTreePanelState);
       };
     });
   }
 </script>
 
-<div class="locale-switcher-shell">
+<div class="locale-switcher-shell" class:locale-switcher-hidden={hideLocaleSwitcher}>
   <label class="locale-switcher">
     <span>{$currentUiMessages.languageLabel}</span>
     <select
@@ -164,6 +176,10 @@
     right: 16px;
     z-index: 120;
     pointer-events: none;
+  }
+
+  .locale-switcher-hidden {
+    display: none;
   }
 
   .locale-switcher {
