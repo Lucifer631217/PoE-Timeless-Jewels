@@ -294,12 +294,27 @@
     .locale-switcher-shell {
       top: calc(env(safe-area-inset-top) + 12px);
       right: 12px;
-      left: 12px;
     }
 
     .locale-switcher {
-      width: 100%;
-      justify-content: space-between;
+      max-width: 152px;
+      padding: 8px;
+      gap: 0;
+    }
+
+    .locale-switcher span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .locale-switcher select {
+      width: 136px;
+      max-width: calc(100vw - 24px);
+      padding: 8px;
     }
   }
 </style>

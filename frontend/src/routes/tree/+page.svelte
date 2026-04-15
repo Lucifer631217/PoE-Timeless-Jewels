@@ -3019,7 +3019,7 @@
       top: calc(env(safe-area-inset-top) + 12px);
       left: 12px;
       margin: 0;
-      z-index: 80;
+      z-index: 130;
     }
   }
 
