@@ -7,7 +7,14 @@
     tw: 'home-title.mp4',
     en: 'home-title-en.mp4',
     cn: 'home-title-cn.mp4',
-    jp: 'home-title-jp.mp4'
+    de: 'home-title-de.mp4',
+    es: 'home-title-es.mp4',
+    fr: 'home-title-fr.mp4',
+    jp: 'home-title-jp.mp4',
+    kr: 'home-title-kr.mp4',
+    po: 'home-title-po.mp4',
+    ru: 'home-title-ru.mp4',
+    th: 'home-title-th.mp4'
   };
 
   $: titleVideoSrc = `${assets}/media/${homeTitleVideos[$locale] ?? homeTitleVideos.tw ?? 'home-title.mp4'}`;
