@@ -114,6 +114,31 @@ function Download-JsonGzip {
     $source.Dispose()
     Remove-Item $temporaryFile -Force
 }
+function Download-OfficialTaiwanSkillTreeGzip {
+    param(
+        [string]$TreeVersion,
+        [string]$OutFile
+    )
+
+    $page = curl.exe -sfL "https://pathofexile.tw/passive-skill-tree/$TreeVersion"
+    $match = [regex]::Match($page, '(?s)var passiveSkillTreeData\s*=\s*(\{.*?\})\s*;\s*var ')
+    if (-not $match.Success) {
+        throw "Cannot extract passiveSkillTreeData from the official Taiwan skill tree."
+    }
+
+    $temporaryFile = "$OutFile.download"
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $OutFile) | Out-Null
+    [System.IO.File]::WriteAllText($temporaryFile, $match.Groups[1].Value, [System.Text.UTF8Encoding]::new($false))
+
+    $source = [System.IO.File]::OpenRead($temporaryFile)
+    $destination = [System.IO.File]::Create($OutFile)
+    $gzip = New-Object System.IO.Compression.GZipStream($destination, [System.IO.Compression.CompressionMode]::Compress)
+    $source.CopyTo($gzip)
+    $gzip.Dispose()
+    $destination.Dispose()
+    $source.Dispose()
+    Remove-Item $temporaryFile -Force
+}
 
 $availableVersions = Get-MetaVersions
 $resolvedGameVersion = Resolve-GameVersion -AvailableVersions $availableVersions -Requested $GameVersion -AllowFallback:$AllowFallbackToLatest
@@ -162,6 +187,11 @@ foreach ($locale in $officialStatLocales) {
 $poeDbLocales = @{ en = 'us'; cn = 'cn'; de = 'de'; es = 'sp'; fr = 'fr'; jp = 'jp'; kr = 'kr'; po = 'pt'; ru = 'ru'; th = 'th'; tw = 'tw' }
 New-Item -ItemType Directory -Force -Path ".\data\skill_tree_translations" | Out-Null
 foreach ($locale in $officialStatLocales) {
+    if ($locale -eq 'tw') {
+        Download-OfficialTaiwanSkillTreeGzip -TreeVersion $resolvedTreeVersion -OutFile ".\data\skill_tree_translations\tw\SkillTree.json.gz"
+        continue
+    }
+
     $poeDbLocale = $poeDbLocales[$locale]
     Download-JsonGzip -Url "https://poedb.tw/data/passive-skill-tree/$resolvedGameVersion/data_$poeDbLocale.json?5" -OutFile ".\data\skill_tree_translations\$locale\SkillTree.json.gz"
 }
