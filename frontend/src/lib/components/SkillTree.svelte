@@ -9,6 +9,7 @@
     drawnNodes,
     inverseSprites,
     inverseSpritesActive,
+    localizeSkillTreeNode,
     orbitAngleAt,
     skillTree,
     splitBilingualStatText,
@@ -385,8 +386,9 @@
     }
 
     if (hoveredNode) {
-      let nodeName = hoveredNode.name || '';
-      let nodeStats: { text: string; special: boolean }[] = (hoveredNode.stats || []).map((text) => ({
+      const localizedNode = localizeSkillTreeNode(hoveredNode);
+      let nodeName = localizedNode.name || '';
+      let nodeStats: { text: string; special: boolean }[] = (localizedNode.stats || []).map((text) => ({
         text,
         special: false
       }));

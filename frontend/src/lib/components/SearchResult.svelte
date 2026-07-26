@@ -1,6 +1,6 @@
 ﻿<script lang="ts">
   import type { SearchWithSeed, TradeCondition } from '../skill_tree';
-  import { formatBilingualStatHtml, skillTree, translateStatBilingual, openTrade } from '../skill_tree';
+  import { formatBilingualStatHtml, localizeSkillTreeNode, skillTree, translateStatBilingual, openTrade } from '../skill_tree';
   import { translateConquerorName } from '../zh_tw';
   import { currentUiMessages, locale, translateUi } from '../i18n';
 
@@ -69,7 +69,7 @@
   {#each set.skills as skill}
     <div class="skill-item">
       <span class="skill-name">
-        {skillTree.nodes[skill.passive].name}
+        {localizeSkillTreeNode(skillTree.nodes[skill.passive]).name}
         <span class="skill-id">({skill.passive})</span>
       </span>
       <ul class="skill-stats">

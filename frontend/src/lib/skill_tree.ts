@@ -15,6 +15,7 @@ export const inverseSpritesActive: Record<string, Sprite> = {};
 
 export const inverseTranslations: Record<string, Translation> = {};
 export const inverseTranslationsByLocale: Record<string, Record<string, Translation>> = {};
+export const skillTreeNodeTranslationsByLocale: Record<string, Record<string, Node>> = {};
 
 export const passiveToTree: Record<number, number> = {};
 
@@ -113,6 +114,7 @@ export const loadSkillTree = () => {
 
   Object.keys(inverseTranslations).forEach((key) => delete inverseTranslations[key]);
   Object.keys(inverseTranslationsByLocale).forEach((locale) => delete inverseTranslationsByLocale[locale]);
+  Object.keys(skillTreeNodeTranslationsByLocale).forEach((locale) => delete skillTreeNodeTranslationsByLocale[locale]);
 
   const localeTranslationGroups = [
     data.StatTranslationsByLocaleJSON || {},
@@ -134,6 +136,10 @@ export const loadSkillTree = () => {
     inverseTranslations[id] = descriptor;
   });
 
+  Object.entries(data.SkillTreeNodeTranslationsByLocaleJSON || {}).forEach(([locale, rawJson]) => {
+    skillTreeNodeTranslationsByLocale[locale] = JSON.parse(rawJson) as Record<string, Node>;
+  });
+
   const treeToPassive = data.TreeToPassive;
   if (treeToPassive) {
     Object.keys(treeToPassive).forEach((k) => {
@@ -145,6 +151,25 @@ export const loadSkillTree = () => {
   }
 };
 
+
+export const localizeSkillTreeNode = (node: Node): Node => {
+  if (node.skill === undefined) {
+    return node;
+  }
+
+  const localized = skillTreeNodeTranslationsByLocale[getCurrentLocale()]?.[node.skill.toString()];
+  if (!localized) {
+    return node;
+  }
+
+  return {
+    ...node,
+    name: localized.name || node.name,
+    stats: localized.stats || node.stats,
+    reminderText: localized.reminderText || node.reminderText,
+    masteryEffects: localized.masteryEffects || node.masteryEffects
+  };
+};
 const indexHandlers: Record<string, number> = {
   negate: -1,
   times_twenty: 1 / 20,

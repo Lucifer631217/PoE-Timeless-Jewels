@@ -69,11 +69,15 @@ var PassiveSkillAuraStatTranslationsJSON []byte
 //go:embed stat_translations/*/*.json.gz
 var statTranslationsFS embed.FS
 
+//go:embed skill_tree_translations/*/*.json.gz
+var skillTreeTranslationsFS embed.FS
+
 var (
 	OfficialStatTranslationLocales               []string
 	StatTranslationsByLocaleJSON                 map[string]string
 	PassiveSkillStatTranslationsByLocaleJSON     map[string]string
 	PassiveSkillAuraStatTranslationsByLocaleJSON map[string]string
+	SkillTreeNodeTranslationsByLocaleJSON        map[string]string
 )
 
 //go:embed possible_stats.json.gz
@@ -143,6 +147,7 @@ func init() {
 	StatTranslationsByLocaleJSON = loadTranslationJSONByLocale("stat_descriptions.json.gz")
 	PassiveSkillStatTranslationsByLocaleJSON = loadTranslationJSONByLocale("passive_skill_stat_descriptions.json.gz")
 	PassiveSkillAuraStatTranslationsByLocaleJSON = loadTranslationJSONByLocale("passive_skill_aura_stat_descriptions.json.gz")
+	SkillTreeNodeTranslationsByLocaleJSON = loadSkillTreeNodeTranslationJSONByLocale()
 	OfficialStatTranslationLocales = collectOfficialStatTranslationLocales()
 
 	PossibleStatsJSON = unzipTo(possibleStatsGz)
@@ -196,6 +201,42 @@ func loadTranslationJSONByLocale(fileName string) map[string]string {
 		}
 
 		result[locale] = string(unzipTo(content))
+	}
+
+	return result
+}
+
+// loadSkillTreeNodeTranslationJSONByLocale keeps only locale-specific node fields.
+// Geometry and node IDs still come from GGG's official skilltree-export.
+func loadSkillTreeNodeTranslationJSONByLocale() map[string]string {
+	entries, err := skillTreeTranslationsFS.ReadDir("skill_tree_translations")
+	if err != nil {
+		panic(err)
+	}
+
+	result := make(map[string]string, len(entries))
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		locale := entry.Name()
+		content, err := skillTreeTranslationsFS.ReadFile("skill_tree_translations/" + locale + "/SkillTree.json.gz")
+		if err != nil {
+			panic(err)
+		}
+
+		var tree map[string]json.RawMessage
+		if err := json.Unmarshal(unzipTo(content), &tree); err != nil {
+			panic(err)
+		}
+
+		nodes, ok := tree["nodes"]
+		if !ok {
+			panic("skill tree translation is missing nodes")
+		}
+
+		result[locale] = string(nodes)
 	}
 
 	return result

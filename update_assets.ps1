@@ -96,6 +96,24 @@ function Download-ToFile {
     Write-Host "Downloading: $Url"
     curl.exe -sfL "$Url" -o "$OutFile"
 }
+function Download-JsonGzip {
+    param(
+        [string]$Url,
+        [string]$OutFile
+    )
+
+    $temporaryFile = "$OutFile.download"
+    Download-ToFile -Url $Url -OutFile $temporaryFile
+
+    $source = [System.IO.File]::OpenRead($temporaryFile)
+    $destination = [System.IO.File]::Create($OutFile)
+    $gzip = New-Object System.IO.Compression.GZipStream($destination, [System.IO.Compression.CompressionMode]::Compress)
+    $source.CopyTo($gzip)
+    $gzip.Dispose()
+    $destination.Dispose()
+    $source.Dispose()
+    Remove-Item $temporaryFile -Force
+}
 
 $availableVersions = Get-MetaVersions
 $resolvedGameVersion = Resolve-GameVersion -AvailableVersions $availableVersions -Requested $GameVersion -AllowFallback:$AllowFallbackToLatest
@@ -139,6 +157,14 @@ foreach ($locale in $officialStatLocales) {
     Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/stat_translations/$locale/passive_skill_aura_stat_descriptions.json.gz" -OutFile ".\data\stat_translations\$locale\passive_skill_aura_stat_descriptions.json.gz"
 }
 
+# Localized passive tree nodes. PoEDB publishes the same graph in each supported locale;
+# GGG's official export above remains the geometry source.
+$poeDbLocales = @{ en = 'us'; cn = 'cn'; de = 'de'; es = 'sp'; fr = 'fr'; jp = 'jp'; kr = 'kr'; po = 'pt'; ru = 'ru'; th = 'th'; tw = 'tw' }
+New-Item -ItemType Directory -Force -Path ".\data\skill_tree_translations" | Out-Null
+foreach ($locale in $officialStatLocales) {
+    $poeDbLocale = $poeDbLocales[$locale]
+    Download-JsonGzip -Url "https://poedb.tw/data/passive-skill-tree/$resolvedGameVersion/data_$poeDbLocale.json?5" -OutFile ".\data\skill_tree_translations\$locale\SkillTree.json.gz"
+}
 # Keep legacy English exports for compatibility with the current data package.
 Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/stat_translations/en/stat_descriptions.json.gz" -OutFile ".\data\stat_descriptions.json.gz"
 Download-ToFile -Url "https://go-pob-data.pages.dev/data/$resolvedGameVersion/stat_translations/en/passive_skill_stat_descriptions.json.gz" -OutFile ".\data\passive_skill_stat_descriptions.json.gz"

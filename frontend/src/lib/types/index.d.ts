@@ -88,6 +88,7 @@ export declare namespace data {
   const PassiveSkills: Array<data.PassiveSkill | undefined> | undefined;
   const PossibleStats: string;
   const SkillTree: string;
+  const SkillTreeNodeTranslationsByLocaleJSON: Record<string, string> | undefined;
   const StatTranslationsByLocaleJSON: Record<string, string> | undefined;
   const StatTranslationsJSON: string;
   const TimelessJewelConquerors: Record<number, Record<string, data.TimelessJewelConqueror | undefined> | undefined> | undefined;

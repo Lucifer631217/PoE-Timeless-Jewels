@@ -30,6 +30,7 @@
     clearTradeOpenFeedback,
     formatBilingualStatHtml,
     getAffectedNodes,
+    localizeSkillTreeNode,
     openTrade,
     skillTree,
     splitBilingualStatText,
@@ -904,7 +905,7 @@
 
     return {
       passive: entry.node,
-      passiveName: skillTree.nodes[entry.node]?.name || entry.node.toString(),
+      passiveName: localizeSkillTreeNode(skillTree.nodes[entry.node] || {}).name || entry.node.toString(),
       stats
     };
   };
@@ -913,7 +914,7 @@
     set.skills
       .map((skill) => ({
         passive: skill.passive,
-        passiveName: skillTree.nodes[skill.passive]?.name || skill.passive.toString(),
+        passiveName: localizeSkillTreeNode(skillTree.nodes[skill.passive] || {}).name || skill.passive.toString(),
         stats: uniqueStrings(
           Object.entries(skill.stats).map(([statId, rollValue]) => translateStatBilingual(statId, rollValue as number))
         )

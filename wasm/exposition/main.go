@@ -44,6 +44,7 @@ func Expose() *crystalline.Exposer {
 	e.ExposeOrPanic(data.StatTranslationsByLocaleJSON, "data", "StatTranslationsByLocaleJSON")
 	e.ExposeOrPanic(data.PassiveSkillStatTranslationsByLocaleJSON, "data", "PassiveSkillStatTranslationsByLocaleJSON")
 	e.ExposeOrPanic(data.PassiveSkillAuraStatTranslationsByLocaleJSON, "data", "PassiveSkillAuraStatTranslationsByLocaleJSON")
+	e.ExposeOrPanic(data.SkillTreeNodeTranslationsByLocaleJSON, "data", "SkillTreeNodeTranslationsByLocaleJSON")
 	e.ExposeOrPanic(string(data.PossibleStatsJSON), "data", "PossibleStats")
 
 	return e
