@@ -13,6 +13,7 @@
   let wasmLoading = true;
   let loadError: string | null = null;
   const VERSION_CHECK_MARKER_KEY = 'app-version-reload-marker';
+  const WASM_ASSET_REVISION = 'tw-tree-20260727-1';
   const TREE_PANEL_STATE_EVENT = 'timeless-tree-panel-state';
   let treePanelExpanded = false;
   $: isTreeRoute = $page.url.pathname.endsWith('/tree');
@@ -55,7 +56,7 @@
     try {
       // @ts-ignore
       go = new globalThis.Go();
-      const response = await fetch(`${assets}/calculator.wasm?v=${APP_VERSION}`);
+      const response = await fetch(`${assets}/calculator.wasm?v=${APP_VERSION}-${WASM_ASSET_REVISION}`, { cache: 'no-store' });
       if (!response.ok) {
         throw new Error(`WASM 請求失敗（HTTP ${response.status}）`);
       }
