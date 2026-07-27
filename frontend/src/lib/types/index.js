@@ -20,6 +20,7 @@ export const initializeCrystalline = () => {
     PassiveSkills: globalThis["go"]["timeless-jewels"]["data"]["PassiveSkills"],
     PossibleStats: globalThis["go"]["timeless-jewels"]["data"]["PossibleStats"],
     SkillTree: globalThis["go"]["timeless-jewels"]["data"]["SkillTree"],
+    SkillTreeNodeTranslationsByLocaleJSON: globalThis["go"]["timeless-jewels"]["data"]["SkillTreeNodeTranslationsByLocaleJSON"],
     StatTranslationsByLocaleJSON: globalThis["go"]["timeless-jewels"]["data"]["StatTranslationsByLocaleJSON"],
     StatTranslationsJSON: globalThis["go"]["timeless-jewels"]["data"]["StatTranslationsJSON"],
     TimelessJewelConquerors: globalThis["go"]["timeless-jewels"]["data"]["TimelessJewelConquerors"],
